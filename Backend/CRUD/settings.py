@@ -11,10 +11,15 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# 금감원 open api
+load_dotenv(os.path.join(BASE_DIR, '.env'))
+API_KEY = os.environ.get('API_KEY')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -71,6 +76,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # corsheaders
     'django.middleware.common.CommonMiddleware',
+    'allauth.account.middleware.AccountMiddleware',  # allauth
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -154,6 +160,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'users.User' # users 앱의 User 모델을 사용
+# AUTH_USER_MODEL = 'users.User' # users 앱의 User 모델을 사용
 
 ACCOUNT_EMAIL_VERIFICATION = 'none'
