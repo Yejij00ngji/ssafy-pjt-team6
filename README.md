@@ -1,1 +1,0 @@
-# ssafy-pjt-team6
