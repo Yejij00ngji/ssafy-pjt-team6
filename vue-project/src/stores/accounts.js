@@ -8,44 +8,52 @@ export const useAccountStore = defineStore('account', () => {
 
   const router = useRouter()
   
-  const user = ref(null)
   const token = ref(null)
+  const user = ref(null)
 
   const isLogin = computed(() => {
     return token.value ? true : false
   })
 
-  const isMyData = ref(false)
+  const isMyData = computed(() => {
+    if (user.value){
+      return user.value.is_mydata_agreed ? true : false
+    }
+    
+    else {
+      return false
+    }
+  })
 
   const subscriptions = ref(null)
   const cluster_info = ref(null)
 
-  const signUp = async ({username,password1,password2}) => {
-    const response = await axios.post(`${API_URL}/accounts/signup/`,{username,password1,password2})
+  const signUp = async ({username,password1,password2,birth_date,salary,possessions,is_mydata_agreed}) => {
+    const response = await axios.post(`${API_URL}/accounts/signup/`,{username,password1,password2,birth_date,salary,possessions,is_mydata_agreed})
+
     token.value = response.data.key
+    user.value = response.data.user
 
     router.push({ name: 'Home' })
-
-    console.log(token.value)
   }
 
   const logIn = async ({username,password}) => {
     const response = await axios.post(`${API_URL}/accounts/login/`,{username,password})
+
     token.value = response.data.key
+    user.value = response.data.user
 
     router.push({ name: 'Home' })
-
-    console.log(token.value)
   }
 
   const logOut = async () => {
     await axios.post(`${API_URL}/accounts/logout/`)
+    
     token.value = null
+    user.value = null
 
     router.push({ name: 'LoginView' })
-
-    console.log(token.value)
   }
 
-  return { API_URL, user, isLogin, isMyData, subscriptions, cluster_info, signUp, logIn, logOut }
+  return { API_URL, token, user, isLogin, isMyData, subscriptions, cluster_info, signUp, logIn, logOut }
 }, { persist: true })
