@@ -1,0 +1,10 @@
+{
+    // Python 인터프리터 경로를 검색할 폴더 목록을 지정합니다. (현재 워크스페이스 내부를 검색)
+    "python.venvFolders": [
+        "." 
+    ],
+    // 가상 환경을 만들 때 기본 이름을 "venv"로 설정합니다.
+    "python.defaultVenvName": "venv",
+    // 가상 환경 경로를 현재 디렉토리(Backend 폴더) 내로 지정합니다.
+    "python.venvPath": "./"
+}

@@ -63,7 +63,7 @@ SITE_ID = 1
 REST_FRAMEWORK = {
     # Authentication
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.TokenAuthentication',  # 기본 토큰 사용
     ],
     # permission
     'DEFAULT_PERMISSION_CLASSES': [
