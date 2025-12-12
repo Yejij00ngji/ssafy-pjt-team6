@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>로그인</h1>
-    <!-- <form @submit.prevent="logIn">
+    <form @submit.prevent="logIn">
       <label for="username">username: </label><br>
       <input type="text" id="username" v-model.trim="username">
       <br>
@@ -9,12 +9,27 @@
       <input type="password" id="password" v-model.trim="password">
       <br>
       <input type="submit" value="LogIn">
-    </form> -->
+    </form>
   </div>
 </template>
 
 <script setup>
+import { useAccountStore } from '@/stores/accounts';
+import { ref } from 'vue';
 
+const accountStore = useAccountStore()
+
+const username = ref(null)
+const password = ref(null)
+
+const logIn = () => {
+  const payload = {
+    username: username.value,
+    password: password.value,
+  }
+
+  accountStore.logIn(payload)
+}
 </script>
 
 <style scoped>

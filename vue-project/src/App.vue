@@ -12,6 +12,10 @@ const router = useRouter()
 const accountstore = useAccountStore()
 const store = useProductStore()
 
+const logOut = () => {
+  accountstore.logOut()
+}
+
 </script>
 
 <template>
@@ -27,7 +31,7 @@ const store = useProductStore()
           <span> | </span>
         </template>
         <template v-else>
-          <RouterLink>logout</RouterLink>
+          <a href="#" @click.prevent="logOut">logout</a>
           <span> | </span>
         </template>
         <RouterLink :to="{name:'FinanceProducts'}">finance</RouterLink>

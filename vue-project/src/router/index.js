@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAccountStore } from '@/stores/accounts'
 
 const login_required = ['']
-const login_not_allowed = ['']
+const login_not_allowed = ['SignUpView']
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -53,7 +53,7 @@ router.beforeEach((to,from) => {
     return {name: 'LoginView'}
   }
 
-  if (to.name === 'SignUpView' && accountstore.isLogin){
+  if (to.name in login_not_allowed && accountstore.isLogin){
     window.alert('이미 로그인 되어 있습니다.')
     return { name: 'Home' }
   }
