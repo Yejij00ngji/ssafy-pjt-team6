@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'users',
     'products',
     # 라이브러리
+    'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
     'dj_rest_auth',
@@ -68,6 +69,9 @@ REST_FRAMEWORK = {
     # permission
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
     ],
 }
 
