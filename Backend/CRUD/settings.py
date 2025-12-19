@@ -37,8 +37,10 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     # 사용자 정의 앱
-    'users',
-    'products',
+    'community',  # 커뮤니티
+    'externals',  # 외부기능(지도, 유튜브)
+    'users',  # 사용자
+    'products',  # 예적금상품
     # 라이브러리
     'rest_framework',
     'rest_framework.authtoken',
