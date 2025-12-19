@@ -13,22 +13,22 @@ const router = createRouter({
       component: () => import('@/views/Home.vue')
     },
     {
-      path: '/login/',
+      path: '/login',
       name: 'LoginView',
       component: () => import('@/views/LoginView.vue')
     },
     {
-      path: '/signup/',
+      path: '/signup',
       name: 'SignUpView',
       component: () => import('@/views/SignUpView.vue')
     },
     {
-      path: '/community/',
+      path: '/community',
       name: 'Community',
       component: () => import('@/views/Community.vue')
     },
     {
-      path: '/products/',
+      path: '/products',
       name: 'Products',
       component: () => import('@/views/Products.vue')
     },
@@ -38,29 +38,34 @@ const router = createRouter({
       component: () => import('@/views/ProductDetails.vue')
     },
     {
-      path: '/goods/',
+      path: '/goods',
       name: 'Goods',
       component: () => import('@/views/Goods.vue')
     },
     {
-      path: '/map/',
+      path: '/externals/map',
       name: 'Map',
       component: () => import('@/views/Map.vue')
     },
     {
-      path: '/profile/',
+      path: '/profile',
       name: 'Profile',
       component: () => import('@/views/Profile.vue')
     },
     {
-      path: '/recommendations/',
+      path: '/recommendations',
       name: 'Recommendations',
       component: () => import('@/views/Recommendations.vue')
     },
     {
-      path: '/search/',
+      path: '/externals/search',
       name: 'Search',
       component: () => import('@/views/Search.vue')
+    },
+    {
+      path: '/externals/search/:videoId',
+      name: 'SearchDetail',
+      component: () => import('@/views/SearchDetail.vue')
     },
   ],
 })
