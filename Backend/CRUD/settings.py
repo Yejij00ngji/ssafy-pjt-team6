@@ -17,12 +17,15 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# 금감원 open api
+# 1. 금감원 open api
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 API_KEY = os.environ.get('API_KEY')
 
-# youtube api key
+# 2. youtube api key
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
+
+# 3. kakao path key
+KAKAO_PATH_KEY = os.getenv('KAKAO_PATH_KEY')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
