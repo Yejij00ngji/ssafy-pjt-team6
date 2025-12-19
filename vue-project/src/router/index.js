@@ -23,24 +23,39 @@ const router = createRouter({
       component: () => import('@/views/SignUpView.vue')
     },
     {
-      path: '/products/finance',
-      name: 'FinanceProducts',
-      component: () => import('@/views/FinanaceProducts.vue')
+      path: '/community/',
+      name: 'Community',
+      component: () => import('@/views/Community.vue')
     },
     {
-      path: '/products/recommand',
-      name: 'RecommandProducts',
-      component: () => import('@/views/RecommandProducts.vue')
+      path: '/products/',
+      name: 'Products',
+      component: () => import('@/views/Products.vue')
     },
     {
-      path: '/exchange/',
-      name: 'ExchangeRate',
-      component: () => import('@/views/ExchangeRate.vue')
+      path: '/goods/',
+      name: 'Goods',
+      component: () => import('@/views/Goods.vue')
     },
     {
       path: '/map/',
       name: 'Map',
       component: () => import('@/views/Map.vue')
+    },
+    {
+      path: '/profile/',
+      name: 'Profile',
+      component: () => import('@/views/Profile.vue')
+    },
+    {
+      path: '/recommendations/',
+      name: 'Recommendations',
+      component: () => import('@/views/Recommendations.vue')
+    },
+    {
+      path: '/search/',
+      name: 'Search',
+      component: () => import('@/views/Search.vue')
     },
   ],
 })

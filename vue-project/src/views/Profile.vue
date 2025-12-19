@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>
-      상품 가입
+      프로필
     </h1>
   </div>
 </template>

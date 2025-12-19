@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>
-      환율
+      상품
     </h1>
   </div>
 </template>

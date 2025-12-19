@@ -29,18 +29,24 @@ const logOut = () => {
           <span> | </span>
           <RouterLink :to="{name:'SignUpView'}">signup</RouterLink>
           <span> | </span>
+          <RouterLink :to="{name:'Profile'}">profile</RouterLink>
+          <span> | </span>
         </template>
         <template v-else>
           <a href="#" @click.prevent="logOut">logout</a>
           <span> | </span>
         </template>
-        <RouterLink :to="{name:'FinanceProducts'}">finance</RouterLink>
+        <RouterLink :to="{name:'Products'}">finance</RouterLink>
         <span> | </span>
-        <RouterLink :to="{name:'RecommandProducts'}">recommand</RouterLink>
+        <RouterLink :to="{name:'Search'}">search</RouterLink>
         <span> | </span>
-        <RouterLink :to="{name:'ExchangeRate'}">exchange</RouterLink>
+        <RouterLink :to="{name:'Recommendations'}">recommand</RouterLink>
         <span> | </span>
         <RouterLink :to="{name:'Map'}">map</RouterLink>
+        <span> | </span>
+        <RouterLink :to="{name:'Goods'}">goods</RouterLink>
+        <span> | </span>
+        <RouterLink :to="{name:'Community'}">community</RouterLink>
       </nav>
     </div>
   </header>
