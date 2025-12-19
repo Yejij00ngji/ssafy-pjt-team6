@@ -1,18 +1,56 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAccountStore } from './accounts'
+import { useAccountStore } from '@/stores/accounts'
 import axios from 'axios'
 
 export const useProductStore = defineStore('product', () => {
   
-  const accountstore = useAccountStore()
+  const accountStore = useAccountStore()
 
-  const products_recommanded = ref(null)
-  const products_finance = ref(null)
+  const getProducts = async ({ bank, term }) => {
+    const response = await axios.get(
+      `${accountStore.API_URL}/products/`,{
+      headers: {
+        'Authorization': `Token ${accountStore.token}`
+      },
+      params: {
+        bank: bank || undefined,
+        term: term || undefined
+      }
+      })
+    
+    console.log(response.data)
 
-  const map_info = ref(null)
-  const currencies = ref(null)
+    return response.data
+  }
 
-  return { products_finance, products_recommanded, map_info, currencies }
+  const getProductDetails = async (id) => {
+    const response = await axios.get(
+      `${accountStore.API_URL}/products/${id}`,{
+      headers: {
+        'Authorization': `Token ${accountStore.token}`
+      },
+      })
+    
+    console.log(response.data)
+
+    return response.data
+  }
+
+  const subscribeProduct = async ({deposit_option, amounts}) => {
+    await axios.post(
+      `${accountStore.API_URL}/accounts/subscriptions/`,
+      {
+        deposit_option: deposit_option,
+        amounts: amounts,
+      },
+      {
+      headers: {
+        'Authorization': `Token ${accountStore.token}`
+        },
+      })
+  }
+
+  return { getProducts, getProductDetails, subscribeProduct }
 }, { persist: true })
