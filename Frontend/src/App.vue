@@ -40,7 +40,7 @@ const logOut = () => {
         <span> | </span>
         <RouterLink :to="{name:'Search'}">search</RouterLink>
         <span> | </span>
-        <RouterLink :to="{name:'Recommendations'}">recommand</RouterLink>
+        <RouterLink :to="{name:'Recommendations'}">recommend</RouterLink>
         <span> | </span>
         <RouterLink :to="{name:'Map'}">map</RouterLink>
         <span> | </span>
