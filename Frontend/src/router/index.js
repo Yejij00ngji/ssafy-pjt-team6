@@ -16,33 +16,33 @@ const router = createRouter({
     {
       path: '/login',
       name: 'LoginView',
-      component: () => import('@/views/LoginView.vue')
+      component: () => import('@/views/users/LoginView.vue')
     },
     {
       path: '/signup',
       name: 'SignUpView',
-      component: () => import('@/views/SignUpView.vue')
+      component: () => import('@/views/users/SignUpView.vue')
     },
     {
       path: '/profile',
       name: 'Profile',
-      component: () => import('@/views/Profile.vue')
+      component: () => import('@/views/users/Profile.vue')
     },
     {
       path: '/subscribe/:id',
       name: 'Subscribe',
-      component: () => import('@/views/Subscribe.vue')
+      component: () => import('@/views/users/Subscribe.vue')
     },
     //상품
     {
       path: '/products',
       name: 'Products',
-      component: () => import('@/views/Products.vue')
+      component: () => import('@/views/products/Products.vue')
     },
     {
       path: '/products/:id',
       name: 'ProductDetails',
-      component: () => import('@/views/ProductDetails.vue')
+      component: () => import('@/views/products/ProductDetails.vue')
     },
     // 상품 추천
     {
@@ -75,22 +75,22 @@ const router = createRouter({
     {
       path: '/goods',
       name: 'Goods',
-      component: () => import('@/views/Goods.vue')
+      component: () => import('@/views/externals/Goods.vue')
     },
     {
       path: '/externals/map',
       name: 'Map',
-      component: () => import('@/views/Map.vue')
+      component: () => import('@/views/externals/Map.vue')
     },
     {
       path: '/externals/search',
       name: 'Search',
-      component: () => import('@/views/Search.vue')
+      component: () => import('@/views/externals/Search.vue')
     },
     {
       path: '/externals/search/:videoId',
       name: 'SearchDetail',
-      component: () => import('@/views/SearchDetail.vue')
+      component: () => import('@/views/externals/SearchDetail.vue')
     },
   ],
 })
