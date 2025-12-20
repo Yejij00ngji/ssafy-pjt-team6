@@ -1,0 +1,1702 @@
+[
+  {
+    "model": "users.user",
+    "pk": 1,
+    "fields": {
+      "username": "user1",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user1@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1992-04-12",
+      "salary": 32740000,
+      "possessions": 469740000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 2,
+    "fields": {
+      "username": "user2",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user2@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2003-11-21",
+      "salary": 95560000,
+      "possessions": 360880000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 3,
+    "fields": {
+      "username": "user3",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user3@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1988-05-29",
+      "salary": 70050000,
+      "possessions": 145690000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 4,
+    "fields": {
+      "username": "user4",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user4@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1992-10-03",
+      "salary": 93740000,
+      "possessions": 334750000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 5,
+    "fields": {
+      "username": "user5",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user5@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1983-06-24",
+      "salary": 44170000,
+      "possessions": 34770000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 6,
+    "fields": {
+      "username": "user6",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user6@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1988-02-13",
+      "salary": 78710000,
+      "possessions": 35630000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 7,
+    "fields": {
+      "username": "user7",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user7@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1982-01-24",
+      "salary": 71790000,
+      "possessions": 316600000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 8,
+    "fields": {
+      "username": "user8",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user8@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2000-01-18",
+      "salary": 117850000,
+      "possessions": 323580000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 9,
+    "fields": {
+      "username": "user9",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user9@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1979-01-07",
+      "salary": 37570000,
+      "possessions": 407960000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 10,
+    "fields": {
+      "username": "user10",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user10@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2000-12-22",
+      "salary": 34110000,
+      "possessions": 335630000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 11,
+    "fields": {
+      "username": "user11",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user11@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1976-02-02",
+      "salary": 116470000,
+      "possessions": 76670000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 12,
+    "fields": {
+      "username": "user12",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user12@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1998-07-15",
+      "salary": 51390000,
+      "possessions": 452610000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 13,
+    "fields": {
+      "username": "user13",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user13@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1982-05-06",
+      "salary": 55300000,
+      "possessions": 458220000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 14,
+    "fields": {
+      "username": "user14",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user14@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1992-08-03",
+      "salary": 39970000,
+      "possessions": 319430000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 15,
+    "fields": {
+      "username": "user15",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user15@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2001-07-29",
+      "salary": 79420000,
+      "possessions": 194580000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 16,
+    "fields": {
+      "username": "user16",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user16@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1994-11-02",
+      "salary": 73190000,
+      "possessions": 187890000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 17,
+    "fields": {
+      "username": "user17",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user17@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2003-04-03",
+      "salary": 93430000,
+      "possessions": 12040000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 18,
+    "fields": {
+      "username": "user18",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user18@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2002-11-04",
+      "salary": 61770000,
+      "possessions": 417300000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 19,
+    "fields": {
+      "username": "user19",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user19@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1993-01-30",
+      "salary": 103630000,
+      "possessions": 131830000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 20,
+    "fields": {
+      "username": "user20",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user20@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1992-12-17",
+      "salary": 103440000,
+      "possessions": 230320000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 21,
+    "fields": {
+      "username": "user21",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user21@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1982-05-27",
+      "salary": 90220000,
+      "possessions": 175770000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 22,
+    "fields": {
+      "username": "user22",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user22@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1990-11-10",
+      "salary": 98370000,
+      "possessions": 373740000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 23,
+    "fields": {
+      "username": "user23",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user23@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2000-07-24",
+      "salary": 92280000,
+      "possessions": 468230000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 24,
+    "fields": {
+      "username": "user24",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user24@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1980-09-17",
+      "salary": 88350000,
+      "possessions": 295850000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 25,
+    "fields": {
+      "username": "user25",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user25@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1985-09-06",
+      "salary": 64360000,
+      "possessions": 322140000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 26,
+    "fields": {
+      "username": "user26",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user26@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1991-09-08",
+      "salary": 119080000,
+      "possessions": 341120000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 27,
+    "fields": {
+      "username": "user27",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user27@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1976-04-10",
+      "salary": 102200000,
+      "possessions": 265700000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 28,
+    "fields": {
+      "username": "user28",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user28@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1988-07-03",
+      "salary": 69920000,
+      "possessions": 330560000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 29,
+    "fields": {
+      "username": "user29",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user29@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1978-02-14",
+      "salary": 102760000,
+      "possessions": 90480000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 30,
+    "fields": {
+      "username": "user30",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user30@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1996-03-14",
+      "salary": 65210000,
+      "possessions": 281140000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 31,
+    "fields": {
+      "username": "user31",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user31@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1990-07-24",
+      "salary": 37200000,
+      "possessions": 282180000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 32,
+    "fields": {
+      "username": "user32",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user32@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2002-03-03",
+      "salary": 110770000,
+      "possessions": 318920000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 33,
+    "fields": {
+      "username": "user33",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user33@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1989-10-11",
+      "salary": 74120000,
+      "possessions": 173860000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 34,
+    "fields": {
+      "username": "user34",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user34@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1990-09-16",
+      "salary": 97560000,
+      "possessions": 349040000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 35,
+    "fields": {
+      "username": "user35",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user35@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1989-09-22",
+      "salary": 92610000,
+      "possessions": 250280000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 36,
+    "fields": {
+      "username": "user36",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user36@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1979-08-28",
+      "salary": 100430000,
+      "possessions": 172270000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 37,
+    "fields": {
+      "username": "user37",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user37@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1986-01-05",
+      "salary": 65230000,
+      "possessions": 212600000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 38,
+    "fields": {
+      "username": "user38",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user38@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1976-08-29",
+      "salary": 40040000,
+      "possessions": 404790000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 39,
+    "fields": {
+      "username": "user39",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user39@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2000-03-04",
+      "salary": 42610000,
+      "possessions": 104810000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 40,
+    "fields": {
+      "username": "user40",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user40@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1978-07-14",
+      "salary": 104170000,
+      "possessions": 328330000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 41,
+    "fields": {
+      "username": "user41",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user41@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2001-05-22",
+      "salary": 100260000,
+      "possessions": 16670000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 42,
+    "fields": {
+      "username": "user42",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user42@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2000-06-09",
+      "salary": 31670000,
+      "possessions": 104040000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 43,
+    "fields": {
+      "username": "user43",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user43@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2003-11-17",
+      "salary": 63960000,
+      "possessions": 131140000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 44,
+    "fields": {
+      "username": "user44",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user44@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1994-03-13",
+      "salary": 87580000,
+      "possessions": 11780000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 45,
+    "fields": {
+      "username": "user45",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user45@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1988-06-21",
+      "salary": 45050000,
+      "possessions": 363450000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 46,
+    "fields": {
+      "username": "user46",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user46@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1992-10-08",
+      "salary": 71090000,
+      "possessions": 498000000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 47,
+    "fields": {
+      "username": "user47",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user47@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1977-11-23",
+      "salary": 31140000,
+      "possessions": 372860000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 48,
+    "fields": {
+      "username": "user48",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user48@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1981-03-27",
+      "salary": 63600000,
+      "possessions": 489060000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 49,
+    "fields": {
+      "username": "user49",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user49@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1983-12-31",
+      "salary": 115130000,
+      "possessions": 22410000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 50,
+    "fields": {
+      "username": "user50",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user50@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1981-09-28",
+      "salary": 84350000,
+      "possessions": 162100000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 51,
+    "fields": {
+      "username": "user51",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user51@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1999-06-25",
+      "salary": 109270000,
+      "possessions": 18120000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 52,
+    "fields": {
+      "username": "user52",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user52@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1994-09-19",
+      "salary": 72280000,
+      "possessions": 326890000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 53,
+    "fields": {
+      "username": "user53",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user53@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1994-07-29",
+      "salary": 99960000,
+      "possessions": 398710000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 54,
+    "fields": {
+      "username": "user54",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user54@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2004-05-27",
+      "salary": 64860000,
+      "possessions": 283650000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 55,
+    "fields": {
+      "username": "user55",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user55@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1997-04-19",
+      "salary": 37630000,
+      "possessions": 108840000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 56,
+    "fields": {
+      "username": "user56",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user56@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2000-09-30",
+      "salary": 34190000,
+      "possessions": 102850000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 57,
+    "fields": {
+      "username": "user57",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user57@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1994-07-06",
+      "salary": 50150000,
+      "possessions": 292340000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 58,
+    "fields": {
+      "username": "user58",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user58@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1990-05-08",
+      "salary": 38690000,
+      "possessions": 184500000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 59,
+    "fields": {
+      "username": "user59",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user59@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1977-09-08",
+      "salary": 112180000,
+      "possessions": 496410000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 60,
+    "fields": {
+      "username": "user60",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user60@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1987-12-01",
+      "salary": 86680000,
+      "possessions": 85940000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 61,
+    "fields": {
+      "username": "user61",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user61@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1984-06-13",
+      "salary": 111370000,
+      "possessions": 397260000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 62,
+    "fields": {
+      "username": "user62",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user62@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1978-08-11",
+      "salary": 71360000,
+      "possessions": 137930000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 63,
+    "fields": {
+      "username": "user63",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user63@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1998-08-16",
+      "salary": 101300000,
+      "possessions": 195270000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 64,
+    "fields": {
+      "username": "user64",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user64@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2003-07-30",
+      "salary": 98610000,
+      "possessions": 62200000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 65,
+    "fields": {
+      "username": "user65",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user65@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1979-11-20",
+      "salary": 100010000,
+      "possessions": 267910000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 66,
+    "fields": {
+      "username": "user66",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user66@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2001-06-07",
+      "salary": 111130000,
+      "possessions": 293220000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 67,
+    "fields": {
+      "username": "user67",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user67@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2005-12-21",
+      "salary": 107070000,
+      "possessions": 139440000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 68,
+    "fields": {
+      "username": "user68",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user68@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2004-08-28",
+      "salary": 101970000,
+      "possessions": 461970000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 69,
+    "fields": {
+      "username": "user69",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user69@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1980-05-24",
+      "salary": 83860000,
+      "possessions": 417230000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 70,
+    "fields": {
+      "username": "user70",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user70@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1990-09-14",
+      "salary": 77580000,
+      "possessions": 384820000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 71,
+    "fields": {
+      "username": "user71",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user71@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1984-02-24",
+      "salary": 67320000,
+      "possessions": 136200000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 72,
+    "fields": {
+      "username": "user72",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user72@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2004-12-19",
+      "salary": 42560000,
+      "possessions": 104370000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 73,
+    "fields": {
+      "username": "user73",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user73@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1997-07-17",
+      "salary": 59450000,
+      "possessions": 239820000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 74,
+    "fields": {
+      "username": "user74",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user74@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1987-06-20",
+      "salary": 69760000,
+      "possessions": 234030000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 75,
+    "fields": {
+      "username": "user75",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user75@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2002-01-13",
+      "salary": 108360000,
+      "possessions": 101320000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 76,
+    "fields": {
+      "username": "user76",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user76@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1977-01-03",
+      "salary": 81690000,
+      "possessions": 222460000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 77,
+    "fields": {
+      "username": "user77",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user77@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2000-09-27",
+      "salary": 83620000,
+      "possessions": 217560000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 78,
+    "fields": {
+      "username": "user78",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user78@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1992-04-01",
+      "salary": 60060000,
+      "possessions": 140730000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 79,
+    "fields": {
+      "username": "user79",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user79@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2003-07-21",
+      "salary": 97670000,
+      "possessions": 384240000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 80,
+    "fields": {
+      "username": "user80",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user80@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2001-06-03",
+      "salary": 111900000,
+      "possessions": 202900000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 81,
+    "fields": {
+      "username": "user81",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user81@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1977-03-06",
+      "salary": 95890000,
+      "possessions": 327810000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 82,
+    "fields": {
+      "username": "user82",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user82@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1989-01-16",
+      "salary": 58340000,
+      "possessions": 492100000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 83,
+    "fields": {
+      "username": "user83",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user83@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1981-06-25",
+      "salary": 72110000,
+      "possessions": 334770000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 84,
+    "fields": {
+      "username": "user84",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user84@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1990-07-12",
+      "salary": 87060000,
+      "possessions": 70320000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 85,
+    "fields": {
+      "username": "user85",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user85@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1997-02-15",
+      "salary": 43580000,
+      "possessions": 369780000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 86,
+    "fields": {
+      "username": "user86",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user86@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1978-01-28",
+      "salary": 93760000,
+      "possessions": 297230000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 87,
+    "fields": {
+      "username": "user87",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user87@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1997-02-19",
+      "salary": 85860000,
+      "possessions": 136800000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 88,
+    "fields": {
+      "username": "user88",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user88@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1988-09-11",
+      "salary": 97390000,
+      "possessions": 324580000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 89,
+    "fields": {
+      "username": "user89",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user89@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2005-06-28",
+      "salary": 38410000,
+      "possessions": 344660000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 90,
+    "fields": {
+      "username": "user90",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user90@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2000-07-21",
+      "salary": 73280000,
+      "possessions": 378600000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 91,
+    "fields": {
+      "username": "user91",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user91@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "2004-11-21",
+      "salary": 107200000,
+      "possessions": 12830000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 92,
+    "fields": {
+      "username": "user92",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user92@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1979-10-28",
+      "salary": 60880000,
+      "possessions": 495600000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 93,
+    "fields": {
+      "username": "user93",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user93@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1990-05-08",
+      "salary": 85710000,
+      "possessions": 219560000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 94,
+    "fields": {
+      "username": "user94",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user94@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1977-07-05",
+      "salary": 101250000,
+      "possessions": 312980000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 95,
+    "fields": {
+      "username": "user95",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user95@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1990-11-04",
+      "salary": 100540000,
+      "possessions": 181560000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 96,
+    "fields": {
+      "username": "user96",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user96@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1996-01-31",
+      "salary": 34930000,
+      "possessions": 74510000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 97,
+    "fields": {
+      "username": "user97",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user97@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1978-11-13",
+      "salary": 62270000,
+      "possessions": 77270000,
+      "is_mydata_agreed": true
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 98,
+    "fields": {
+      "username": "user98",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user98@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1980-02-17",
+      "salary": 113090000,
+      "possessions": 215050000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 99,
+    "fields": {
+      "username": "user99",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user99@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1990-03-16",
+      "salary": 66570000,
+      "possessions": 107670000,
+      "is_mydata_agreed": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 100,
+    "fields": {
+      "username": "user100",
+      "password": "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z=",
+      "email": "user100@example.com",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "birth_date": "1992-02-09",
+      "salary": 62570000,
+      "possessions": 81970000,
+      "is_mydata_agreed": false
+    }
+  }
+]

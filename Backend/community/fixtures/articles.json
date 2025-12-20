@@ -1,0 +1,74 @@
+[
+  {
+    "model": "community.article",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "title": "[공지] 커뮤니티 이용 수칙 및 가이드라인",
+      "content": "함께 성장하는 커뮤니티를 위해 서로를 존중해 주세요.",
+      "category": "notice",
+      "views": 150,
+      "is_complete": false,
+      "created_at": "2024-05-20T10:00:00Z",
+      "updated_at": "2024-05-20T10:00:00Z",
+      "like_users": []
+    }
+  },
+  {
+    "model": "community.article",
+    "pk": 2,
+    "fields": {
+      "user": 1,
+      "title": "파이썬 알고리즘 스터디 3기 모집 (주말/강남)",
+      "content": "백준 골드 목표로 함께 달릴 분들 찾습니다!",
+      "category": "study",
+      "views": 85,
+      "is_complete": false,
+      "created_at": "2024-05-20T11:30:00Z",
+      "updated_at": "2024-05-20T11:30:00Z",
+      "like_users": []
+    }
+  },
+  {
+    "model": "community.article",
+    "pk": 3,
+    "fields": {
+      "user": 1,
+      "title": "Vue3 + Django REST Framework 연결 시 CORS 에러 질문",
+      "content": "설정은 다 한 것 같은데 왜 자꾸 에러가 뜰까요? ㅠㅠ",
+      "category": "qna",
+      "views": 120,
+      "is_complete": true,
+      "created_at": "2024-05-21T09:15:00Z",
+      "updated_at": "2024-05-21T14:20:00Z",
+      "like_users": []
+    }
+  },
+  {
+    "model": "community.article",
+    "pk": 4,
+    "fields": {
+      "user": 1,
+      "title": "비전공자 개발자 1년차 회고록",
+      "content": "정말 힘들었지만 보람찬 1년이었습니다. 공유해봅니다.",
+      "category": "free",
+      "views": 450,
+      "is_complete": false,
+      "created_at": "2024-05-21T18:00:00Z",
+      "updated_at": "2024-05-21T18:00:00Z",
+      "like_users": []
+    }
+  },
+  {
+    "model": "community.comment",
+    "pk": 1,
+    "fields": {
+      "article": 3,
+      "user": 1,
+      "content": "django-cors-headers 패키지 설치하셨나요?",
+      "is_picked": true,
+      "created_at": "2024-05-21T10:00:00Z",
+      "updated_at": "2024-05-21T10:00:00Z"
+    }
+  }
+]
