@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 # Create your views here.
+import pandas as pd
 import requests
 import os
 from django.conf import settings
@@ -71,3 +72,38 @@ def get_route(request):
         return Response({"error": "모빌리티 API 호출 실패"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # 3. 금/은 시세 확인 
+def get_asset_prices(asset_type):
+    # 파일 경로 설정 (자산 타입에 따라 파일 선택)
+    file_name = f"{asset_type.capitalize()}_prices.xlsx"
+    file_path = os.path.join(settings.BASE_DIR, 'CRUD', 'data', file_name)
+    
+    # 엑셀 읽기
+    df = pd.read_excel(file_path)
+    
+    # 날짜와 가격 컬럼만 추출 (컬럼명은 실제 엑셀 파일에 맞게 수정 필요)
+    # 예: 날짜, 종가(Price)
+    return df
+
+@api_view(['GET'])
+def asset_price_list(request):
+    asset_type = request.query_params.get('type', 'gold') # 기본값 gold
+    start_date = request.query_params.get('start')
+    end_date = request.query_params.get('end')
+    
+    df = get_asset_prices(asset_type)
+
+    df['Date'] = pd.to_datetime(df['Date'])
+    df = df.sort_values(by='Date')
+    
+    # 날짜 필터링 로직 (데이터가 많을 경우 pandas에서 미리 처리하는 게 좋음)
+    if start_date and end_date:
+        df = df[(df['Date'] >= start_date) & (df['Date'] <= end_date)]
+
+    result = []
+    for _, row in df.iterrows():
+        result.append({
+            'date': row['Date'].strftime('%Y-%m-%d'),
+            'price': float(str(row['Close/Last']).replace(',', '')) # 콤마 제거 후 실수 변환
+        })
+        
+    return Response(result)

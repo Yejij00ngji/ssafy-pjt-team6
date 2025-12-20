@@ -54,6 +54,35 @@ const logOut = () => {
   <RouterView />
 </template>
 
-<style scoped>
+<style>
+.chart-wrapper {
+  position: relative;
+  height: 300px;
+  width: 100%;
+  margin-bottom: 30px;
+}
 
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background-color: #f4f4f4;
+}
+
+.rate {
+  font-weight: bold;
+  color: #2c3e50;
+}
 </style>

@@ -5,4 +5,5 @@ urlpatterns = [
     # 유튜브 검색/조회
     path('search/', views.youtube_search),
     path('map/route/', views.get_route),
+    path('asset-prices/', views.asset_price_list),
 ]
