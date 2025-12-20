@@ -43,6 +43,7 @@
         :key="comment.id" 
         :comment="comment" 
         @delete-comment="handleDeleteComment"
+        @update-comment="handleUpdateComment"
       />
     </section>
     </div>
@@ -141,6 +142,26 @@ const handleDeleteComment = async (commentId) => {
     } else {
       alert('삭제 처리 중 오류가 발생했습니다.')
     }
+  }
+}
+
+// 댓글 수정 로직
+const handleUpdateComment = async (commentId, newContent) => {
+  try {
+    const token = accountStore.token
+    await axios.put(
+      `http://127.0.0.1:8000/community/comments/${commentId}/`,
+      { content: newContent }, // 수정할 데이터
+      {
+        headers: { Authorization: `Token ${token}` }
+      }
+    )
+    
+    // 성공 시 데이터 새로고침
+    fetchArticleDetail()
+  } catch (err) {
+    console.error('댓글 수정 에러:', err)
+    alert('수정 권한이 없거나 오류가 발생했습니다.')
   }
 }
 
