@@ -9,6 +9,12 @@
           <span class="fw-bold text-dark me-3">{{ article.user.nickname }}</span>
           <span>{{ article.created_at }}</span>
           <span class="ms-3">👁️ {{ article.views }}</span>
+          <div v-if="article && accountStore.user && Number(accountStore.user.pk) === Number(article.user.id)" class="text-end mb-3">
+            <router-link :to="{ name: 'ArticleUpdate', params: { id: article.id } }" class="btn btn-outline-primary btn-sm me-2">
+              게시글 수정
+            </router-link>
+            <button @click="deleteArticle" class="btn btn-outline-danger btn-sm">게시글 삭제</button>
+          </div>
         </div>
       </header>
 
@@ -72,6 +78,25 @@ const fetchArticleDetail = async () => {
   } catch (err) {
     alert('게시글을 찾을 수 없습니다.')
     router.push({ name: 'Community' })
+  }
+}
+
+// 게시글 삭제 로직
+const deleteArticle = async () => {
+  if (confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+    try {
+      await axios.delete(`http://127.0.0.1:8000/community/${route.params.id}/`, {
+        headers: {
+          Authorization: `Token ${accountStore.token}`
+        }
+      })
+      alert('게시글이 삭제되었습니다.')
+      // 삭제 후 게시판 목록 페이지로 이동
+      router.push({ name: 'Community' }) 
+    } catch (err) {
+      console.error(err)
+      alert('게시글 삭제에 실패했습니다.')
+    }
   }
 }
 

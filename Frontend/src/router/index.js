@@ -69,7 +69,7 @@ const router = createRouter({
     {
       path: '/community/:id/update',  // 수정 기능
       name: 'ArticleUpdate',
-      component: () => import('@/views/community/ArticleCreateView.vue')  // 재사용
+      component: () => import('@/views/community/ArticleUpdateView.vue')
     },
     // EXTERNALS
     {
