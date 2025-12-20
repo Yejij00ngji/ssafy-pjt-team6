@@ -8,8 +8,6 @@ from .models import Subscription
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
-
-
 # Create your views here.
 
 @api_view(['GET', 'POST'])

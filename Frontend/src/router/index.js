@@ -12,6 +12,7 @@ const router = createRouter({
       name: 'Home',
       component: () => import('@/views/Home.vue')
     },
+    // 회원 관리
     {
       path: '/login',
       name: 'LoginView',
@@ -23,10 +24,16 @@ const router = createRouter({
       component: () => import('@/views/SignUpView.vue')
     },
     {
-      path: '/community',
-      name: 'Community',
-      component: () => import('@/views/Community.vue')
+      path: '/profile',
+      name: 'Profile',
+      component: () => import('@/views/Profile.vue')
     },
+    {
+      path: '/subscribe/:id',
+      name: 'Subscribe',
+      component: () => import('@/views/Subscribe.vue')
+    },
+    //상품
     {
       path: '/products',
       name: 'Products',
@@ -37,11 +44,34 @@ const router = createRouter({
       name: 'ProductDetails',
       component: () => import('@/views/ProductDetails.vue')
     },
+    // 상품 추천
     {
-      path: '/subscribe/:id',
-      name: 'Subscribe',
-      component: () => import('@/views/Subscribe.vue')
+      path: '/recommendations',
+      name: 'Recommendations',
+      component: () => import('@/views/Recommendations.vue')
     },
+    // 커뮤니티
+    {
+      path: '/community',
+      name: 'Community',
+      component: () => import('@/views/community/CommunityView.vue')
+    },
+    {
+      path: '/community/:id',
+      name: 'ArticleDetail',
+      component: () => import('@/views/community/ArticleDetailView.vue')
+    },
+    {
+      path: '/community/create',
+      name: 'ArticleCreate',
+      component: () => import('@/views/community/ArticleCreateView.vue')
+    },
+    {
+      path: '/community/:id/update',  // 수정 기능
+      name: 'ArticleUpdate',
+      component: () => import('@/views/community/ArticleCreateView.vue')  // 재사용
+    },
+    // EXTERNALS
     {
       path: '/goods',
       name: 'Goods',
@@ -51,16 +81,6 @@ const router = createRouter({
       path: '/externals/map',
       name: 'Map',
       component: () => import('@/views/Map.vue')
-    },
-    {
-      path: '/profile',
-      name: 'Profile',
-      component: () => import('@/views/Profile.vue')
-    },
-    {
-      path: '/recommendations',
-      name: 'Recommendations',
-      component: () => import('@/views/Recommendations.vue')
     },
     {
       path: '/externals/search',

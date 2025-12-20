@@ -1,3 +1,75 @@
 from django.shortcuts import render
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 
-# Create your views here.
+from django.shortcuts import get_object_or_404
+from .models import Article, Comment
+from .serializers import ArticleListSerializer, ArticleSerializer, CommentSerializer
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticatedOrReadOnly])
+def articles_view_create(request):
+    # 1. GET: 게시글 목록 조회 (카테고리 필터링 포함)
+    if request.method == 'GET':
+        category = request.GET.get('category')
+        articles = Article.objects.all().order_by('-created_at')
+        
+        if category:
+            articles = articles.filter(category=category)
+            
+        serializer = ArticleListSerializer(articles, many=True)
+        return Response(serializer.data)
+
+    # 2. POST: 새로운 게시글 작성
+    elif request.method == 'POST':
+        serializer = ArticleSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def article_detail(request, article_pk):
+    article = get_object_or_404(Article, pk=article_pk)
+
+    if request.method == 'GET':
+        # 상세 조회 시 조회수 증가 로직 (선택)
+        article.views += 1
+        article.save()
+        serializer = ArticleSerializer(article)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        if request.user != article.user:
+            return Response({'error': '권한이 없습니다.'}, status=status.HTTP_403_FORBIDDEN)
+        serializer = ArticleSerializer(article, data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+
+    elif request.method == 'DELETE':
+        if request.user != article.user:
+            return Response({'error': '권한이 없습니다.'}, status=status.HTTP_403_FORBIDDEN)
+        article.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+# 댓글
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def comment_create(request, article_pk):
+    article = get_object_or_404(Article, pk=article_pk)
+    serializer = CommentSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        serializer.save(user=request.user, article=article)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def comment_detail(request, comment_pk):
+    comment = get_object_or_404(Comment, pk=comment_pk)
+    if request.user != comment.user:
+        return Response({'error': '권한이 없습니다.'}, status=status.HTTP_403_FORBIDDEN)
+    comment.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+    
