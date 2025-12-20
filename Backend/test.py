@@ -6,7 +6,7 @@ def generate_users(count=100):
     users = []
     # 'password123'을 Django 기본 알고리즘(pbkdf2_sha256)으로 해싱한 값입니다.
     # 이 값을 넣어야 실제로 프론트엔드에서 로그인이 가능합니다.
-    hashed_password = "pbkdf2_sha256$600000$L9N7vR2uHj8A$p+B9W/u6E7j8z9k0m1n2o3p4q5r6s7t8u9v0w1x2y3z="
+    hashed_password = "pbkdf2_sha256$1000000$wBGc085ipgtGdui1elcfPC$ewaG4QfLf90wYtg/GLLHZRbaRLI25h277hYoVIeVIys="
 
     for i in range(1, count + 1):
         # 랜덤 생년월일 (20세 ~ 50세 사이)
@@ -20,6 +20,7 @@ def generate_users(count=100):
                 "username": f"user{i}",
                 "password": hashed_password,
                 "email": f"user{i}@example.com",
+                "nickname": f"nickname{i}",
                 "is_active": True,
                 "is_staff": False,
                 "is_superuser": False,

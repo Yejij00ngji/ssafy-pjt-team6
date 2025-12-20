@@ -22,19 +22,6 @@
         <button class="btn btn-outline-secondary px-4 rounded-pill">💬 댓글 {{ article.comments.length }}</button>
       </div>
 
-      <!-- <section class="comment-section">
-        <h5 class="fw-bold mb-4">Comments</h5>
-        <textarea v-model="newComment" class="form-control mb-3 p-3 bg-light border-0" rows="3" placeholder="의견을 남겨주세요..."></textarea>
-        <div class="text-end mb-5">
-          <button class="btn btn-primary px-4" @click="submitComment">등록</button>
-        </div>
-
-        <div v-for="comment in article.comments" :key="comment.id" class="comment-item py-3 border-bottom">
-          <div class="fw-bold mb-1">{{ comment.user.nickname }}</div>
-          <div class="text-secondary small">{{ comment.content }}</div>
-        </div>
-      </section> -->
-
       <section class="comment-section mt-5">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h5 class="fw-bold">답변 <span class="text-success">{{ article.comments.length }}</span></h5>
@@ -55,6 +42,7 @@
         v-for="comment in article.comments" 
         :key="comment.id" 
         :comment="comment" 
+        @delete-comment="handleDeleteComment"
       />
     </section>
     </div>
@@ -124,6 +112,35 @@ const submitComment = async () => {
     console.error('댓글 등록 실패:', err.response?.data || err)
     // 400 에러 등이 날 경우 서버에서 주는 에러 메시지를 alert로 띄워주면 좋습니다.
     alert('댓글 등록에 실패했습니다.')
+  }
+}
+
+// 댓글 삭제 로직
+const handleDeleteComment = async (commentId) => {
+  // 1. 사용자에게 한 번 더 확인 (실수 방지)
+  if (!confirm('정말 이 댓글을 삭제하시겠습니까?')) return
+
+  try {
+    const token = accountStore.token
+    
+    // 2. DELETE 요청 전송 (URL은 본인의 백엔드 설정에 맞게 수정하세요)
+    await axios.delete(`http://127.0.0.1:8000/community/comments/${commentId}/`, {
+      headers: {
+        Authorization: `Token ${token}`
+      }
+    })
+
+    // 3. 삭제 성공 시 목록 새로고침
+    alert('댓글이 삭제되었습니다.')
+    fetchArticleDetail() // 상세 페이지 정보를 다시 불러와서 댓글 목록을 갱신
+    
+  } catch (err) {
+    console.error('댓글 삭제 에러:', err.response?.data || err)
+    if (err.response?.status === 403) {
+      alert('삭제 권한이 없습니다.')
+    } else {
+      alert('삭제 처리 중 오류가 발생했습니다.')
+    }
   }
 }
 

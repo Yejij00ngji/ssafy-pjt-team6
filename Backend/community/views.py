@@ -64,12 +64,22 @@ def comment_create(request, article_pk):
         serializer.save(user=request.user, article=article)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-@api_view(['DELETE'])
+@api_view(['PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def comment_detail(request, comment_pk):
     comment = get_object_or_404(Comment, pk=comment_pk)
-    if request.user != comment.user:
-        return Response({'error': '권한이 없습니다.'}, status=status.HTTP_403_FORBIDDEN)
-    comment.delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
+
+    if request.method == 'PUT':
+        if request.user != comment.user:
+            return Response({'error': '권한이 없습니다.'}, status=status.HTTP_403_FORBIDDEN)
+        serializer = CommentSerializer(comment, data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+        
+    elif request.method == 'DELETE':
+        if request.user != comment.user:
+            return Response({'error': '권한이 없습니다.'}, status=status.HTTP_403_FORBIDDEN)
+        comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
     

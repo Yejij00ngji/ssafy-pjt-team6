@@ -37,13 +37,30 @@ export const useAccountStore = defineStore('account', () => {
     router.push({ name: 'Home' })
   }
 
-  const logIn = async ({username,password}) => {
-    const response = await axios.post(`${API_URL}/accounts/login/`,{username,password})
+  const logIn = async ({ username, password }) => {
+    try {
+      const response = await axios.post(`${API_URL}/accounts/login/`, { username, password })
+      
+      // 1. 토큰 먼저 저장
+      token.value = response.data.key
 
-    token.value = response.data.key
-    user.value = response.data.user
+      // 2. 토큰을 가지고 내 상세 정보(id, nickname 등) 가져오기
+      // dj-rest-auth의 기본 유저 정보 엔드포인트는 /accounts/user/ 입니다.
+      const userResponse = await axios.get(`${API_URL}/accounts/user/`, {
+        headers: {
+          Authorization: `Token ${token.value}`
+        }
+      })
 
-    router.push({ name: 'Home' })
+      // 3. 받아온 유저 정보를 저장 (이제 id가 들어옵니다!)
+      user.value = userResponse.data
+      console.log('로그인 성공 & 유저 정보 로드:', user.value)
+
+      router.push({ name: 'Home' })
+    } catch (err) {
+      console.error('로그인 에러:', err)
+      alert('아이디 또는 비밀번호를 확인해주세요.')
+    }
   }
 
   const logOut = async () => {

@@ -8,7 +8,7 @@ User = get_user_model()  # settings에 정의된 내 커스텀 user 모델 가�
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username') # nickname이 있다면 포함
+        fields = ('id', 'username', 'nickname') 
 
 class ArticleListSerializer(serializers.ModelSerializer):
     # 작성자 정보를 상세하게 포함 (인프런 스타일)

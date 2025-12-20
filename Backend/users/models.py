@@ -5,8 +5,7 @@ from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 class User(AbstractUser):
-  # email = models.EmailField(null=True)
-  # nickname = models.CharField(null=True)
+  nickname = models.CharField(max_length=20, blank=True)  # 닉네임 추가
   birth_date = models.DateField(null=True, blank=True)
   salary = models.IntegerField(null=True)
   possessions = models.IntegerField(null=True)

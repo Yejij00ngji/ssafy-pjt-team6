@@ -1,8 +1,12 @@
 <template>
+  <div style="background: #fff3f3; padding: 5px; font-size: 12px; border: 1px solid red;">
+    내 ID: {{ accountStore.user?.pk }} (타입: {{ typeof accountStore.user?.pk }}) <br>
+    작성자 ID: {{ comment.user.id }} (타입: {{ typeof comment.user.id }}) <br>
+    비교 결과: {{ accountStore.user?.id == comment.user.id }}
+  </div>
   <div class="comment-wrapper d-flex gap-3 py-4 border-bottom">
     <div class="vote-section d-flex flex-column align-items-center">
       <button class="btn btn-link p-0 text-secondary"><i class="bi bi-hand-thumbs-up"></i></button>
-      <span class="fw-bold my-1">{{ comment.likes_count || 0 }}</span>
       <button class="btn btn-link p-0 text-secondary"><i class="bi bi-hand-thumbs-down"></i></button>
     </div>
 
@@ -12,13 +16,21 @@
           <img :src="`https://ui-avatars.com/api/?name=${comment.user.nickname}`" class="rounded-circle" width="32">
         </div>
         <div class="user-info">
-          <span class="fw-bold me-2">{{ comment.user.username }}</span>
+          <span class="fw-bold me-2">{{ comment.user.nickname }}</span>
           <span class="badge bg-light text-success border">지식공유자</span> <div class="text-muted small">{{ comment.created_at }}</div>
         </div>
       </div>
 
       <div class="comment-text mb-3 text-dark">
         {{ comment.content }}
+      </div>
+
+      <div v-if="accountStore.user && Number(accountStore.user.pk) === Number(comment.user.id)">
+        <button 
+          @click="$emit('delete-comment', comment.id)" 
+          class="btn btn-sm text-danger border-0 p-0"
+        >삭제
+        </button>
       </div>
 
       <div class="comment-actions d-flex gap-2">
@@ -30,9 +42,16 @@
 </template>
 
 <script setup>
+import { useAccountStore } from '@/stores/accounts';
+const accountStore = useAccountStore()
+
 defineProps({
   comment: Object
 })
+
+// 부모에게 보낼 이벤트 이름 정의
+defineEmits(['delete-comment'])
+
 </script>
 
 <style scoped>
