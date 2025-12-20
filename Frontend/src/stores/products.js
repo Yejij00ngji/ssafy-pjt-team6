@@ -11,9 +11,9 @@ export const useProductStore = defineStore('product', () => {
   const getProducts = async ({ bank, term }) => {
     const response = await axios.get(
       `${accountStore.API_URL}/products/`,{
-      headers: {
-        'Authorization': `Token ${accountStore.token}`
-      },
+      // headers: {
+      //   'Authorization': `Token ${accountStore.token}`
+      // },
       params: {
         bank: bank || undefined,
         term: term || undefined
@@ -28,9 +28,9 @@ export const useProductStore = defineStore('product', () => {
   const getProductDetails = async (id) => {
     const response = await axios.get(
       `${accountStore.API_URL}/products/${id}`,{
-      headers: {
-        'Authorization': `Token ${accountStore.token}`
-      },
+      // headers: {
+      //   'Authorization': `Token ${accountStore.token}`
+      // },
       })
     
     console.log(response.data)

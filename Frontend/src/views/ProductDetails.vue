@@ -20,7 +20,9 @@
             <th>금리 유형</th>
             <th>저축 금리</th>
             <th>최고 우대금리</th>
-            <th>가입</th>
+            <template v-if="accountStore.isLogin">
+              <th>가입</th>
+            </template>
           </tr>
         </thead>
         <tbody>
@@ -34,7 +36,9 @@
             <td>{{ option.intr_rate_type_nm }}</td>
             <td class="rate">{{ option.intr_rate }}%</td>
             <td class="rate2">{{ option.intr_rate2 }}%</td>
-            <td><button class="apply-btn">O</button></td>
+            <template v-if="accountStore.isLogin">
+              <td><button class="apply-btn">O</button></td>
+            </template>
           </tr>
         </tbody>
       </table>
@@ -44,11 +48,13 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
 import { useProductStore } from '@/stores/products'
+import { useAccountStore } from '@/stores/accounts'
 import { ref, onMounted } from 'vue'
 
 const route = useRoute()
 const router = useRouter();
 const productStore = useProductStore()
+const accountStore = useAccountStore()
 
 const product = ref([])
 

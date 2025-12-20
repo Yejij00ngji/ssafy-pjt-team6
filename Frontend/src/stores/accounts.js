@@ -51,6 +51,7 @@ export const useAccountStore = defineStore('account', () => {
     
     token.value = null
     user.value = null
+    subscriptions.value = null
 
     router.push({ name: 'LoginView' })
   }

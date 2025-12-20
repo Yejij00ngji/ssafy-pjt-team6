@@ -33,9 +33,9 @@ const logOut = () => {
         <template v-else>
           <a href="#" @click.prevent="logOut">logout</a>
           <span> | </span>
+          <RouterLink :to="{name:'Profile'}">profile</RouterLink>
+          <span> | </span>
         </template>
-        <RouterLink :to="{name:'Profile'}">profile</RouterLink>
-        <span> | </span>
         <RouterLink :to="{name:'Products'}">products</RouterLink>
         <span> | </span>
         <RouterLink :to="{name:'Search'}">search</RouterLink>
