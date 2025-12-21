@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import DepositOptions, DepositProducts
+from .models import DepositOptions, DepositProducts, FinancialProfile
 from .serializers import DepositOptionsSerializer, DepositProductsSerializer, DepositProductsDetailsSerializer
 from .filters import ProductFilter
 from datetime import date
@@ -41,3 +41,22 @@ def options(request):
     # deposit_options = DepositOptions.objects.all()
     # serializer = DepositOptionsSerializer(deposit_options,many=True)
     return Response(serializer.data)
+  
+# -----------------------------------------------------------------------------------------
+# 마이데이터 생성
+# -----------------------------------------------------------------------------------------
+from .services import simulate_mydata_linking
+
+@api_view(['POST'])
+def link_mydata_api(request):
+    # 로그인한 유저의 프로필 가져오기
+    profile = request.user.FinancialProfile
+    
+    # 마이데이터 시뮬레이션 실행
+    updated_profile = simulate_mydata_linking(profile)
+    
+    return Response({
+        "message": "마이데이터 2.0 연동이 완료되었습니다.",
+        "linked_orgs": updated_profile.linked_org_count,
+        "total_balance": updated_profile.balance_amt
+    })
