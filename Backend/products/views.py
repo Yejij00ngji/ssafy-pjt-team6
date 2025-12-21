@@ -3,9 +3,9 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.db.models import Avg
+from django.db.models import Avg, Count
 
-from .models import DepositOptions, DepositProducts
+from .models import DepositOptions, DepositProducts, Subscription
 from users.models import FinancialProfile
 from .serializers import DepositOptionsSerializer, DepositProductsSerializer, DepositProductsDetailsSerializer
 from .services import simulate_mydata_linking, predict_user_cluster
@@ -14,6 +14,7 @@ from .filters import ProductFilter
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
+# 전체 상품 조회
 @api_view(['GET'])
 def products(request):
   if request.method == 'GET':
@@ -27,7 +28,8 @@ def products(request):
 
     serializer = DepositProductsSerializer(queryset, many=True)
     return Response(serializer.data)
-  
+
+# 상품 상세 정보 조회
 @api_view(['GET','POST'])
 def product_details(request, pk):
   if request.method == 'GET':
@@ -35,6 +37,7 @@ def product_details(request, pk):
     serializer = DepositProductsDetailsSerializer(deposit_product)
     return Response(serializer.data)
 
+# 상품 옵션 정보 조회
 @api_view(['GET'])
 def options(request):
   if request.method == 'GET':
@@ -101,3 +104,49 @@ def get_my_financial_report(request):
 
     except Exception as e:
         return Response({"error": str(e)}, status=500)
+  
+# 본격적인 상품 추천 로직
+@api_view(['GET'])
+def recommend_by_portfolio(request):
+    user = request.user
+    
+    # 1. 유저의 프로필 및 클러스터 확인
+    try:
+        profile = user.financialprofile
+        my_label = profile.cluster_label
+        if not my_label:
+            return Response({"message": "마이데이터 연동이 필요합니다."}, status=400)
+    except Exception:
+        return Response({"message": "프로필을 찾을 수 없습니다."}, status=404)
+
+    # 2. 나와 같은 그룹인 유저들의 ID 리스트 추출
+    similar_user_ids = FinancialProfile.objects.filter(
+        cluster_label=my_label
+    ).exclude(user=user).values_list('user_id', flat=True)
+
+    # 3. 그들이 가입한 상품(DepositOptions) 중 가장 인기 있는 것 Top 3
+    # Subscription 테이블을 통해 인기 상품 집계
+    recommended_items = Subscription.objects.filter(
+        user_id__in=similar_user_ids
+    ).values('deposit_option') \
+     .annotate(subscriber_count=Count('user')) \
+     .order_by('-subscriber_count')[:3]
+
+    # 4. 상품 상세 정보 담기
+    recommend_list = []
+    for item in recommended_items:
+        option = DepositOptions.objects.get(id=item['deposit_option'])
+        recommend_list.append({
+            "product_name": option.product.fin_prdt_nm,
+            "bank_name": option.product.kor_co_nm,
+            "intr_rate": option.intr_rate,
+            "intr_rate2": option.intr_rate2,
+            "save_trm": option.save_trm,
+            "subscriber_count": item['subscriber_count'] # "ㅇㅇ님 그룹에서 n명이 선택함" 강조용
+        })
+
+    return Response({
+        "username": user.username,
+        "persona": my_label,
+        "recommendations": recommend_list
+    })
