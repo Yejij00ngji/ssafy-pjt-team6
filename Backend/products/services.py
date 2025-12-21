@@ -1,50 +1,137 @@
-# 마이데이터 연동/분석 핵심 로직
-# 사용자가 버튼을 클릭하면 즉시 가상 데이터 생성하는 로직
-import random
 import numpy as np
-from .models import FinancialProfile
-from datetime import date
+import random
 
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+import pandas as pd
+import joblib
+
+from users.models import FinancialProfile
+
+# ====================================================
+# 마이데이터를 가상으로 생성 & 데이터 정규분포화
+# ====================================================
 def simulate_mydata_linking(user_profile):
-    # 1. User 모델의 birth_date를 활용한 나이 계산
-    birth_date = user_profile.user.birth_date
-    if birth_date:
-        today = date.today()
-        age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-    else:
-        age = 30 # 폴백(Fallback) 값
-
-    # 2. 나이 기반 자산 생성 로직 (기존과 동일)
-    if age < 30:
-        mean_income, mean_asset, investment_weight = 35000000, 20000000, 0.3
-    elif age < 45:
-        mean_income, mean_asset, investment_weight = 55000000, 150000000, 0.5
-    else:
-        mean_income, mean_asset, investment_weight = 70000000, 400000000, 0.2
+    age = user_profile.age  # 미리 저장된 나이 사용
+    
+    # 페르소나 확률 결정 (테스트를 위해 랜덤하게 부여 후 그에 맞는 수치 생성)
+    persona = random.choice(['yolo', 'holder', 'aggressive', 'steady', 'silver'])
+    
+    if persona == 'yolo': # 욜로족: 소득 대비 지출 높음, 저축 낮음
+        income = np.random.normal(35000000, 5000000)
+        expense_ratio = random.uniform(0.8, 0.95) # 소득의 80~95% 소비
+        invest_ratio = random.uniform(0.01, 0.1)
         
-    # 2. 정규분포를 활용한 가상 데이터 생성 (현실성 확보)
-    # 실제 연봉(annual_income_amt) 생성
-    user_profile.annual_income_amt = int(np.random.normal(mean_income, mean_income*0.2))
-    
-    # [표준 항목: balance_amt] 총 잔액 (연봉의 일정 비율이 자산으로 쌓였다고 가정)
-    total_assets = int(np.random.normal(mean_asset, mean_asset*0.3))
-    user_profile.balance_amt = int(total_assets * (1 - investment_weight))
-    
-    # [표준 항목: invest_eval_amt] 투자 자산 평가액
-    user_profile.invest_eval_amt = int(total_assets * investment_weight)
-    
-    # [표준 항목: monthly_paid_amt] 월 평균 저축액 (연봉의 10~40%)
-    user_profile.monthly_paid_amt = int((user_profile.annual_income_amt * random.uniform(0.1, 0.4)) / 12)
-    
-    # [표준 항목: last_offered_rate] 현재 보유 상품 금리 (연 2.0% ~ 5.0% 사이)
-    user_profile.last_offered_rate = round(random.uniform(2.0, 5.0), 2)
-    
-    # [표준 항목: withdrawable_amt] 출금 가능 금액 (잔액의 10~30%)
-    user_profile.withdrawable_amt = int(user_profile.balance_amt * random.uniform(0.1, 0.3))
+    elif persona == 'holder': # 현금 홀더: 잔액은 많으나 예적금 안 함
+        income = np.random.normal(50000000, 10000000)
+        expense_ratio = random.uniform(0.4, 0.6)
+        invest_ratio = random.uniform(0.05, 0.15)
+        # 특징: withdrawable_amt(출금가능액)를 balance의 80% 이상으로 설정
+        
+    elif persona == 'aggressive': # 공격적 투자자: 투자 비중 압도적
+        income = np.random.normal(60000000, 15000000)
+        expense_ratio = random.uniform(0.3, 0.5)
+        invest_ratio = random.uniform(0.6, 0.8) # 자산의 60~80%가 투자
+        
+    elif persona == 'steady': # 자산 형성 모범생: 소득 대비 저축률 높음
+        income = np.random.normal(45000000, 8000000)
+        expense_ratio = random.uniform(0.2, 0.4)
+        invest_ratio = random.uniform(0.2, 0.4)
+        
+    else: # 은퇴/안정형: 고소득, 고자산, 투자 낮음
+        income = np.random.normal(90000000, 20000000)
+        expense_ratio = random.uniform(0.2, 0.3)
+        invest_ratio = random.uniform(0.1, 0.2)
 
-    # 3. 마이데이터 연동 상태 업데이트
-    user_profile.is_mydata_linked = True
-    user_profile.linked_org_count = random.randint(2, 8) # 2~8개 기관 연동 시뮬레이션
+    # DB 필드에 매칭
+    user_profile.annual_income_amt = int(income)
+    total_assets = int(income * random.uniform(0.5, 5.0)) # 경력에 따른 자산 배수
+    user_profile.invest_eval_amt = int(total_assets * invest_ratio)
+    user_profile.balance_amt = total_assets - user_profile.invest_eval_amt
     
+    # 지출액 기반 월 저축액 계산
+    monthly_income = income / 12
+    user_profile.monthly_paid_amt = int(monthly_income * (1 - expense_ratio))
+    
+    # 현금 홀더 특화 로직
+    if persona == 'holder':
+        user_profile.withdrawable_amt = int(user_profile.balance_amt * 0.9)
+    else:
+        user_profile.withdrawable_amt = int(user_profile.balance_amt * 0.2)
+
+    user_profile.is_mydata_linked = True
     user_profile.save()
-    return user_profile
+
+# ====================================================
+# 5개의 그룹으로 클러스터링 (기준만 있고 정답 레이블은 없음)
+# ====================================================
+def run_financial_clustering():
+    profiles = FinancialProfile.objects.filter(is_mydata_linked=True)
+    data = []
+
+    for p in profiles:
+        total_asset = p.balance_amt + p.invest_eval_amt + 1
+        data.append({
+            'id': p.id,
+            'income': p.annual_income_amt,
+            'age': p.age,
+            'invest_ratio': p.invest_eval_amt / total_asset, # 투자 비중
+            'save_ratio': (p.monthly_paid_amt * 12) / (p.annual_income_amt + 1), # 저축률
+            'liquidity_ratio': p.withdrawable_amt / (p.balance_amt + 1) # 유동성 비중
+        })
+
+    df = pd.DataFrame(data)
+    features = ['income', 'age', 'invest_ratio', 'save_ratio', 'liquidity_ratio']
+    
+    scaler = StandardScaler()
+    scaled_data = scaler.fit_transform(df[features])
+
+    # K=5 설정
+    kmeans = KMeans(n_clusters=5, init='k-means++', n_init=20, random_state=42)
+    df['cluster'] = kmeans.fit_predict(scaled_data)
+
+    # [중요] 전략 B를 위해 Scaler와 KMeans 모델 저장
+    model_path = 'ml_models'
+    if not os.path.exists(model_path):
+        os.makedirs(model_path)
+        
+    joblib.dump(scaler, f'{model_path}/scaler.pkl')
+    joblib.dump(kmeans, f'{model_path}/kmeans.pkl')
+
+    # 결과 DB 반영
+    for _, row in df.iterrows():
+        profile = FinancialProfile.objects.get(id=row['id'])
+        profile.cluster_label = str(int(row['cluster']))
+        profile.save()
+
+
+def predict_user_cluster(profile):
+    """신규 유저 1명의 데이터를 받아 클러스터 라벨을 반환"""
+    try:
+        # 1. 저장된 모델 로드
+        scaler = joblib.load('ml_models/scaler.pkl')
+        kmeans = joblib.load('ml_models/kmeans.pkl')
+
+        # 2. 유저 데이터를 모델 입력 형태(2D array)로 변환
+        total_asset = profile.balance_amt + profile.invest_eval_amt + 1
+        user_features = [[
+            profile.annual_income_amt,
+            profile.age,
+            profile.invest_eval_amt / total_asset,
+            (profile.monthly_paid_amt * 12) / (profile.annual_income_amt + 1),
+            profile.expense_growth_rate,
+            profile.expense_to_income_ratio
+        ]]
+
+        # 3. 스케일링 및 예측
+        scaled_features = scaler.transform(user_features) # fit_transform이 아닌 transform만!
+        cluster_id = kmeans.predict(scaled_features)[0]
+
+        # 4. 결과 저장
+        profile.cluster_label = str(int(cluster_id))
+        profile.save()
+        return profile.cluster_label
+    except FileNotFoundError:
+        # 모델 파일이 없으면 전체 클러스터링 한 번 실행
+        run_financial_clustering()
+        return predict_user_cluster(profile)
