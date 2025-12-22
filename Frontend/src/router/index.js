@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAccountStore } from '@/stores/accounts'
+import HomeView from '@/views/HomeView.vue'
 
 const login_required = ['']
 const login_not_allowed = ['SignUpView']
@@ -10,7 +11,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'Home',
-      component: () => import('@/views/Home.vue')
+      component: HomeView
     },
     // 회원 관리
     {
@@ -73,7 +74,7 @@ const router = createRouter({
     },
     // EXTERNALS
     {
-      path: '/goods',
+      path: '/externals/goods',
       name: 'Goods',
       component: () => import('@/views/externals/Goods.vue')
     },
@@ -95,18 +96,18 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach((to,from) => {
+// 가드 로직 수정
+router.beforeEach((to, from) => {
   const accountstore = useAccountStore()
 
-  if (to.name in login_required && !accountstore.isLogin){
+  // includes를 사용해야 정확히 체크됩니다.
+  if (login_required.includes(to.name) && !accountstore.isLogin) {
     window.alert('로그인이 필요합니다.')
-    return {name: 'LoginView'}
+    return { name: 'LoginView' }
   }
 
-  if (to.name in login_not_allowed && accountstore.isLogin){
-    window.alert('이미 로그인 되어 있습니다.')
+  if (login_not_allowed.includes(to.name) && accountstore.isLogin) {
     return { name: 'Home' }
   }
 })
-
 export default router
