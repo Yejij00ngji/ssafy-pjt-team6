@@ -6,4 +6,5 @@ urlpatterns = [
     # path('deposit-products/', views.deposit_products),
     path('products/', views.products),
     path('products/<int:pk>/', views.product_details),
+    path('subscriptions/', views.subscriptions),
 ]

@@ -7,7 +7,7 @@ from django.db.models import Avg, Count
 
 from .models import DepositOptions, DepositProducts, Subscription
 from users.models import FinancialProfile
-from .serializers import DepositOptionsSerializer, DepositProductsSerializer, DepositProductsDetailsSerializer
+from .serializers import DepositOptionsSerializer, DepositProductsSerializer, DepositProductsDetailsSerializer, SubscriptionSerializer
 from .services import simulate_mydata_linking, predict_user_cluster
 from .filters import ProductFilter
 
@@ -50,6 +50,27 @@ def options(request):
     # serializer = DepositOptionsSerializer(deposit_options,many=True)
     return Response(serializer.data)
   
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def subscriptions(request):
+  if request.method == 'POST':
+    serializer = SubscriptionSerializer(data = request.data)
+    
+    if serializer.is_valid(raise_exception=True):
+
+      # 가입 날짜 기준 만기일 계산
+      option = serializer.validated_data['deposit_option']
+      months = option.save_trm
+      expired_date = date.today() + relativedelta(months=months)
+
+      serializer.save(user=request.user, expired_at=expired_date)
+
+      return Response(serializer.data, status=status.HTTP_201_CREATED)
+  elif request.method == 'GET':
+    user_subscriptions = Subscription.objects.filter(user=request.user)
+    serializer = SubscriptionSerializer(user_subscriptions, many=True)
+    return Response(serializer.data)
+
 # -----------------------------------------------------------------------------------------
 # 마이데이터 생성
 # -----------------------------------------------------------------------------------------

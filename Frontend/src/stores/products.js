@@ -8,6 +8,8 @@ export const useProductStore = defineStore('product', () => {
   
   const accountStore = useAccountStore()
 
+  const subscriptions = ref([])
+
   const getProducts = async ({ bank, term }) => {
     const response = await axios.get(
       `${accountStore.API_URL}/products/`,{
@@ -38,9 +40,23 @@ export const useProductStore = defineStore('product', () => {
     return response.data
   }
 
+  const getSubscriptions = async () => {
+    const response = await axios.get(
+      `${accountStore.API_URL}/subscriptions/`,{
+      headers: {
+        'Authorization': `Token ${accountStore.token}`
+      },
+      })
+    
+    console.log(response.data)
+
+    subscriptions.value = response.data
+    return response.data
+  }
+
   const subscribeProduct = async ({deposit_option, amounts}) => {
     await axios.post(
-      `${accountStore.API_URL}/accounts/subscriptions/`,
+      `${accountStore.API_URL}/subscriptions/`,
       {
         deposit_option: deposit_option,
         amounts: amounts,
@@ -52,5 +68,5 @@ export const useProductStore = defineStore('product', () => {
       })
   }
 
-  return { getProducts, getProductDetails, subscribeProduct }
+  return { subscriptions, getProducts, getProductDetails, subscribeProduct, getSubscriptions }
 }, { persist: true })

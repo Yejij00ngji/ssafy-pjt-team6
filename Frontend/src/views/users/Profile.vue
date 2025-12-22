@@ -10,14 +10,14 @@
     <hr>
 
     <h2>상품별 금리 비교</h2>
-    <div v-if="accountStore.subscriptions && accountStore.subscriptions.length > 0" class="chart-wrapper">
+    <div v-if="productStore.subscriptions && productStore.subscriptions.length > 0" class="chart-wrapper">
       <canvas id="rateChart"></canvas>
     </div>
 
     <hr>
 
     <h2>가입한 상품 내역</h2>
-    <div v-if="accountStore.subscriptions && accountStore.subscriptions.length > 0" class="table-container">
+    <div v-if="productStore.subscriptions && productStore.subscriptions.length > 0" class="table-container">
       <table>
         <thead>
           <tr>
@@ -32,12 +32,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="sub in accountStore.subscriptions" :key="sub.id">
+          <tr v-for="sub in productStore.subscriptions" :key="sub.id">
             <td>{{ sub.subscribed_at }}</td>
             <td>{{ sub.bank_name }}</td>
             <td class="product-name">{{ sub.product_name }}</td>
             <td>{{ sub.save_trm }}개월</td>
-            <td>{{ sub.amounts.toLocaleString() }}원</td>
+            <td>{{ sub.amount.toLocaleString() }}원</td>
             <td class="rate">{{ sub.intr_rate }}%</td>
             <td class="rate">{{ sub.intr_rate2 }}%</td>
             <td>{{ sub.expired_at || '정보 없음' }}</td>
@@ -55,8 +55,10 @@
 import { onMounted, watch, ref } from 'vue'
 import { useAccountStore } from '@/stores/accounts'
 import Chart from 'chart.js/auto'
+import { useProductStore } from '@/stores/products'
 
 const accountStore = useAccountStore()
+const productStore = useProductStore()
 let rateChart = null
 
 // 차트를 그리는 함수
@@ -69,7 +71,7 @@ const renderChart = () => {
     rateChart.destroy()
   }
 
-  const subscriptions = accountStore.subscriptions
+  const subscriptions = productStore.subscriptions
   
   // 차트 데이터 가공 (상품명 + 기간을 라벨로 사용)
   const labels = subscriptions.map(sub => `${sub.product_name}(${sub.save_trm}M)`)
@@ -124,12 +126,12 @@ const renderChart = () => {
 
 onMounted(async () => {
   // 컴포넌트가 로드될 때 가입 내역을 가져옵니다.
-  await accountStore.getSubscriptions()
+  await productStore.getSubscriptions()
   renderChart()
 })
 
 // 데이터가 비동기로 로드될 경우를 대비해 watch 추가
-watch(() => accountStore.subscriptions, () => {
+watch(() => productStore.subscriptions, () => {
   renderChart()
 }, { deep: true })
 </script>

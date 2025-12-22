@@ -25,7 +25,6 @@ export const useAccountStore = defineStore('account', () => {
     }
   })
 
-  const subscriptions = ref([])
   const cluster_info = ref(null)
 
   const signUp = async ({username,password1,password2,birth_date,is_mydata_agreed}) => {
@@ -75,19 +74,6 @@ export const useAccountStore = defineStore('account', () => {
     router.push({ name: 'LoginView' })
   }
 
-  const getSubscriptions = async () => {
-    const response = await axios.get(
-      `${API_URL}/accounts/subscriptions/`,{
-      headers: {
-        'Authorization': `Token ${token.value}`
-      },
-      })
-    
-    console.log(response.data)
 
-    subscriptions.value = response.data
-    return response.data
-  }
-
-  return { API_URL, token, user, isLogin, isMyData, subscriptions, cluster_info, signUp, logIn, logOut, getSubscriptions }
+  return { API_URL, token, user, isLogin, isMyData, cluster_info, signUp, logIn, logOut }
 }, { persist: true })
