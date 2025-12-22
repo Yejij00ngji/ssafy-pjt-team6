@@ -1,4 +1,7 @@
-from dj_rest_auth.registration.serializers import RegisterSerializer
+from dj_rest_auth.registration.serializers import RegisterSerializer, SocialLoginSerializer
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from allauth.socialaccount.helpers import complete_social_login
+from allauth.socialaccount.models import SocialApp, SocialAccount
 from rest_framework import serializers
 from .models import User
 from products.models import DepositProducts
@@ -6,8 +9,8 @@ from products.serializers import DepositOptionsSerializer
 
 class CustomRegisterSerializer(RegisterSerializer):
   birth_date = serializers.DateField()
-  salary = serializers.IntegerField()
-  possessions = serializers.IntegerField()
+  # salary = serializers.IntegerField()
+  # possessions = serializers.IntegerField()
   is_mydata_agreed = serializers.BooleanField()
 
   def get_cleaned_data(self):
@@ -24,6 +27,10 @@ class CustomRegisterSerializer(RegisterSerializer):
     # user.salary = self.validated_data.get('salary')
     # user.possessions = self.validated_data.get('possessions')
     user.is_mydata_agreed = self.validated_data.get('is_mydata_agreed')
+
+    if user.email:
+        user.username = user.email
+
     user.save()
     return user
   
@@ -39,7 +46,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
             # 'possessions', 
             'is_mydata_agreed'
         )
-        read_only_fields = ['username', 'birth_data',]
+        read_only_fields = ['username', 'email']
 
 class CustomTokenSerializer(serializers.Serializer):
     # 토큰 필드 (기본 LoginSerializer/RegistrationSerializer 응답에 포함됨)
@@ -47,3 +54,12 @@ class CustomTokenSerializer(serializers.Serializer):
     
     # 사용자 정보를 위한 필드
     user = UserDetailSerializer()
+
+# accounts/serializers.py
+
+class CustomGoogleSerializer(SocialLoginSerializer):
+    # 명시적으로 아무것도 하지 않고 부모 클래스에 맡깁니다.
+    def validate(self, attrs):
+        # view에서 context를 넘겨받아 부모 validate가 작동하게 합니다.
+        attrs = super().validate(attrs)
+        return attrs

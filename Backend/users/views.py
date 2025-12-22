@@ -1,10 +1,13 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from dj_rest_auth.registration.views import SocialLoginView
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .serializers import UserDetailSerializer
+from .serializers import UserDetailSerializer, CustomGoogleSerializer
 
 # Create your views here.
 
@@ -26,3 +29,13 @@ def profile_update_view(request):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+        
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
+    callback_url = "http://localhost:5173/login/callback" # Vue의 리디렉션 URI와 동일해야 함
+    client_class = OAuth2Client
+    def post(self, request, *args, **kwargs):
+        self.serializer = self.get_serializer(data=request.data)
+        self.serializer.is_valid(raise_exception=True)
+        self.login()
+        return self.get_response()

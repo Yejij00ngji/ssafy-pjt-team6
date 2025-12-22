@@ -24,15 +24,8 @@
 
       <div class="info-row">
         <span class="label">이메일:</span>
-        <div v-if="editState.field === 'email'" class="edit-group">
-          <input v-model="editState.value" type="email" class="edit-input" />
-          <button @click="updateProfile" class="btn save">저장</button>
-          <button @click="cancelEdit" class="btn cancel">취소</button>
-        </div>
-        <div v-else class="display-group">
-          <span class="value">{{ accountStore.user.email || '미등록' }}</span>
-          <button @click="startEdit('email', accountStore.user.email)" class="btn-edit">수정</button>
-        </div>
+        <span class="value">{{ accountStore.user.email }}</span>
+        <span class="badge readonly">수정 불가</span>
       </div>
 
       <div class="info-row">

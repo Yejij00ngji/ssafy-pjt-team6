@@ -36,7 +36,7 @@ SECRET_KEY = 'django-insecure-)&w1&$95*mj-ogxs54_h+kc(&jib0&#!f(h=+cvcl2ba(*g&lq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     'dj_rest_auth.registration',
     # 
     'django.contrib.admin',
@@ -184,4 +185,28 @@ REST_AUTH = {
     'TOKEN_SERIALIZER': 'users.serializers.CustomTokenSerializer',
     
     'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
+}
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_UNIQUE_EMAIL = True                # 이메일 중복은 방지
+ACCOUNT_EMAIL_REQUIRED = True
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_USERNAME_REQUIRED = False
+
+SOCIALACCOUNT_QUERY_EMAIL = True
+SOCIALACCOUNT_AUTO_SIGNUP = True
+
+AUTHENTICATION_BACKENDS = [
+    # 반드시 이 항목이 최상단에 있어야 이메일 로그인이 작동합니다.
+    'allauth.account.auth_backends.AuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+        'OAUTH_PKCE_ENABLED': True, # 최근 Google 로그인 이슈 해결에 도움됨
+    }
 }

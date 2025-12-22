@@ -5,11 +5,18 @@ from datetime import date
 
 # Create your models here.
 class User(AbstractUser):
+  email = models.EmailField(unique=True)
   nickname = models.CharField(max_length=20, blank=True)  # 닉네임 추가
   birth_date = models.DateField(null=True, blank=True)
   # salary = models.IntegerField(null=True)
   # possessions = models.IntegerField(null=True)
   is_mydata_agreed = models.BooleanField(default=False)
+
+  REQUIRED_FIELDS = [] # email은 기본적으로 필수이므로 생략 가능
+  USERNAME_FIELD = 'username' # 여전히 username을 쓰지만 이메일 값이 들어갈 것임
+
+  def __str__(self):
+    return self.email
 
 # ----------------------------------------------------------------------
 # 마이데이터 유저 정보

@@ -1,10 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useProductStore } from './products'
 import axios from 'axios'
 
 export const useAccountStore = defineStore('account', () => {
   const API_URL = 'http://127.0.0.1:8000'
+
+  const productStore = useProductStore()
 
   const router = useRouter()
   
@@ -38,9 +41,9 @@ export const useAccountStore = defineStore('account', () => {
     router.push({ name: 'Home' })
   }
 
-  const logIn = async ({ username, password }) => {
+  const logIn = async ({ email, password }) => {
     try {
-      const response = await axios.post(`${API_URL}/accounts/login/`, { username, password })
+      const response = await axios.post(`${API_URL}/accounts/login/`, { email, password })
       
       // 1. 토큰 먼저 저장
       token.value = response.data.key
@@ -69,7 +72,7 @@ export const useAccountStore = defineStore('account', () => {
     
     token.value = null
     user.value = null
-    subscriptions.value = null
+    productStore.subscriptions = null
 
     router.push({ name: 'LoginView' })
   }
