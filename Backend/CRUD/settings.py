@@ -59,6 +59,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.kakao',
+    'allauth.socialaccount.providers.naver',
     # 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -188,12 +190,19 @@ REST_AUTH = {
     'SESSION_LOGIN': True,
 }
 
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_UNIQUE_EMAIL = True                # 이메일 중복은 방지
-ACCOUNT_EMAIL_REQUIRED = True
+# ACCOUNT_AUTHENTICATION_METHOD = 'email'
+# ACCOUNT_UNIQUE_EMAIL = True                # 이메일 중복은 방지
+# ACCOUNT_EMAIL_REQUIRED = True
+
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email']
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
-ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+# ACCOUNT_USERNAME_REQUIRED = False
+
+SOCIALACCOUNT_ADAPTER = 'users.adapters.CustomSocialAccountAdapter'
 
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
@@ -206,13 +215,36 @@ AUTHENTICATION_BACKENDS = [
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
+        'APP': {
+            'client_id': os.getenv('GOOGLE_CLIENT_ID'), # .env의 구글 클라이언트 ID
+            'secret': os.getenv('GOOGLE_SECRET'),       # .env의 구글 시크릿 키
+            'key': ''                                   # 구글은 비워둠
+        },
         'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {'access_type': 'online'},
         'OAUTH_PKCE_ENABLED': True, # 최근 Google 로그인 이슈 해결에 도움됨
+    },
+    'kakao': {
+        'APP': {
+            'client_id': os.getenv('KAKAO_CLIENT_ID'),                # 이미 설정하신 .env의 REST API 키
+            'secret': os.getenv('KAKAO_SECRET'), # 카카오 보안에서 설정 안했다면 빈값
+            'key': ''
+        },
+        'SCOPE': ['account_email'], 
+        'AUTH_PARAMS': {'access_type': 'online'},
+    },
+    'naver': {
+        'APP': {
+            'client_id': os.getenv('NAVER_CLIENT_ID'),
+            'secret': os.getenv('NAVER_SECRET'),
+            'key': ''
+        },
+        'SCOPE': ['email'], 
+        'AUTH_PARAMS': {'access_type': 'online'},
     }
 }
 
-ACCOUNT_SIGNUP_FIELDS = {
-    'username': {'required': False},
-    'email': {'required': True},
-}
+# ACCOUNT_SIGNUP_FIELDS = {
+#     'username': {'required': False},
+#     'email': {'required': True},
+# }

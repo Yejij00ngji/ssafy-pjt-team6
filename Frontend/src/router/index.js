@@ -25,6 +25,16 @@ const router = createRouter({
       component: () => import('@/views/users/GoogleCallback.vue')
     },
     {
+      path: '/login/kakao/callback',
+      name: 'KakaoCallbackView',
+      component: () => import('@/views/users/KakaoCallback.vue')
+    },    
+    {
+      path: '/login/naver/callback',
+      name: 'NaverCallback',
+      component: () => import('@/views/users/NaverCallback.vue')
+    },
+    {
       path: '/signup',
       name: 'SignUpView',
       component: () => import('@/views/users/SignUpView.vue')
