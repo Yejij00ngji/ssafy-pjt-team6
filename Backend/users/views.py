@@ -30,10 +30,17 @@ def profile_update_view(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         
+# 1. 에러 우회용 클라이언트 클래스 정의
+class ReliableOAuth2Client(OAuth2Client):
+    def __init__(self, *args, **kwargs):
+        if 'scope_delimiter' in kwargs:
+            kwargs.pop('scope_delimiter')
+        super().__init__(*args, **kwargs)
+        
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     callback_url = "http://localhost:5173/login/callback" # Vue의 리디렉션 URI와 동일해야 함
-    client_class = OAuth2Client
+    client_class = ReliableOAuth2Client
     def post(self, request, *args, **kwargs):
         self.serializer = self.get_serializer(data=request.data)
         self.serializer.is_valid(raise_exception=True)

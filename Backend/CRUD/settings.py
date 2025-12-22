@@ -48,17 +48,17 @@ INSTALLED_APPS = [
     'users',  # 사용자
     'products',  # 예적금상품
     # 라이브러리
+    'django.contrib.sites',
     'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
     'dj_rest_auth',
+    'dj_rest_auth.registration',
     'corsheaders',
-    'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'dj_rest_auth.registration',
     # 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -181,10 +181,11 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 REST_AUTH = {
     'USER_DETAILS_SERIALIZER': 'users.serializers.UserDetailSerializer',
-
     'TOKEN_SERIALIZER': 'users.serializers.CustomTokenSerializer',
-    
     'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
+    
+    'USE_JWT': False, # 현재 TokenAuthentication 사용 중이므로 False
+    'SESSION_LOGIN': True,
 }
 
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
@@ -209,4 +210,9 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {'access_type': 'online'},
         'OAUTH_PKCE_ENABLED': True, # 최근 Google 로그인 이슈 해결에 도움됨
     }
+}
+
+ACCOUNT_SIGNUP_FIELDS = {
+    'username': {'required': False},
+    'email': {'required': True},
 }

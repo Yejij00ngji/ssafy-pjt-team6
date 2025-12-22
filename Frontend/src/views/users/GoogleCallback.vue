@@ -20,7 +20,7 @@ onMounted(async () => {
   if (code) {
     try {
       // 2. Django 백엔드의 GoogleLogin 뷰로 코드 전송
-      const res = await axios.post(`${accountStore.API_URL}/accounts/google/login/`, {
+      const res = await axios.post(`${accountStore.API_URL}/accounts/google/token/`, {
         code: code
       })
 
