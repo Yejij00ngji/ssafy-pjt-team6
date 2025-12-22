@@ -74,6 +74,27 @@ export const useAccountStore = defineStore('account', () => {
     router.push({ name: 'LoginView' })
   }
 
+  const updateProfile = async (payload) => {
+    try {
+      const res = await axios({
+        method: 'patch',
+        url: `${API_URL}/accounts/profile/`, // 백엔드 URL 경로에 맞게 수정
+        data: payload,
+        headers: {
+          Authorization: `Token ${token.value}`
+        }
+      })
+      
+      // 성공 시 스토어 데이터 업데이트 및 입력창 닫기
+      user.value = res.data
+      alert('수정되었습니다.')
+      return true
+    } catch (err) {
+      console.error(err)
+      alert('수정에 실패했습니다.')
+      return false
+    }
+  }
 
-  return { API_URL, token, user, isLogin, isMyData, cluster_info, signUp, logIn, logOut }
+  return { API_URL, token, user, isLogin, isMyData, cluster_info, signUp, logIn, logOut, updateProfile }
 }, { persist: true })

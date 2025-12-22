@@ -179,7 +179,8 @@ AUTH_USER_MODEL = 'users.User' # users 앱의 User 모델을 사용
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 REST_AUTH = {
-  
+    'USER_DETAILS_SERIALIZER': 'users.serializers.UserDetailSerializer',
+
     'TOKEN_SERIALIZER': 'users.serializers.CustomTokenSerializer',
     
     'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',

@@ -2,9 +2,62 @@
   <div class="profile-container">
     <h1>내 프로필</h1>
     
-    <div v-if="accountStore.user" class="user-info">
-      <p><strong>사용자명:</strong> {{ accountStore.user.username }}</p>
-      <p><strong>내 데이터 동의 여부:</strong> {{ accountStore.isMyData ? '동의' : '미동의' }}</p>
+  <div v-if="accountStore.user" class="user-info card">
+      <div class="info-row">
+        <span class="label">사용자명:</span>
+        <span class="value">{{ accountStore.user.username }}</span>
+        <span class="badge readonly">수정 불가</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">닉네임:</span>
+        <div v-if="editState.field === 'nickname'" class="edit-group">
+          <input v-model="editState.value" class="edit-input" />
+          <button @click="updateProfile" class="btn save">저장</button>
+          <button @click="cancelEdit" class="btn cancel">취소</button>
+        </div>
+        <div v-else class="display-group">
+          <span class="value">{{ accountStore.user.nickname || '없음' }}</span>
+          <button @click="startEdit('nickname', accountStore.user.nickname)" class="btn-edit">수정</button>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <span class="label">이메일:</span>
+        <div v-if="editState.field === 'email'" class="edit-group">
+          <input v-model="editState.value" type="email" class="edit-input" />
+          <button @click="updateProfile" class="btn save">저장</button>
+          <button @click="cancelEdit" class="btn cancel">취소</button>
+        </div>
+        <div v-else class="display-group">
+          <span class="value">{{ accountStore.user.email || '미등록' }}</span>
+          <button @click="startEdit('email', accountStore.user.email)" class="btn-edit">수정</button>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <span class="label">생년월일:</span>
+        <span class="value">{{ accountStore.user.birth_date }}</span>
+        <span class="badge readonly">수정 불가</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">내 데이터 동의:</span>
+        
+        <div v-if="editState.field === 'is_mydata_agreed'" class="edit-group">
+          <label class="checkbox-container">
+            <input type="checkbox" v-model="editState.value" />
+            <span class="checkbox-label">{{ editState.value ? '동의함' : '동의 안 함' }}</span>
+          </label>
+          <button @click="updateProfile" class="btn save">저장</button>
+          <button @click="cancelEdit" class="btn cancel">취소</button>
+        </div>
+        
+        <div v-else class="display-group">
+          <span class="value">{{ accountStore.user.is_mydata_agreed ? '동의' : '미동의' }}</span>
+          <button @click="startEdit('is_mydata_agreed', accountStore.user.is_mydata_agreed)" class="btn-edit">수정</button>
+        </div>
+      </div>
     </div>
 
     <hr>
@@ -54,12 +107,35 @@
 <script setup>
 import { onMounted, watch, ref } from 'vue'
 import { useAccountStore } from '@/stores/accounts'
-import Chart from 'chart.js/auto'
 import { useProductStore } from '@/stores/products'
+import Chart from 'chart.js/auto'
+import axios from 'axios'
 
 const accountStore = useAccountStore()
 const productStore = useProductStore()
 let rateChart = null
+
+const editState = ref({
+  field: null, // 현재 수정 중인 필드명 ('nickname' or 'email')
+  value: ''    // 수정 중인 값
+})
+
+const startEdit = (field, initialValue) => {
+  editState.value.field = field
+  editState.value.value = initialValue
+}
+
+const cancelEdit = () => {
+  editState.value.field = null
+  editState.value.value = ''
+}
+
+const updateProfile = async () => {
+  const payload = { [editState.value.field]: editState.value.value }
+  if (await accountStore.updateProfile(payload)){
+    cancelEdit()
+  }
+}
 
 // 차트를 그리는 함수
 const renderChart = () => {
