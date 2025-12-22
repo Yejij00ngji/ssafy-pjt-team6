@@ -1,60 +1,27 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
+import NavbarItem from './components/home/NavbarItem.vue';
 
-import { useRoute, useRouter } from 'vue-router';
-
+// 기존 store 및 로직 유지
 import { useAccountStore } from './stores/accounts';
-import { useProductStore } from './stores/products';
-
-const route = useRoute()
-const router = useRouter()
-
 const accountstore = useAccountStore()
-const store = useProductStore()
-
-const logOut = () => {
-  accountstore.logOut()
-}
-
 </script>
 
 <template>
-  <header>
-    <div class="wrapper">
-      <nav>
-        <RouterLink :to="{name:'Home'}">home</RouterLink>
-        <span> | </span>
-        <template v-if="!accountstore.isLogin">
-          <RouterLink :to="{name:'LoginView'}">login</RouterLink>
-          <span> | </span>
-          <RouterLink :to="{name:'SignUpView'}">signup</RouterLink>
-          <span> | </span>
-        </template>
-        <template v-else>
-          <a href="#" @click.prevent="logOut">logout</a>
-          <span> | </span>
-          <RouterLink :to="{name:'Profile'}">profile</RouterLink>
-          <span> | </span>
-        </template>
-        <RouterLink :to="{name:'Products'}">products</RouterLink>
-        <span> | </span>
-        <RouterLink :to="{name:'Search'}">search</RouterLink>
-        <span> | </span>
-        <RouterLink :to="{name:'Recommendations'}">recommend</RouterLink>
-        <span> | </span>
-        <RouterLink :to="{name:'Map'}">map</RouterLink>
-        <span> | </span>
-        <RouterLink :to="{name:'Goods'}">goods</RouterLink>
-        <span> | </span>
-        <RouterLink :to="{name:'Community'}">community</RouterLink>
-      </nav>
-    </div>
-  </header>
+  <NavbarItem />
 
   <RouterView />
 </template>
 
 <style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Pretendard', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 기존 차트/테이블 스타일은 유지하되, nav 요소에 영향을 주지 않도록 관리 */
 .chart-wrapper {
   position: relative;
   height: 300px;
