@@ -28,8 +28,10 @@ export const useAccountStore = defineStore('account', () => {
   const subscriptions = ref([])
   const cluster_info = ref(null)
 
-  const signUp = async ({username,password1,password2,birth_date,salary,possessions,is_mydata_agreed}) => {
-    const response = await axios.post(`${API_URL}/accounts/signup/`,{username,password1,password2,birth_date,salary,possessions,is_mydata_agreed})
+  const signUp = async ({username,password1,password2,birth_date,is_mydata_agreed}) => {
+    const response = await axios.post(`${API_URL}/accounts/signup/`,{username,password1,password2,birth_date,is_mydata_agreed})
+//  const signUp = async ({username,password1,password2,birth_date,salary,possessions,is_mydata_agreed}) => {
+//    const response = await axios.post(`${API_URL}/accounts/signup/`,{username,password1,password2,birth_date,salary,possessions,is_mydata_agreed})
 
     token.value = response.data.key
     user.value = response.data.user

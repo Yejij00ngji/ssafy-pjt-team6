@@ -13,16 +13,16 @@ class CustomRegisterSerializer(RegisterSerializer):
   def get_cleaned_data(self):
     data = super().get_cleaned_data()
     data['birth_date'] = self.validated_data.get('birth_date')
-    data['salary'] = self.validated_data.get('salary')
-    data['possessions'] = self.validated_data.get('possessions')
+    # data['salary'] = self.validated_data.get('salary')
+    # data['possessions'] = self.validated_data.get('possessions')
     data['is_mydata_agreed'] = self.validated_data.get('is_mydata_agreed')
     return data
     
   def save(self, request):
     user = super().save(request)
     user.birth_date = self.validated_data.get('birth_date')
-    user.salary = self.validated_data.get('salary')
-    user.possessions = self.validated_data.get('possessions')
+    # user.salary = self.validated_data.get('salary')
+    # user.possessions = self.validated_data.get('possessions')
     user.is_mydata_agreed = self.validated_data.get('is_mydata_agreed')
     user.save()
     return user
@@ -33,8 +33,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
         fields = (
             'username', 
             'birth_date', 
-            'salary', 
-            'possessions', 
+            # 'salary', 
+            # 'possessions', 
             'is_mydata_agreed'
         )
         read_only_fields = fields
