@@ -126,29 +126,50 @@ const searchByFields = () => {
 }
 
 // 카카오 장소 API 호출
+// 1. 키워드 검색 함수 수정
 const searchBanksByKeyword = (keyword, position) => {
   const ps = new window.kakao.maps.services.Places()
+  
+  // 지역 검색일 때는 radius 옵션을 제거하여 검색 범위를 전국으로 확장합니다.
+  const searchOptions = keyword.includes('은행') && keyword.length < 5 
+    ? { location: position, radius: 5000 } // 내 주변 검색용
+    : {} // 시/도 조합 검색용 (전국 검색)
+
   ps.keywordSearch(keyword, (data, status) => {
     if (status === window.kakao.maps.services.Status.OK) {
       banks.value = data
       displayMarkers(data)
+    } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
+      alert('검색 결과가 없습니다. 지역명을 정확히 입력해주세요.')
     }
-  }, { location: position, radius: 5000 })
+  }, searchOptions)
 }
 
+// 2. 마커 표시 및 지도 시야 이동 수정
 const displayMarkers = (places) => {
   clearMapObjects()
+  
+  // 모든 검색 결과를 포함할 지도 범위 객체를 생성합니다.
+  const bounds = new window.kakao.maps.LatLngBounds()
+
   places.forEach((place) => {
+    const markerPosition = new window.kakao.maps.LatLng(place.y, place.x)
     const marker = new window.kakao.maps.Marker({
       map: map.value,
-      position: new window.kakao.maps.LatLng(place.y, place.x)
+      position: markerPosition
     })
+    
     markers.value.push(marker)
+    bounds.extend(markerPosition) // 결과 좌표를 범위에 포함
+
     window.kakao.maps.event.addListener(marker, 'click', () => {
       displayInfoWindow(place, marker)
       getRoute({ lat: place.y, lng: place.x })
     })
   })
+
+  // 검색된 모든 마커가 보이도록 지도의 시야를 이동시킵니다.
+  map.value.setBounds(bounds)
 }
 
 // 마커를 클릭했을 때 나타나는 하얀색 말풍선
