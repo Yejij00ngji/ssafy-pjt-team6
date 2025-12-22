@@ -59,7 +59,7 @@ export const useProductStore = defineStore('product', () => {
       `${accountStore.API_URL}/subscriptions/`,
       {
         deposit_option: deposit_option,
-        amounts: amounts,
+        amount: amounts,
       },
       {
       headers: {
