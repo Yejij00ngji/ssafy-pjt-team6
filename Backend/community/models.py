@@ -15,6 +15,7 @@ class Article(models.Model):
     title = models.CharField(max_length=50)
     content = models.TextField()
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='free')
+    image = models.ImageField(upload_to='community/', blank=True, null=True)
     
     # 조회수 및 추천
     views = models.PositiveIntegerField(default=0)

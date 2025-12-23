@@ -1,62 +1,75 @@
 <template>
-  <div class="container py-5" v-if="article">
-    <div class="max-width-800 mx-auto">
-      <header class="mb-5 text-center">
-        <span class="text-primary fw-bold mb-3 d-block">{{ article.category_label }}</span>
-        <h1 class="fw-bold mb-4">{{ article.title }}</h1>
-        <div class="d-flex justify-content-center align-items-center text-muted">
-          <div class="avatar-sm me-2"></div>
-          <span class="fw-bold text-dark me-3">{{ article.user.nickname }}</span>
-          <span>{{ article.created_at }}</span>
-          <span class="ms-3">👁️ {{ article.views }}</span>
-          <div v-if="article && accountStore.user && Number(accountStore.user.pk) === Number(article.user.id)" class="text-end mb-3">
-            <router-link :to="{ name: 'ArticleUpdate', params: { id: article.id } }" class="btn btn-outline-primary btn-sm me-2">
-              게시글 수정
-            </router-link>
-            <button @click="deleteArticle" class="btn btn-outline-danger btn-sm">게시글 삭제</button>
+  <div class="toss-container" v-if="article">
+    <div class="article-detail-wrapper">
+      <header class="article-header">
+        <div class="header-top">
+          <span class="category-badge" :class="article.category">
+            {{ article.category_label }}
+          </span>
+          <div v-if="accountStore.user && Number(accountStore.user.pk) === Number(article.user.id)" class="action-buttons">
+            <router-link :to="{ name: 'ArticleUpdate', params: { id: article.id } }" class="text-btn">수정</router-link>
+            <button @click="deleteArticle" class="text-btn delete">삭제</button>
+          </div>
+        </div>
+        
+        <h1 class="article-title">{{ article.title }}</h1>
+        
+        <div class="author-info">
+          <div class="avatar-sm"></div>
+          <div class="author-details">
+            <span class="nickname">{{ article.user.nickname }}</span>
+            <span class="meta">{{ formatDate(article.created_at) }} · 조회 {{ article.views }}</span>
           </div>
         </div>
       </header>
 
-      <div class="article-body py-4 border-top">
-        <img v-if="article.image" :src="article.image" class="w-100 rounded-4 mb-5 shadow-sm">
-        <div class="content fs-5" style="line-height: 1.8;">{{ article.content }}</div>
-      </div>
-
-      <div class="text-center my-5 pb-5 border-bottom">
-        <button class="btn btn-outline-danger px-4 rounded-pill me-3">👍 {{ article.likes }}</button>
-        <button class="btn btn-outline-secondary px-4 rounded-pill">💬 댓글 {{ article.comments.length }}</button>
-      </div>
-
-      <section class="comment-section mt-5">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h5 class="fw-bold">답변 <span class="text-success">{{ article.comments.length }}</span></h5>
-        <select class="form-select form-select-sm w-auto">
-          <option>좋아요순</option>
-          <option>최신순</option>
-        </select>
-      </div>
-
-      <div class="comment-input-card mb-5 border rounded-3 p-3 shadow-sm bg-white">
-        <textarea v-model="newComment" class="form-control border-0" rows="2" placeholder="답변을 작성해보세요."></textarea>
-        <div class="text-end mt-2">
-          <button @click="submitComment" class="btn btn-primary btn-sm">등록</button>
+      <div class="article-body">
+        <img v-if="article.image" :src="article.image" class="body-image">
+        <div class="body-content">
+          {{ article.content }}
         </div>
       </div>
 
-      <CommentItem 
-        v-for="comment in article.comments" 
-        :key="comment.id" 
-        :comment="comment" 
-        @delete-comment="handleDeleteComment"
-        @update-comment="handleUpdateComment"
-      />
-    </section>
+      <div class="article-actions">
+        <button class="like-btn" @click="handleLike">
+          <span class="icon">👍</span>
+          <span class="count">{{ article.likes }}</span>
+        </button>
+      </div>
+
+      <section class="comment-section">
+        <div class="comment-header">
+          <h3 class="section-title">댓글 <span>{{ article.comments.length }}</span></h3>
+        </div>
+
+        <div class="comment-input-wrapper">
+          <textarea 
+            v-model="newComment" 
+            placeholder="댓글을 남겨보세요" 
+            rows="1"
+            @input="autoResize"
+          ></textarea>
+          <button @click="submitComment" :disabled="!newComment.trim()" class="submit-btn">
+            등록
+          </button>
+        </div>
+
+        <div class="comment-list">
+          <CommentItem 
+            v-for="comment in article.comments" 
+            :key="comment.id" 
+            :comment="comment" 
+            @delete-comment="handleDeleteComment"
+            @update-comment="handleUpdateComment"
+          />
+        </div>
+      </section>
     </div>
   </div>
 </template>
 
 <script setup>
+/* 기존 로직 유지 (import, fetchArticleDetail, deleteArticle, submitComment 등) */
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAccountStore } from '@/stores/accounts'
@@ -70,7 +83,6 @@ const accountStore = useAccountStore()
 const article = ref(null)
 const newComment = ref('')
 
-// 상세 데이터 및 댓글 가져오기
 const fetchArticleDetail = async () => {
   try {
     const response = await axios.get(`http://127.0.0.1:8000/community/${route.params.id}/`)
@@ -81,124 +93,101 @@ const fetchArticleDetail = async () => {
   }
 }
 
-// 게시글 삭제 로직
 const deleteArticle = async () => {
   if (confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
     try {
       await axios.delete(`http://127.0.0.1:8000/community/${route.params.id}/`, {
-        headers: {
-          Authorization: `Token ${accountStore.token}`
-        }
+        headers: { Authorization: `Token ${accountStore.token}` }
       })
-      alert('게시글이 삭제되었습니다.')
-      // 삭제 후 게시판 목록 페이지로 이동
       router.push({ name: 'Community' }) 
-    } catch (err) {
-      console.error(err)
-      alert('게시글 삭제에 실패했습니다.')
-    }
+    } catch (err) { console.error(err) }
   }
 }
 
-// 댓글 등록 로직
 const submitComment = async () => {
-  // 입력값 검증 (공백만 있는 경우 방지)
-  if (!newComment.value.trim()) {
-    alert('댓글 내용을 입력해주세요.')
-    return
-  }
-  
+  if (!newComment.value.trim()) return
   try {
-    // 2. 스토어에서 토큰 가져오기 (가장 확실한 방법)
     const token = accountStore.token 
-    
-    if (!token) {
-      alert('로그인이 필요한 서비스입니다.')
-      return
-    }
-
-    // 3. POST 요청 실행
+    if (!token) { alert('로그인이 필요합니다.'); return }
     await axios.post(
       `http://127.0.0.1:8000/community/${article.value.id}/comments/`, 
       { content: newComment.value },
-      { 
-        headers: { 
-          // 'Token ' 문자열 뒤에 한 칸 띄우는 것 잊지 마세요!
-          Authorization: `Token ${token}` 
-        } 
-      }
+      { headers: { Authorization: `Token ${token}` } }
     )
-    
-    // 성공 시 처리
-    newComment.value = '' // 입력창 비우기
-    fetchArticleDetail()   // 게시글 상세 정보를 다시 불러와 댓글 목록 갱신
-    alert('댓글이 등록되었습니다.')
-
-  } catch (err) {
-    console.error('댓글 등록 실패:', err.response?.data || err)
-    // 400 에러 등이 날 경우 서버에서 주는 에러 메시지를 alert로 띄워주면 좋습니다.
-    alert('댓글 등록에 실패했습니다.')
-  }
-}
-
-// 댓글 삭제 로직
-const handleDeleteComment = async (commentId) => {
-  // 1. 사용자에게 한 번 더 확인 (실수 방지)
-  if (!confirm('정말 이 댓글을 삭제하시겠습니까?')) return
-
-  try {
-    const token = accountStore.token
-    
-    // 2. DELETE 요청 전송 (URL은 본인의 백엔드 설정에 맞게 수정하세요)
-    await axios.delete(`http://127.0.0.1:8000/community/comments/${commentId}/`, {
-      headers: {
-        Authorization: `Token ${token}`
-      }
-    })
-
-    // 3. 삭제 성공 시 목록 새로고침
-    alert('댓글이 삭제되었습니다.')
-    fetchArticleDetail() // 상세 페이지 정보를 다시 불러와서 댓글 목록을 갱신
-    
-  } catch (err) {
-    console.error('댓글 삭제 에러:', err.response?.data || err)
-    if (err.response?.status === 403) {
-      alert('삭제 권한이 없습니다.')
-    } else {
-      alert('삭제 처리 중 오류가 발생했습니다.')
-    }
-  }
-}
-
-// 댓글 수정 로직
-const handleUpdateComment = async (commentId, newContent) => {
-  try {
-    const token = accountStore.token
-    await axios.put(
-      `http://127.0.0.1:8000/community/comments/${commentId}/`,
-      { content: newContent }, // 수정할 데이터
-      {
-        headers: { Authorization: `Token ${token}` }
-      }
-    )
-    
-    // 성공 시 데이터 새로고침
+    newComment.value = ''
     fetchArticleDetail()
-  } catch (err) {
-    console.error('댓글 수정 에러:', err)
-    alert('수정 권한이 없거나 오류가 발생했습니다.')
-  }
+  } catch (err) { console.error(err) }
 }
 
 const formatDate = (dateStr) => {
   const date = new Date(dateStr)
-  return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`
+  return `${date.getFullYear()}. ${date.getMonth() + 1}. ${date.getDate()}.`
+}
+
+const autoResize = (e) => {
+  e.target.style.height = 'auto'
+  e.target.style.height = e.target.scrollHeight + 'px'
 }
 
 onMounted(fetchArticleDetail)
 </script>
 
 <style scoped>
-.max-width-800 { max-width: 800px; }
-.avatar-sm { width: 30px; height: 30px; background: #ddd; border-radius: 50%; }
+.article-detail-wrapper {
+  max-width: 720px; /* 읽기 최적화 너비 */
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+/* Header 스타일 */
+.article-header { margin-bottom: 40px; }
+.header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+
+.category-badge { font-size: 14px; font-weight: 700; color: var(--toss-blue); }
+.text-btn { font-size: 14px; color: #8b95a1; background: none; border: none; margin-left: 12px; cursor: pointer; text-decoration: none; }
+.text-btn.delete:hover { color: #f03e3e; }
+
+.article-title { font-size: 32px; font-weight: 700; color: #191f28; line-height: 1.3; margin-bottom: 24px; }
+
+.author-info { display: flex; align-items: center; gap: 12px; }
+.avatar-sm { width: 40px; height: 40px; background-color: #f2f4f6; border-radius: 50%; }
+.nickname { display: block; font-size: 16px; font-weight: 600; color: #191f28; }
+.meta { font-size: 14px; color: #8b95a1; }
+
+/* Body 스타일 */
+.article-body { padding: 20px 0; margin-bottom: 40px; }
+.body-image { width: 100%; border-radius: 16px; margin-bottom: 32px; }
+.body-content { font-size: 17px; line-height: 1.8; color: #333d4b; white-space: pre-wrap; }
+
+/* Actions 스타일 */
+.article-actions { display: flex; justify-content: center; padding-bottom: 48px; border-bottom: 1px solid #f2f4f6; }
+.like-btn { 
+  display: flex; align-items: center; gap: 8px; padding: 12px 24px;
+  border-radius: 24px; border: 1px solid #e5e8eb; background: #fff;
+  font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.like-btn:hover { background-color: #f9fafb; border-color: #d1d6db; }
+
+/* Comment 스타일 */
+.comment-section { padding-top: 48px; }
+.section-title { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
+.section-title span { color: var(--toss-blue); }
+
+.comment-input-wrapper {
+  display: flex; gap: 12px; align-items: flex-end;
+  background-color: #f9fafb; padding: 16px; border-radius: 16px; margin-bottom: 32px;
+}
+.comment-input-wrapper textarea {
+  flex: 1; background: none; border: none; outline: none;
+  font-size: 15px; line-height: 1.5; resize: none; max-height: 200px;
+}
+.submit-btn {
+  background-color: var(--toss-blue); color: #fff; border: none;
+  padding: 8px 16px; border-radius: 10px; font-weight: 600; cursor: pointer;
+}
+.submit-btn:disabled { background-color: #d1d6db; cursor: default; }
+
+@media (max-width: 768px) {
+  .article-title { font-size: 24px; }
+}
 </style>

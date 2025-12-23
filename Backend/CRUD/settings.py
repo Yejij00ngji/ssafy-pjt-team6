@@ -190,22 +190,27 @@ REST_AUTH = {
     'SESSION_LOGIN': True,
 }
 
-# ACCOUNT_AUTHENTICATION_METHOD = 'email'
-# ACCOUNT_UNIQUE_EMAIL = True                # 이메일 중복은 방지
-# ACCOUNT_EMAIL_REQUIRED = True
-
-ACCOUNT_LOGIN_METHODS = {'email'}
-ACCOUNT_SIGNUP_FIELDS = ['email']
-
-ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+# 1. 로그인 방식 설정
+# ACCOUNT_AUTHENTICATION_METHOD와 ACCOUNT_LOGIN_METHODS는 역할이 겹칩니다. 
+# 최신 버전에서는 ACCOUNT_AUTHENTICATION_METHOD를 주로 사용합니다.
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
-# ACCOUNT_USERNAME_REQUIRED = False
 
+# 2. 사용자 이름(Username) 관련
+# 이메일 로그인을 쓸 때 username을 아예 안 쓰고 싶다면 아래 설정이 핵심입니다.
+ACCOUNT_USERNAME_REQUIRED = False
+
+# 3. 회원가입 관련
+# ACCOUNT_SIGNUP_FIELDS는 기본적으로 email 로그인을 설정하면 자동으로 포함되므로 
+# 특수 커스텀 필드가 없다면 생략 가능합니다. 
+# 대신 아래 설정을 통해 유저 경험을 높일 수 있습니다.
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username' # 모델 구조상 유지
+
+# 4. 소셜 로그인 관련
 SOCIALACCOUNT_ADAPTER = 'users.adapters.CustomSocialAccountAdapter'
-
 SOCIALACCOUNT_QUERY_EMAIL = True
-SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_AUTO_SIGNUP = True # 소셜 정보가 있으면 바로 가입 처리
 
 AUTHENTICATION_BACKENDS = [
     # 반드시 이 항목이 최상단에 있어야 이메일 로그인이 작동합니다.
@@ -250,3 +255,9 @@ ML_MODELS_DIR = os.path.join(BASE_DIR, 'ml_models')
 #     'username': {'required': False},
 #     'email': {'required': True},
 # }
+
+# 1. 사용자가 업로드한 파일을 저장할 실제 경로
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# 2. 웹 브라우저에서 접근할 때 사용할 URL 주소
+MEDIA_URL = '/media/'

@@ -1,22 +1,107 @@
-/* 공통으로 사용할 Toss 스타일 클래스 (assets/main.css 등에 저장) */
-
-/* 공통으로 쓰일 기본 폰트 및 초기화 */
+/* 기존 변수 유지 및 확장 */
 :root {
   --toss-blue: #3182f6;
-  --toss-blue-light: #e8f3ff;
+  --toss-blue-hover: #1b64da;
   --toss-gray-bg: #f9fafb;
+  --toss-white: #ffffff;
   --toss-text-main: #191f28;
   --toss-text-sub: #4e5968;
+  --toss-text-tertiary: #8b95a1;
   --toss-border: #e5e8eb;
 }
 
-body { margin: 0; font-family: 'Pretendard', sans-serif; -webkit-font-smoothing: antialiased; }
-.toss-card { background: #f9fafb; border-radius: 24px; padding: 24px; }
-.toss-select { 
-  width: 100%; padding: 14px; border: 1px solid #e5e8eb; 
-  background-color: #fff; border-radius: 14px; outline: none; 
+body {
+  margin: 0;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  background-color: var(--toss-white);
+  color: var(--toss-text-main);
+  line-height: 1.6;
 }
-.toss-btn-main { 
-  width: 100%; background-color: #3182f6; color: #fff; 
-  padding: 16px; border-radius: 14px; font-weight: 700; border: none; 
+
+/* Typography */
+.toss-title { font-size: 24px; font-weight: 700; color: var(--toss-text-main); margin-bottom: 8px; }
+.toss-desc { font-size: 15px; color: var(--toss-text-sub); margin-bottom: 24px; }
+
+/* Layout & Card */
+.toss-container { 
+  width: 100%; 
+  max-width: 1200px; /* 기존 600px에서 확장 */
+  margin: 0 auto; 
+  padding: 40px 24px; 
+}
+
+.toss-card {
+  background: var(--toss-gray-bg);
+  border-radius: 24px;
+  padding: 24px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.toss-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* Input & Button */
+/* 2. 검색창 그룹: 버튼 배치를 위해 flex 적용 */
+.toss-input-group { 
+  position: relative; 
+  display: flex; 
+  gap: 12px; /* 입력창과 버튼 사이 간격 */
+  margin-bottom: 40px; 
+}
+
+.toss-input {
+  width: 100%;
+  padding: 18px 20px;
+  font-size: 16px;
+  border: 1px solid transparent;
+  background-color: var(--toss-gray-bg);
+  border-radius: 14px;
+  outline: none;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.toss-input:focus {
+  background-color: #fff;
+  border-color: var(--toss-blue);
+  box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.1);
+}
+
+.toss-btn-main {
+  background-color: var(--toss-blue);
+  color: #fff;
+  padding: 16px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toss-btn-main:hover { background-color: var(--toss-blue-hover); }
+
+/* 4. 검색 버튼 스타일 추가 */
+.toss-btn-search {
+  width: 100px; /* 적정 너비 설정 */
+  background-color: var(--toss-blue);
+  color: #fff;
+  border-radius: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+  transition: background 0.2s;
+}
+.toss-btn-search:hover { background-color: var(--toss-blue-hover); }
+
+/* 3. 그리드 레이아웃: 영상 목록을 그리드 형태로 변경 */
+.search-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* 반응형 그리드 */
+  gap: 24px;
 }

@@ -1,44 +1,39 @@
 <template>
-  <div class="detail-page">
-    <div class="video-section bg-black">
-      <div class="container-fluid px-0">
-        <div class="ratio ratio-21x9">
-          <iframe 
-            :src="`https://www.youtube.com/embed/${$route.params.videoId}?autoplay=1`" 
-            title="YouTube video player"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen>
-          </iframe>
+  <div class="toss-container">
+    <header class="detail-header">
+      <h1 class="toss-title-lg" v-html="$route.query.title"></h1>
+      <div class="video-meta-group">
+        <span class="channel-name">{{ $route.query.channel }}</span>
+        <span class="divider">·</span>
+        <span class="meta-item">조회수 {{ formatViewCount($route.query.viewCount) }}회</span>
+        <span class="divider">·</span>
+        <span class="meta-item">{{ $route.query.date }}</span>
+      </div>
+    </header>
+
+    <section class="video-wrapper">
+      <div class="video-container">
+        <iframe 
+          :src="`https://www.youtube.com/embed/${$route.params.videoId}?autoplay=1`" 
+          title="YouTube video player"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowfullscreen>
+        </iframe>
+      </div>
+    </section>
+
+    <section class="description-section">
+      <div class="toss-card description-card">
+        <h2 class="section-subtitle">영상 설명</h2>
+        <div class="description-content">
+          {{ $route.query.description }}
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="container mt-4 pb-5">
-      <div class="row justify-content-center">
-        <div class="col-lg-11">
-          
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <h1 class="video-title fw-bold" v-html="$route.query.title"></h1>
-            <div class="text-end text-muted small mt-2 ps-3">
-              <p class="mb-0">게시일: {{ $route.query.date }}</p>
-              <p class="mb-0">조회수: {{ formatViewCount($route.query.viewCount) }}회</p>
-            </div>
-          </div>
-
-          <div class="channel-info mb-4">
-            <h4 class="text-primary fw-normal h5">{{ $route.query.channel }}</h4>
-          </div>
-
-          <div class="description-container p-4 rounded-3 border bg-white">
-            <h6 class="fw-bold mb-4 border-bottom pb-2 text-secondary">영상 설명</h6>
-            <div class="description-content">
-              {{ $route.query.description }}
-            </div>
-          </div>
-
-        </div>
-      </div>
+    <div class="action-area">
+      <button class="toss-btn-secondary" @click="$router.back()">목록으로 돌아가기</button>
     </div>
   </div>
 </template>
@@ -48,7 +43,7 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-// 조회수 포맷팅 (예: 1234567 -> 1,234,567)
+// 조회수 포맷팅 (숫자)
 const formatViewCount = (count) => {
   if (!count) return '0'
   return Number(count).toLocaleString()
@@ -56,47 +51,104 @@ const formatViewCount = (count) => {
 </script>
 
 <style scoped>
-.detail-page {
-  background-color: #ffffff;
-  min-height: 100vh;
+/* 타이포그래피 확장 */
+.toss-title-lg {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--toss-text-main);
+  line-height: 1.4;
+  margin-bottom: 12px;
 }
 
-.video-section {
-  border-bottom: 1px solid #eee;
+.video-meta-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: var(--toss-text-sub);
+  margin-bottom: 32px;
 }
 
-.video-title {
-  font-size: 2rem;
-  line-height: 1.3;
-  color: #1a1a1a;
-  max-width: 85%;
+.channel-name {
+  color: var(--toss-blue);
+  font-weight: 600;
 }
 
-.channel-info h4 {
-  color: #3b82f6 !important; /* 이미지의 밝은 파란색 */
+.divider {
+  color: var(--toss-border);
 }
 
-.description-container {
-  border: 1px solid #e5e7eb !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+/* 비디오 컨테이너: 토스 스타일의 32px 라운딩 */
+.video-wrapper {
+  margin-bottom: 32px;
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
+}
+
+.video-container {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 비율 */
+  height: 0;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* 설명 섹션 */
+.section-subtitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--toss-text-main);
+}
+
+.description-card {
+  background-color: var(--toss-gray-bg);
+  cursor: default; /* 상세페이지 카드는 클릭 효과 제거 */
+}
+
+.description-card:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 .description-content {
-  white-space: pre-wrap; /* 줄바꿈 유지 */
-  line-height: 1.8;
-  color: #4b5563;
-  font-size: 0.95rem;
-  word-break: break-all;
+  white-space: pre-wrap;
+  line-height: 1.6;
+  color: var(--toss-text-sub);
+  font-size: 16px;
 }
 
-/* 이미지와 동일한 느낌을 위한 여백 조정 */
+/* 하단 버튼 */
+.action-area {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.toss-btn-secondary {
+  padding: 12px 24px;
+  border-radius: 12px;
+  background-color: var(--toss-gray-bg);
+  color: var(--toss-text-sub);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toss-btn-secondary:hover {
+  background-color: var(--toss-border);
+}
+
 @media (max-width: 768px) {
-  .video-title {
-    font-size: 1.4rem;
-    max-width: 100%;
-  }
-  .ratio-21x9 {
-    --bs-aspect-ratio: 56.25%; /* 모바일에서는 16:9로 변경 */
-  }
+  .toss-title-lg { font-size: 22px; }
+  .video-wrapper { border-radius: 16px; } /* 모바일에서는 라운딩 축소 */
 }
 </style>

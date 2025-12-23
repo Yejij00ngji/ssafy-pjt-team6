@@ -80,12 +80,12 @@ const router = createRouter({
     {
       path: '/community/create',
       name: 'ArticleCreate',
-      component: () => import('@/views/community/ArticleCreateView.vue')
+      component: () => import('@/views/community/ArticleFormView.vue')
     },
     {
       path: '/community/:id/update',  // 수정 기능
       name: 'ArticleUpdate',
-      component: () => import('@/views/community/ArticleUpdateView.vue')
+      component: () => import('@/views/community/ArticleFormView.vue')
     },
     // EXTERNALS
     {
@@ -101,7 +101,7 @@ const router = createRouter({
     {
       path: '/externals/search',
       name: 'Search',
-      component: () => import('@/views/externals/Search.vue')
+      component: () => import('@/views/externals/SearchView.vue')
     },
     {
       path: '/externals/search/:videoId',
