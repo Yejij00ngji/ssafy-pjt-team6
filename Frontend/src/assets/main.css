@@ -30,6 +30,13 @@ body {
   padding: 40px 24px; 
 }
 
+/* 2. 집중형 컨테이너: 모바일 특화 (로그인, 추천 설문용) */
+.toss-container-narrow {
+  max-width: 480px; /* 모바일~태블릿 너비 */
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
 .toss-card {
   background: var(--toss-gray-bg);
   border-radius: 24px;

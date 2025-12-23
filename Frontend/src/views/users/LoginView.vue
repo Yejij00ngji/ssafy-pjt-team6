@@ -85,12 +85,16 @@ const isFormValid = computed(() => {
   return email.value?.length > 0 && password.value?.length > 0
 })
 
-const logIn = () => {
+const logIn = async () => {
   const payload = {
     email: email.value,
     password: password.value,
   }
-  accountStore.logIn(payload)
+
+  const response = await accountStore.logIn(payload)
+
+  token.value = response.data.key
+  localStorage.setItem("token", response.data.key)
 }
 
 const googleLogin = () => {

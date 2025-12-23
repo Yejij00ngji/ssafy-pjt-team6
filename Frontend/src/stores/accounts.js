@@ -47,6 +47,9 @@ export const useAccountStore = defineStore('account', () => {
       
       // 1. 토큰 먼저 저장
       token.value = response.data.key
+      localStorage.setItem("token", response.data.key)
+
+      console.log("저장된 토큰:", localStorage.getItem("token"))
 
       // 2. 토큰을 가지고 내 상세 정보(id, nickname 등) 가져오기
       // dj-rest-auth의 기본 유저 정보 엔드포인트는 /accounts/user/ 입니다.

@@ -1,15 +1,17 @@
 <template>
-  <div class="recommend-layout">
-    <transition name="slide-fade" mode="out-in">
-      <component 
-        :is="currentStepComponent" 
-        @next="handleNextStep"
-        :is-my-data="isMyDataAgreed"
-      />
-    </transition>
+  <div class="recommend-wrapper">
+    <div class="toss-container-narrow">
+      <transition name="slide-fade" mode="out-in">
+        <component 
+          :is="currentStepComponent" 
+          @next="handleNextStep"
+          @retry="resetAll"
+          :is-my-data="isMyDataAgreed"
+        />
+      </transition>
+    </div>
   </div>
 </template>
-
 <script setup>
 import { ref, computed } from 'vue'
 import StartStepItem from '@/components/recommendations/StartStepItem.vue'
@@ -45,23 +47,17 @@ const handleNextStep = (data) => {
 </script>
 
 <style scoped>
-.recommend-layout {
-  max-width: 500px;
-  margin: 0 auto;
+.recommend-wrapper {
+  background-color: var(--toss-white); /* 혹은 var(--toss-gray-bg) */
   min-height: 100vh;
-  background-color: #fff;
 }
-
-/* 토스 스타일의 부드러운 슬라이드 전환 애니메이션 */
-.slide-fade-enter-active, .slide-fade-leave-active {
-  transition: all 0.4s ease-out;
+.toss-container-narrow {
+  max-width: 480px; /* 모바일 우선 너비 */
+  margin: 0 auto;
+  padding: 60px 24px;
 }
-.slide-fade-enter-from {
-  opacity: 0;
-  transform: translateX(20px);
-}
-.slide-fade-leave-to {
-  opacity: 0;
-  transform: translateX(-20px);
-}
+/* 슬라이드 애니메이션 */
+.slide-fade-enter-active, .slide-fade-leave-active { transition: all 0.3s ease-out; }
+.slide-fade-enter-from { opacity: 0; transform: translateY(10px); }
+.slide-fade-leave-to { opacity: 0; transform: translateY(-10px); }
 </style>
