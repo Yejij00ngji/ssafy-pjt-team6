@@ -101,7 +101,7 @@ const router = createRouter({
     {
       path: '/externals/search',
       name: 'Search',
-      component: () => import('@/views/externals/Search.vue')
+      component: () => import('@/views/externals/SearchView.vue')
     },
     {
       path: '/externals/search/:videoId',
