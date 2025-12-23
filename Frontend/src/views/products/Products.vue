@@ -5,16 +5,16 @@
     <hr>
 
     <h2>상품 검색 필터</h2>
-
+      
     <div class="filter-box">
 
       <select v-model="filters.bank">
-        <option value="">모든 은행</option>
-        <option value="우리은행">우리은행</option>
-        <option value="국민은행">국민은행</option>
-        <option value="신한은행">신한은행</option>
-        <option value="농협은행주식회사">농협은행</option>
-      </select>
+          <option value="">모든 은행</option>
+          <option value="우리은행">우리은행</option>
+          <option value="국민은행">국민은행</option>
+          <option value="신한은행">신한은행</option>
+          <option value="농협은행주식회사">농협은행</option>
+        </select>
 
       <select v-model="filters.term">
         <option value="">모든 기간</option>
@@ -24,10 +24,10 @@
         <option :value="12">12개월</option>
         <option :value="24">24개월</option>
         <option :value="36">36개월</option>
-      </select>
+        </select>
 
       <button @click="onSearch">검색하기</button>
-    </div>
+      </div>
 
     <hr />
 
@@ -42,7 +42,7 @@
 
 
     <hr>
-    
+
     <div class="table-container">
       <table>
         <thead>
