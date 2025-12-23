@@ -74,14 +74,6 @@ class Command(BaseCommand):
                 is_mydata_linked=True
             )
             profiles.append(profile)
-
-            # # 가입 내역 생성
-            # if random.random() < sub_p and product_options:
-            #     Subscription.objects.create(
-            #         user=user,
-            #         product_option=random.choice(product_options),
-            #         amount=random.randint(1000000, 10000000)
-            #     )
                 
             # 2. 가입 내역 생성 (핵심 수정 부분: Snapshot 필드 반영)
             if random.random() < sub_p:
@@ -102,18 +94,19 @@ class Command(BaseCommand):
         df = pd.DataFrame([{
             'id': p.id, 
             'inc': p.annual_income_amt, 
-            'inv': p.invest_eval_amt / (p.balance_amt + p.invest_eval_amt + 1),
+            'inv_ratio': p.invest_eval_amt / (p.balance_amt + p.invest_eval_amt + 1),
+            'withdrawable_ratio': p.withdrawable_amt / (p.balance_amt + p.invest_eval_amt + 1),  # 현금 유동성: 총 자산 중 '지금 당장 예적금으로 묶어도 되는 비율'
             'growth': p.expense_growth_rate, 
-            'ratio': p.expense_to_income_ratio
+            'expense_ratio': p.expense_to_income_ratio
         } for p in profiles])
 
         scaler = StandardScaler()
-        scaled = scaler.fit_transform(df[['inc', 'inv', 'growth', 'ratio']])
+        scaled = scaler.fit_transform(df[['inc', 'inv_ratio', 'withdrawable_ratio', 'growth', 'expense_ratio']])
         
         kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
         df['cluster'] = kmeans.fit_predict(scaled)
 
         for _, row in df.iterrows():
-            FinancialProfile.objects.filter(id=row['id']).update(cluster_label=str(int(row['cluster'])))
+            FinancialProfile.objects.filter(id=row['id']).update(cluster_label=int(row['cluster']))  # 클러스터 라벨 저장 - 통계를 위해 int로 저장
 
         self.stdout.write(self.style.SUCCESS("마이데이터 생성 및 AI 클러스터링 완료!"))

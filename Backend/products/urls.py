@@ -6,4 +6,6 @@ urlpatterns = [
     path('products/', views.products),
     path('products/<int:pk>/', views.product_details),
     path('subscriptions/', views.subscriptions),
+    path('recommendations/', views.get_recommendations),
+    path('recommendations/test/', views.get_recommendations),
 ]

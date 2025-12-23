@@ -27,6 +27,9 @@ YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
 # 3. kakao path key
 KAKAO_PATH_KEY = os.getenv('KAKAO_PATH_KEY')
 
+# 4. openai api key
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 

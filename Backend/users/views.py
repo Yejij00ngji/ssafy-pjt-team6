@@ -4,7 +4,6 @@ import os
 from django.conf import settings
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from products.services import predict_user_cluster
 from allauth.socialaccount.providers.naver.views import NaverOAuth2Adapter
 from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -77,22 +76,22 @@ class NaverLogin(SocialLoginView):
         self.login()
         return self.get_response()
     
-# 마이데이터 생성
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-# @parser_classes([MultiPartParser, FormParser])
-def financial_profile(request):
-    # 1. 시리얼라이저 초기화 (데이터와 context 전달)
-    serializer = FinancialProfileSerializer(data=request.data)
+# # 마이데이터 생성
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# # @parser_classes([MultiPartParser, FormParser])
+# def financial_profile(request):
+#     # 1. 시리얼라이저 초기화 (데이터와 context 전달)
+#     serializer = FinancialProfileSerializer(data=request.data)
     
-    # 2. 유효성 검사 (숫자 형식이 맞는지, 필수 필드 등 확인)
-    if serializer.is_valid():
-        profile = serializer.save(user=request.user)  # Serializer의 create() 메서드가 호출됨
+#     # 2. 유효성 검사 (숫자 형식이 맞는지, 필수 필드 등 확인)
+#     if serializer.is_valid():
+#         profile = serializer.save(user=request.user)  # Serializer의 create() 메서드가 호출됨
         
-        predict_user_cluster(profile)
+#         predict_user_cluster(profile)
 
-        return Response({"cluster": profile.cluster_label, "message": "성공"}, status=200)
+#         return Response({"cluster": profile.cluster_label, "message": "성공"}, status=200)
     
-    # 3. 검증 실패 시 에러 반환
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     # 3. 검증 실패 시 에러 반환
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
