@@ -248,3 +248,9 @@ SOCIALACCOUNT_PROVIDERS = {
 #     'username': {'required': False},
 #     'email': {'required': True},
 # }
+
+# 1. 사용자가 업로드한 파일을 저장할 실제 경로
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# 2. 웹 브라우저에서 접근할 때 사용할 URL 주소
+MEDIA_URL = '/media/'
