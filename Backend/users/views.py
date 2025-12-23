@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
+from allauth.socialaccount.providers.naver.views import NaverOAuth2Adapter
+from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
@@ -41,6 +43,27 @@ class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     callback_url = "http://localhost:5173/login/callback" # Vue의 리디렉션 URI와 동일해야 함
     client_class = ReliableOAuth2Client
+    def post(self, request, *args, **kwargs):
+        self.serializer = self.get_serializer(data=request.data)
+        self.serializer.is_valid(raise_exception=True)
+        self.login()
+        return self.get_response()
+    
+class KakaoLogin(SocialLoginView):
+    adapter_class = KakaoOAuth2Adapter
+    callback_url = "http://localhost:5173/login/kakao/callback" # 프론트엔드 리다이렉트 경로
+    client_class = ReliableOAuth2Client
+    def post(self, request, *args, **kwargs):
+        self.serializer = self.get_serializer(data=request.data)
+        self.serializer.is_valid(raise_exception=True)
+        self.login()
+        return self.get_response()
+    
+class NaverLogin(SocialLoginView):
+    adapter_class = NaverOAuth2Adapter
+    callback_url = "http://localhost:5173/login/naver/callback" # 프론트엔드 URL
+    client_class = ReliableOAuth2Client
+    
     def post(self, request, *args, **kwargs):
         self.serializer = self.get_serializer(data=request.data)
         self.serializer.is_valid(raise_exception=True)
