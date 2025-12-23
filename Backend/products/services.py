@@ -106,7 +106,6 @@ def run_financial_clustering():
         profile.cluster_label = str(int(row['cluster']))
         profile.save()
 
-
 def predict_user_cluster(profile):
     """신규 유저 1명의 데이터를 받아 클러스터 라벨을 반환"""
     try:
@@ -124,8 +123,9 @@ def predict_user_cluster(profile):
             profile.age,
             profile.invest_eval_amt / total_asset,
             (profile.monthly_paid_amt * 12) / (profile.annual_income_amt + 1),
-            profile.expense_growth_rate,
-            profile.expense_to_income_ratio
+            # profile.expense_growth_rate,
+            # profile.expense_to_income_ratio
+            float(profile.withdrawable_amt / (profile.balance_amt + 1)) # liquidity_ratio (이게 빠져있었음)
         ]]
 
         # 3. 스케일링 및 예측
@@ -136,6 +136,7 @@ def predict_user_cluster(profile):
         profile.cluster_label = str(int(cluster_id))
         profile.save()
         return profile.cluster_label
+    
     except FileNotFoundError:
         # 모델 파일이 없으면 전체 클러스터링 한 번 실행
         run_financial_clustering()
