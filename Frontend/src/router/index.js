@@ -64,7 +64,7 @@ const router = createRouter({
     {
       path: '/recommendations',
       name: 'Recommendations',
-      component: () => import('@/views/Recommendations.vue')
+      component: () => import('@/views/recommendations/RecommendView.vue')
     },
     // 커뮤니티
     {
