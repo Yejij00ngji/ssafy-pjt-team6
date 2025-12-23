@@ -38,6 +38,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
+            'pk',  # 로그인한 유저 정보 알기 위해 반드시 필요함
             'username',
             'nickname', 
             'email',

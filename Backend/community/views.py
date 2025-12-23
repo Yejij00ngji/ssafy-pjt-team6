@@ -53,7 +53,30 @@ def article_detail(request, article_pk):
             return Response({'error': '권한이 없습니다.'}, status=status.HTTP_403_FORBIDDEN)
         article.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+# 좋아요 기능
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])  # 로그인한 유저만 가능
+def article_like(request, article_pk):
+    article = get_object_or_404(Article, pk=article_pk)
+    user = request.user
+
+    # 좋아요 토글 로직
+    if article.like_users.filter(pk=user.pk).exists():
+        # 이미 좋아요를 누른 경우 -> 취소
+        article.like_users.remove(user)
+        is_liked = False
+    else:
+        # 좋아요를 누르지 않은 경우 -> 추가
+        article.like_users.add(user)
+        is_liked = True
     
+    context = {
+        'is_liked': is_liked,
+        'like_count': article.like_users.count()
+    }
+    return Response(context)    
+
 # 댓글
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
