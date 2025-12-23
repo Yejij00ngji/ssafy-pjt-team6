@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import os
 
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
