@@ -54,11 +54,11 @@ export const useProductStore = defineStore('product', () => {
     return response.data
   }
 
-  const subscribeProduct = async ({deposit_option, amounts}) => {
+  const subscribeProduct = async ({product_option, amounts}) => {
     await axios.post(
       `${accountStore.API_URL}/subscriptions/`,
       {
-        deposit_option: deposit_option,
+        product_option: product_option,
         amount: amounts,
       },
       {
