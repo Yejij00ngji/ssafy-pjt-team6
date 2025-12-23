@@ -28,6 +28,9 @@ class Command(BaseCommand):
             return
 
         product_options = list(ProductOption.objects.all())
+        if not product_options:
+            self.stdout.write(self.style.ERROR("상품 옵션이 없습니다. seed_products를 먼저 실행하세요."))
+            return
         
         profiles = []
         for user in users:
@@ -72,19 +75,36 @@ class Command(BaseCommand):
             )
             profiles.append(profile)
 
-            # 가입 내역 생성
-            if random.random() < sub_p and product_options:
+            # # 가입 내역 생성
+            # if random.random() < sub_p and product_options:
+            #     Subscription.objects.create(
+            #         user=user,
+            #         product_option=random.choice(product_options),
+            #         amount=random.randint(1000000, 10000000)
+            #     )
+                
+            # 2. 가입 내역 생성 (핵심 수정 부분: Snapshot 필드 반영)
+            if random.random() < sub_p:
+                selected_option = random.choice(product_options)
                 Subscription.objects.create(
                     user=user,
-                    product_option=random.choice(product_options),
-                    amount=random.randint(1000000, 10000000)
+                    product_option=selected_option,
+                    amount=random.randint(1000000, 10000000),
+                    # 새로 추가한 Snapshot 필드들!
+                    init_intr_rate=selected_option.intr_rate or 0,
+                    init_intr_rate2=selected_option.intr_rate2 or 0,
+                    init_save_trm=selected_option.save_trm,
+                    init_intr_rate_type_nm=selected_option.intr_rate_type_nm,
+                    is_active=True
                 )
 
         # 2. 클러스터링 (비지도 학습)
         df = pd.DataFrame([{
-            'id': p.id, 'inc': p.annual_income_amt, 
+            'id': p.id, 
+            'inc': p.annual_income_amt, 
             'inv': p.invest_eval_amt / (p.balance_amt + p.invest_eval_amt + 1),
-            'growth': p.expense_growth_rate, 'ratio': p.expense_to_income_ratio
+            'growth': p.expense_growth_rate, 
+            'ratio': p.expense_to_income_ratio
         } for p in profiles])
 
         scaler = StandardScaler()

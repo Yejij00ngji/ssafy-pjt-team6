@@ -14,7 +14,7 @@
     </div>
 
     <div class="info-text">
-      <p>선택하신 옵션 번호: <strong>{{ payload.deposit_option }}</strong></p>
+      <p>선택하신 옵션 번호: <strong>{{ payload.product_option }}</strong></p>
       <p>최종 가입 금액: <strong>{{ payload.amounts.toLocaleString() }}</strong> 원</p>
     </div>
 
@@ -35,7 +35,7 @@ const router = useRouter()
 const productStore = useProductStore()
 
 const payload = ref({
-  deposit_option: route.params.id,
+  product_option: route.params.id,
   amounts: 0,
 })
 
@@ -49,7 +49,7 @@ const onSubscribe = async () => {
     try {
       // Store의 subscribeProduct 호출
       await productStore.subscribeProduct({
-        deposit_option: payload.value.deposit_option,
+        product_option: payload.value.product_option,
         amounts: payload.value.amounts
       })
       

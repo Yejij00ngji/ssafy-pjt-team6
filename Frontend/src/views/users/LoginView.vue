@@ -49,18 +49,18 @@
 
       <div class="social-group">
         <button @click="kakaoLogin" class="social-btn kakao">
-          <img src="@/assets/icons/kakao.svg" alt="카카오" class="social-icon-svg" />
-          카카오로 시작하기
+          <img src="@/assets/icons/kakao.svg" alt="카카오" class="social-icon" />
+          <span>카카오로 시작하기</span>
         </button>
         
         <button @click="naverLogin" class="social-btn naver">
-          <img src="@/assets/icons/naver.svg" alt="네이버" class="social-icon-svg white-icon" />
-          네이버로 시작하기
+          <img src="@/assets/icons/naver.svg" alt="네이버" class="social-icon" />
+          <span>네이버로 시작하기</span>
         </button>
         
         <button @click="googleLogin" class="social-btn google">
-          <img src="@/assets/icons/google.svg" alt="구글" class="social-icon-svg" />
-          구글로 시작하기
+          <img src="@/assets/icons/google.svg" alt="구글" class="social-icon" />
+          <span>구글로 시작하기</span>
         </button>
       </div>
 
@@ -227,6 +227,7 @@ const naverLogin = () => {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
 }
 
 .social-btn {
@@ -239,20 +240,43 @@ const naverLogin = () => {
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  gap: 10px;
+  position: relative;
+  transition: opacity 0.2s;
 }
 
-.social-icon-svg {
+.social-btn:hover {
+  opacity: 0.9;
+}
+
+/* 아이콘 공통 스타일 */
+.social-icon {
   width: 18px;
   height: 18px;
-  /* 소셜 로고의 정렬을 맞추기 위해 사용 */
-  object-fit: contain; 
+  margin-right: 10px;
+  object-fit: contain;
 }
 
-/* 네이버 같은 경우 로고가 흰색이어야 잘 보일 수 있으므로 스타일 조정 가능 */
-.naver .social-icon-svg {
-  /* 필요시 필터로 색상 제어 가능 */
-  filter: brightness(0) invert(1); 
+/* 1. 카카오 스타일 */
+.kakao {
+  background-color: #FEE500;
+  color: #191919;
+}
+
+/* 2. 네이버 스타일: 배경이 초록일 때 아이콘을 하얗게 */
+.naver {
+  background-color: #03C75A;
+  color: #FFFFFF;
+}
+/* SVG가 검은색 'N'일 경우 하얗게 반전시키는 매직 코드 */
+.white-icon {
+  filter: brightness(0) invert(1);
+}
+
+/* 3. 구글 스타일: 가이드에 따라 화이트 배경 권장 */
+.google {
+  background-color: #FFFFFF;
+  color: #3C4043;
+  border: 1px solid #E5E8EB;
 }
 
 .auth-footer {
