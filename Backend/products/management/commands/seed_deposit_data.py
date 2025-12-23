@@ -3,14 +3,13 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.db import transaction
 
-# 모델 이름 변경 감안: 사용자 코드는 DepositProducts를 사용하나, 
-# 이전 대화에서 FinanceProduct를 사용했으므로 DepositProducts로 가정하고 작성합니다.
-from products.models import DepositProducts, DepositOptions 
+from products.models import FinancialProduct, ProductOption 
+# from products.models import FinancialProduct, ProductOption
 
 # API 기본 정보 설정
 API_KEY = settings.API_KEY
 BASE_URL = 'https://finlife.fss.or.kr/finlifeapi/'
-DEPOSIT_URL = BASE_URL + 'depositProductsSearch.json'
+DEPOSIT_URL = BASE_URL + 'FinancialProductSearch.json'
 TOP_FIN_GRP_NO = '020000' # 은행 권역 코드
 
 class Command(BaseCommand):
@@ -93,7 +92,7 @@ class Command(BaseCommand):
                 if data[key] is None:
                     data[key] = ''
 
-            DepositProducts.objects.update_or_create(
+            FinancialProduct.objects.update_or_create(
                 fin_prdt_cd=product_data['fin_prdt_cd'],
                 defaults=data
             )
@@ -107,14 +106,14 @@ class Command(BaseCommand):
         # 📌 최적화 핵심: 저장된 모든 상품 인스턴스를 한 번에 불러와 딕셔너리로 만듭니다.
         products_dict = {
             p.fin_prdt_cd: p 
-            for p in DepositProducts.objects.filter(fin_prdt_cd__in=product_codes)
+            for p in FinancialProduct.objects.filter(fin_prdt_cd__in=product_codes)
         }
         
         options_to_create = []
         
         # 기존 옵션 데이터 삭제 (옵션만 업데이트하는 경우도 있지만, 여기서는 초기화)
         # 💡 옵션은 상품 코드와 save_trm을 조합하여 Unique함을 가정합니다.
-        DepositOptions.objects.filter(product__fin_prdt_cd__in=product_codes).delete()
+        ProductOption.objects.filter(product__fin_prdt_cd__in=product_codes).delete()
         
         for option_data in option_list:
             fin_prdt_cd = option_data.get('fin_prdt_cd')
@@ -130,7 +129,7 @@ class Command(BaseCommand):
             intr_rate_val = option_data.get('intr_rate')
             intr_rate2_val = option_data.get('intr_rate2')
 
-            options_to_create.append(DepositOptions(
+            options_to_create.append(ProductOption(
                 product=product_instance,
                 save_trm=int(option_data.get('save_trm')),
                 intr_rate_type_nm=option_data.get('intr_rate_type_nm'),
@@ -140,6 +139,6 @@ class Command(BaseCommand):
             ))
             
         # 📌 성능 최적화: BULK INSERT 사용
-        DepositOptions.objects.bulk_create(options_to_create, ignore_conflicts=True)
+        ProductOption.objects.bulk_create(options_to_create, ignore_conflicts=True)
         
         self.stdout.write(self.style.NOTICE(f'✅ 옵션 정보 {len(options_to_create)}개 저장 완료.'))

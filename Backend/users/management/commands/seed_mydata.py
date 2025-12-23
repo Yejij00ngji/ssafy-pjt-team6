@@ -8,7 +8,7 @@ from sklearn.preprocessing import StandardScaler
 
 # 앱 위치에 따른 정확한 참조
 from users.models import FinancialProfile
-from products.models import DepositOptions, Subscription 
+from products.models import ProductOption, Subscription 
 
 User = get_user_model()
 
@@ -27,7 +27,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR("유저가 없습니다. users.json을 먼저 실행하세요."))
             return
 
-        deposit_options = list(DepositOptions.objects.all())
+        product_options = list(ProductOption.objects.all())
         
         profiles = []
         for user in users:
@@ -73,10 +73,10 @@ class Command(BaseCommand):
             profiles.append(profile)
 
             # 가입 내역 생성
-            if random.random() < sub_p and deposit_options:
+            if random.random() < sub_p and product_options:
                 Subscription.objects.create(
                     user=user,
-                    deposit_option=random.choice(deposit_options),
+                    product_option=random.choice(product_options),
                     amount=random.randint(1000000, 10000000)
                 )
 
