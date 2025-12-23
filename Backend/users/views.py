@@ -1,5 +1,10 @@
+import joblib
+import numpy as np
+import os
+from django.conf import settings
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
+from products.services import predict_user_cluster
 from allauth.socialaccount.providers.naver.views import NaverOAuth2Adapter
 from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -11,6 +16,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from .serializers import UserDetailSerializer, CustomGoogleSerializer, FinancialProfileSerializer
+
 
 # Create your views here.
 
@@ -81,11 +87,12 @@ def financial_profile(request):
     
     # 2. 유효성 검사 (숫자 형식이 맞는지, 필수 필드 등 확인)
     if serializer.is_valid():
-        serializer.save(user=request.user)  # Serializer의 create() 메서드가 호출됨
-        return Response({
-            "message": "금융 프로필이 업데이트되었습니다.",
-            "data": serializer.data
-        }, status=status.HTTP_200_OK)
+        profile = serializer.save(user=request.user)  # Serializer의 create() 메서드가 호출됨
+        
+        predict_user_cluster(profile)
+
+        return Response({"cluster": profile.cluster_label, "message": "성공"}, status=200)
     
     # 3. 검증 실패 시 에러 반환
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

@@ -244,6 +244,8 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+ML_MODELS_DIR = os.path.join(BASE_DIR, 'ml_models')
+
 # ACCOUNT_SIGNUP_FIELDS = {
 #     'username': {'required': False},
 #     'email': {'required': True},

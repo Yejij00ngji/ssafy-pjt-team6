@@ -5,6 +5,8 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import joblib
+import os
+from django.conf import settings
 
 from users.models import FinancialProfile
 
@@ -91,12 +93,11 @@ def run_financial_clustering():
     df['cluster'] = kmeans.fit_predict(scaled_data)
 
     # [중요] 전략 B를 위해 Scaler와 KMeans 모델 저장
-    model_path = 'ml_models'
-    if not os.path.exists(model_path):
-        os.makedirs(model_path)
+    scaler_path = os.path.join(settings.ML_MODELS_DIR, 'financial_scaler.pkl')
+    kmeans_path = os.path.join(settings.ML_MODELS_DIR, 'financial_kmeans.pkl')
         
-    joblib.dump(scaler, f'{model_path}/scaler.pkl')
-    joblib.dump(kmeans, f'{model_path}/kmeans.pkl')
+    joblib.dump(scaler, scaler_path)
+    joblib.dump(kmeans, kmeans_path)
 
     # 결과 DB 반영
     for _, row in df.iterrows():
@@ -109,8 +110,11 @@ def predict_user_cluster(profile):
     """신규 유저 1명의 데이터를 받아 클러스터 라벨을 반환"""
     try:
         # 1. 저장된 모델 로드
-        scaler = joblib.load('ml_models/scaler.pkl')
-        kmeans = joblib.load('ml_models/kmeans.pkl')
+        scaler_path = os.path.join(settings.ML_MODELS_DIR, 'financial_scaler.pkl')
+        kmeans_path = os.path.join(settings.ML_MODELS_DIR, 'financial_kmeans.pkl')
+
+        scaler = joblib.load(scaler_path)
+        kmeans = joblib.load(kmeans_path)
 
         # 2. 유저 데이터를 모델 입력 형태(2D array)로 변환
         total_asset = profile.balance_amt + profile.invest_eval_amt + 1
