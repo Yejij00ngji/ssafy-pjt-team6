@@ -103,7 +103,7 @@ class Command(BaseCommand):
             'id': p.id, 
             'inc': p.annual_income_amt, 
             'inv': p.invest_eval_amt / (p.balance_amt + p.invest_eval_amt + 1),
-            'growth': p.expense_growth_rate, 
+            'growth': p.expense_growth_rate,
             'ratio': p.expense_to_income_ratio
         } for p in profiles])
 

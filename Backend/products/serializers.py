@@ -147,9 +147,15 @@ class SubscriptionSerializer(serializers.ModelSerializer):
   intr_rate = serializers.ReadOnlyField(source='product_option.intr_rate')
   intr_rate2 = serializers.ReadOnlyField(source='product_option.intr_rate2')
   class Meta:
-      model = Subscription
-      fields = ['id', 'product_option', 'amount', 'subscribed_at', 'expired_at','product_name', 'bank_name', 'save_trm', 'intr_rate', 'intr_rate2', ]
-      read_only_fields = ['user', 'subscribed_at', 'expired_at', ]
+        model = Subscription
+        fields = [
+            'id', 'product_option', 'amount', 'subscribed_at', 'expired_at',
+            'product_name', 'bank_name', 
+            'init_intr_rate', 'init_intr_rate2', 'init_save_trm', 'init_intr_rate_type_nm',
+            'save_trm', 'intr_rate', 'intr_rate2',
+        ]
+        read_only_fields = ['user', 'subscribed_at', 'expired_at', 'init_intr_rate', 'init_intr_rate2', 'init_save_trm', 'init_intr_rate_type_nm',
+        ]
 
   def create(self, validated_data):
-     return Subscription.objects.create(**validated_data)
+        return Subscription.objects.create(**validated_data)
