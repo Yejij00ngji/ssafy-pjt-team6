@@ -3,7 +3,7 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.helpers import complete_social_login
 from allauth.socialaccount.models import SocialApp, SocialAccount
 from rest_framework import serializers
-from .models import User
+from .models import User, FinancialProfile
 from products.models import DepositProducts
 from products.serializers import DepositOptionsSerializer
 
@@ -63,3 +63,29 @@ class CustomGoogleSerializer(SocialLoginSerializer):
         # view에서 context를 넘겨받아 부모 validate가 작동하게 합니다.
         attrs = super().validate(attrs)
         return attrs
+    
+# 마이데이터 Serializer
+class FinancialProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FinancialProfile
+        # 요청에서 받을 5가지 필드 정의
+        fields = [
+            'balance_amt',
+            'invest_eval_amt',
+            'annual_income_amt',
+            'monthly_paid_amt',
+            'withdrawable_amt'
+        ]
+
+    def create(self, validated_data):
+        # view에서 넘겨준 user 객체를 꺼냅니다.
+        user = validated_data.pop('user')
+        
+        # update_or_create를 사용하여 기존 데이터가 있으면 덮어쓰고, 없으면 생성합니다.
+        profile, created = FinancialProfile.objects.update_or_create(
+            user=user,
+            defaults={
+                **validated_data,
+            }
+        )
+        return profile
