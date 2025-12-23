@@ -4,8 +4,12 @@ from allauth.socialaccount.helpers import complete_social_login
 from allauth.socialaccount.models import SocialApp, SocialAccount
 from rest_framework import serializers
 from .models import User, FinancialProfile
-from products.models import DepositProducts
-from products.serializers import DepositOptionsSerializer
+# from products.models import FinancialProduct
+# from products.serializers import ProductOptionSerializer
+from products.models import FinancialProduct
+from products.serializers import ProductOptionSerializer
+
+
 
 class CustomRegisterSerializer(RegisterSerializer):
   birth_date = serializers.DateField()
@@ -38,6 +42,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
+            'pk',  # 로그인한 유저 정보 알기 위해 반드시 필요함
             'username',
             'nickname', 
             'email',

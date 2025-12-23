@@ -5,9 +5,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.db.models import Avg, Count
 
-from .models import DepositOptions, DepositProducts, Subscription
+# from .models import ProductOption, FinancialProduct, Subscription
+from .models import ProductOption, FinancialProduct, Subscription
 from users.models import FinancialProfile
-from .serializers import DepositOptionsSerializer, DepositProductsSerializer, DepositProductsDetailsSerializer, SubscriptionSerializer
+# from .serializers import ProductOptionSerializer, FinancialProductSerializer, FinancialProductDetailsSerializer, SubscriptionSerializer
+from .serializers import ProductOptionSerializer, FinancialProductSerializer, FinancialProductDetailSerializer, SubscriptionSerializer
 from .services import simulate_mydata_linking, predict_user_cluster
 from .filters import ProductFilter
 
@@ -19,36 +21,40 @@ from dateutil.relativedelta import relativedelta
 def products(request):
   if request.method == 'GET':
     
-    queryset = DepositProducts.objects.all().distinct()
+    queryset = FinancialProduct.objects.all().distinct()
 
     filterset = ProductFilter(request.GET, queryset=queryset)
 
     if filterset.is_valid():
       queryset = filterset.qs
 
-    serializer = DepositProductsSerializer(queryset, many=True)
+    serializer = FinancialProductSerializer(queryset, many=True)
     return Response(serializer.data)
 
 # 상품 상세 정보 조회
 @api_view(['GET','POST'])
 def product_details(request, pk):
   if request.method == 'GET':
-    deposit_product = DepositProducts.objects.get(pk=pk)
-    serializer = DepositProductsDetailsSerializer(deposit_product)
+    deposit_product = FinancialProduct.objects.get(pk=pk)
+    serializer = FinancialProductDetailSerializer(deposit_product)
     return Response(serializer.data)
 
 # 상품 옵션 정보 조회
 @api_view(['GET'])
 def options(request):
   if request.method == 'GET':
-    subscribed_option_ids = request.user.subscriptions.values_list('deposit_option_id', flat=True)
+    subscribed_option_ids = request.user.subscriptions.values_list('product_option_id', flat=True)
 
-    subscribed_options = DepositOptions.objects.filter(id__in=subscribed_option_ids).select_related('product')
-    serializer = DepositOptionsSerializer(subscribed_options, many=True)
+    subscribed_options = ProductOption.objects.filter(id__in=subscribed_option_ids).select_related('product')
+    serializer = ProductOptionSerializer(subscribed_options, many=True)
 
-    # deposit_options = DepositOptions.objects.all()
-    # serializer = DepositOptionsSerializer(deposit_options,many=True)
+    # product_options = ProductOption.objects.all()
+    # serializer = ProductOptionSerializer(product_options,many=True)
     return Response(serializer.data)
+
+# =================================================================================
+# 예적금 통합
+# =================================================================================
   
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -59,7 +65,7 @@ def subscriptions(request):
     if serializer.is_valid(raise_exception=True):
 
       # 가입 날짜 기준 만기일 계산
-      option = serializer.validated_data['deposit_option']
+      option = serializer.validated_data['product_option']
       months = option.save_trm
       expired_date = date.today() + relativedelta(months=months)
 
@@ -145,18 +151,18 @@ def recommend_by_portfolio(request):
         cluster_label=my_label
     ).exclude(user=user).values_list('user_id', flat=True)
 
-    # 3. 그들이 가입한 상품(DepositOptions) 중 가장 인기 있는 것 Top 3
+    # 3. 그들이 가입한 상품(ProductOption) 중 가장 인기 있는 것 Top 3
     # Subscription 테이블을 통해 인기 상품 집계
     recommended_items = Subscription.objects.filter(
         user_id__in=similar_user_ids
-    ).values('deposit_option') \
+    ).values('product_option') \
      .annotate(subscriber_count=Count('user')) \
      .order_by('-subscriber_count')[:3]
 
     # 4. 상품 상세 정보 담기
     recommend_list = []
     for item in recommended_items:
-        option = DepositOptions.objects.get(id=item['deposit_option'])
+        option = ProductOption.objects.get(id=item['product_option'])
         recommend_list.append({
             "product_name": option.product.fin_prdt_nm,
             "bank_name": option.product.kor_co_nm,

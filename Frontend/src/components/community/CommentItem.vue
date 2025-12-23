@@ -74,8 +74,14 @@ const cancelEdit = () => { isEditing.value = false }
 
 const onUpdate = () => {
   if (!editContent.value.trim()) return
-  emit('update-comment', props.comment.id, editContent.value)
-  isEditing.value = false
+
+  // 부모에게 보낼 때 'commentId'라는 이름을 정확히 사용합니다.
+  emit('update-comment', { 
+    commentId: props.comment.id, 
+    content: editContent.value 
+  })
+  
+  isEditing.value = false // 수정 모드 종료
 }
 
 const formatDate = (dateStr) => {

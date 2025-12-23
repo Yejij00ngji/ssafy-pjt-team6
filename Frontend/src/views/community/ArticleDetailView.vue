@@ -87,9 +87,29 @@ const fetchArticleDetail = async () => {
   try {
     const response = await axios.get(`http://127.0.0.1:8000/community/${route.params.id}/`)
     article.value = response.data
+
+    // 이 로그를 통해 버튼이 안 보이는 원인을 찾으세요!
+    console.log('현재 로그인 유저 PK:', accountStore.user?.pk)
+    console.log('게시글 작성자 ID:', article.value.user?.id)
+
   } catch (err) {
     alert('게시글을 찾을 수 없습니다.')
     router.push({ name: 'Community' })
+  }
+}
+
+// 게시글 좋아요
+const handleLike = async () => {
+  try {
+    await axios.post(`http://127.0.0.1:8000/community/${article.value.id}/like/`, {}, {
+      headers: { Authorization: `Token ${accountStore.token}` }
+    })
+    // 백엔드에서 준 최신 데이터로 로컬 상태 업데이트
+    article.value.likes = response.data.like_count
+
+    // fetchArticleDetail() // 좋아요 수 업데이트를 위해 다시 불러오기
+  } catch (err) {
+    console.error('좋아요 실패:', err)
   }
 }
 
@@ -117,6 +137,48 @@ const submitComment = async () => {
     newComment.value = ''
     fetchArticleDetail()
   } catch (err) { console.error(err) }
+}
+
+// 1. 댓글 삭제 함수
+const handleDeleteComment = async (commentId) => {
+  if (confirm('댓글을 삭제하시겠습니까?')) {
+    try {
+      await axios.delete(`http://127.0.0.1:8000/community/comments/${commentId}/`, {
+        headers: { Authorization: `Token ${accountStore.token}` }
+      })
+      // 삭제 후 게시글 상세 정보를 다시 불러와 댓글 목록 갱신
+      fetchArticleDetail()
+    } catch (err) {
+      console.error('댓글 삭제 실패:', err)
+      alert('본인의 댓글만 삭제할 수 있습니다.')
+    }
+  }
+}
+
+// 2. 댓글 수정 함수 (수정 로직이 있다면)
+const handleUpdateComment = async (payload) => {
+  // 디버깅용: 데이터가 어떻게 들어오는지 확인
+  console.log('부모가 받은 데이터:', payload)
+
+  try {
+    // payload 안의 commentId와 content를 꺼냅니다.
+    const { commentId, content } = payload
+    
+    // 만약 아이디가 없으면 여기서 차단
+    if (!commentId) {
+      console.error("댓글 ID를 찾을 수 없습니다. payload를 확인하세요.");
+      return
+    }
+
+    await axios.put(`http://127.0.0.1:8000/community/comments/${commentId}/`, 
+      { content: content },
+      { headers: { Authorization: `Token ${accountStore.token}` } }
+    )
+    
+    fetchArticleDetail() // 성공 시 목록 갱신
+  } catch (err) {
+    console.error('댓글 수정 실패:', err)
+  }
 }
 
 const formatDate = (dateStr) => {
