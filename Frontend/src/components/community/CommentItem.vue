@@ -1,91 +1,148 @@
 <template>
+  <div class="comment-item">
+    <div class="comment-header">
+      <div class="user-group">
+        <div class="avatar-wrapper">
+          <img :src="`https://ui-avatars.com/api/?name=${comment.user.nickname}&background=f2f4f6&color=8b95a1`" class="avatar-img">
+        </div>
+        <div class="user-info">
+          <div class="name-row">
+            <span class="nickname">{{ comment.user.nickname }}</span>
+            <span v-if="isAuthor" class="author-label">작성자</span>
+          </div>
+          <span class="created-at">{{ formatDate(comment.created_at) }}</span>
+        </div>
+      </div>
 
-  <div class="comment-wrapper d-flex gap-3 py-4 border-bottom">
-    <div class="vote-section d-flex flex-column align-items-center">
-      <button class="btn btn-link p-0 text-secondary"><i class="bi bi-hand-thumbs-up"></i></button>
-      <button class="btn btn-link p-0 text-secondary"><i class="bi bi-hand-thumbs-down"></i></button>
+      <div v-if="isMyComment && !isEditing" class="action-group">
+        <button @click="toggleEdit" class="text-btn">수정</button>
+        <button @click="$emit('delete-comment', comment.id)" class="text-btn delete">삭제</button>
+      </div>
     </div>
 
-    <div class="content-section flex-grow-1">
-      <div v-if="!isEditing">
-        <div class="d-flex align-items-center mb-2">
-          <div class="avatar me-2">
-            <img :src="`https://ui-avatars.com/api/?name=${comment.user.nickname}`" class="rounded-circle" width="32">
-          </div>
-          <div class="user-info">
-            <span class="fw-bold me-2">{{ comment.user.nickname }}</span>
-            <span class="badge bg-light text-success border">글쓴이</span> 
-            <div class="text-muted small">{{ comment.created_at }}</div>
-          </div>
-        </div>
-        
-        <div class="comment-text mb-3 text-dark">
-          {{ comment.content }}
-        </div>
-        
-        <div v-if="accountStore.user && Number(accountStore.user.pk) === Number(comment.user.id)" class="mb-2">
-          <button @click="toggleEdit" class="btn btn-sm text-primary border-0 p-0 me-2">수정</button>
-          <button @click="$emit('delete-comment', comment.id)" class="btn btn-sm text-danger border-0 p-0">삭제</button>
-        </div>
-        
-        <div class="comment-actions d-flex gap-2">
-          <button class="btn btn-sm btn-light border-0 rounded-pill px-3">💬 답글</button>
-          <button class="btn btn-sm btn-link text-secondary"><i class="bi bi-link-45deg"></i></button>
+    <div class="comment-body">
+      <div v-if="!isEditing" class="content-text">
+        {{ comment.content }}
+      </div>
+      
+      <div v-else class="edit-wrapper">
+        <textarea v-model="editContent" class="edit-textarea" rows="3"></textarea>
+        <div class="edit-actions">
+          <button @click="cancelEdit" class="toss-btn-sub-s">취소</button>
+          <button @click="onUpdate" class="toss-btn-primary-s">저장</button>
         </div>
       </div>
+    </div>
 
-      <div v-else>
-        <textarea v-model="editContent" class="form-control mb-2" rows="2"></textarea>
-        <div class="d-flex justify-content-end gap-2">
-          <button @click="cancelEdit" class="btn btn-sm btn-outline-secondary">취소</button>
-          <button @click="onUpdate" class="btn btn-sm btn-primary">저장</button>
-        </div>
-      </div>
+    <div v-if="!isEditing" class="comment-footer">
+      <button class="interaction-btn">
+        <span class="icon">💬</span> 답글 달기
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useAccountStore } from '@/stores/accounts';
-const accountStore = useAccountStore()
 
+const accountStore = useAccountStore()
 const props = defineProps({
-  comment: Object
+  comment: Object,
+  articleAuthorId: [Number, String] // 부모로부터 게시글 작성자 ID를 전달받으면 좋습니다
 })
 
-// 부모에게 보낼 이벤트 이름 정의
 const emit = defineEmits(['delete-comment', 'update-comment'])
 
-// 수정 관련 상태
 const isEditing = ref(false)
 const editContent = ref(props.comment.content)
 
-// 수정 모드 전환
+// 권한 확인 로직
+const isMyComment = computed(() => 
+  accountStore.user && Number(accountStore.user.pk) === Number(props.comment.user.id)
+)
+
+// 작성자 여부 (예시: 상위 컴포넌트에서 정보를 주거나 비교 로직 필요)
+const isAuthor = computed(() => false) // 로직에 따라 구현
+
 const toggleEdit = () => {
   isEditing.value = true
-  editContent.value = props.comment.content // 취소했다가 다시 누를 때를 대비해 초기화
+  editContent.value = props.comment.content
 }
 
-// 수정 취소
-const cancelEdit = () => {
+const cancelEdit = () => { isEditing.value = false }
+
+const onUpdate = () => {
+  if (!editContent.value.trim()) return
+  emit('update-comment', props.comment.id, editContent.value)
   isEditing.value = false
 }
 
-// 부모에게 수정 신호 보내기
-const onUpdate = () => {
-  if (!editContent.value.trim()) {
-    alert('내용을 입력해주세요.')
-    return
-  }
-  // 부모에게 댓글 ID와 수정된 내용을 보냄
-  emit('update-comment', props.comment.id, editContent.value)
-  isEditing.value = false // 입력창 닫기
+const formatDate = (dateStr) => {
+  const date = new Date(dateStr)
+  return `${date.getMonth() + 1}월 ${date.getDate()}일`
 }
 </script>
 
 <style scoped>
-.avatar img { background: #f0f0f0; }
-.comment-text { white-space: pre-wrap; line-height: 1.6; }
-.vote-section .bi { font-size: 1.2rem; }
+.comment-item {
+  padding: 24px 0;
+  border-bottom: 1px solid #f2f4f6;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.user-group { display: flex; align-items: center; gap: 12px; }
+.avatar-img { width: 36px; height: 36px; border-radius: 50%; }
+
+.name-row { display: flex; align-items: center; gap: 6px; }
+.nickname { font-size: 15px; font-weight: 600; color: #191f28; }
+.author-label { font-size: 12px; color: var(--toss-blue); font-weight: 700; }
+.created-at { font-size: 13px; color: #8b95a1; }
+
+.text-btn { font-size: 13px; color: #8b95a1; background: none; border: none; cursor: pointer; margin-left: 8px; }
+.text-btn.delete:hover { color: #f03e3e; }
+
+.comment-body { margin-bottom: 16px; }
+.content-text { font-size: 15px; line-height: 1.6; color: #333d4b; white-space: pre-wrap; }
+
+/* 수정 모드 스타일 */
+.edit-wrapper {
+  background-color: #f9fafb;
+  padding: 12px;
+  border-radius: 12px;
+}
+.edit-textarea {
+  width: 100%;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  resize: none;
+}
+.edit-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+
+/* 하단 버튼 */
+.interaction-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4e5968;
+  cursor: pointer;
+  padding: 0;
+}
+.interaction-btn:hover { color: var(--toss-blue); }
+
+/* 토스 스타일 공통 버튼(작은 사이즈) */
+.toss-btn-primary-s { background-color: var(--toss-blue); color: #fff; border: none; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+.toss-btn-sub-s { background-color: #e5e8eb; color: #4e5968; border: none; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; }
 </style>
