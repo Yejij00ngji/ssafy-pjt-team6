@@ -69,5 +69,9 @@ export const useProductStore = defineStore('product', () => {
       })
   }
 
+  const delSubscription = async () => {
+    pass
+  }
+
   return { subscriptions, getProducts, getProductDetails, subscribeProduct, getSubscriptions }
 }, { persist: true })
