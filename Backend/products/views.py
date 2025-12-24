@@ -115,7 +115,7 @@ def get_recommendations(request):
         logger.error("금융 프로필을 찾을 수 없습니다.")  # 오류 로그
         return Response({"error": "금융 프로필 없음"}, status=404)
 
-    if not profile.cluster_label:
+    if profile.cluster_label not in [0, 1, 2, 3, 4]:
         logger.warning("마이데이터 연동이 필요합니다.")  # 경고 로그
         return Response({"error": "마이데이터 연동 필요"}, status=400)
 

@@ -15,11 +15,14 @@
 </template>
 <script setup>
 import { ref, computed } from 'vue'
+import { useAccountStore } from '@/stores/accounts'
 import axios from 'axios'
 import StartStepItem from '@/components/recommendations/StartStepItem.vue'
 import ResultsStepItem from '@/components/recommendations/ResultsStepItem.vue'
 import LoadingItem from '@/components/recommendations/LoadingItem.vue'
 import SurveyItem from '@/components/recommendations/SurveyItem.vue'
+
+const accountStore = useAccountStore()
 
 const currentStep = ref('intro') // intro -> survey(선택) -> loading -> result
 const isMyDataAgreed = ref(false)
@@ -39,7 +42,7 @@ const currentStepComponent = computed(() => {
 
 // 실제 API 호출 함수
 const getRecommendations = async () => {
-  const token = localStorage.getItem("token")
+  const token = accountStore.token
   const API_URL = "http://localhost:8000" // 환경에 맞춰 수정
 
   try {

@@ -93,8 +93,8 @@ const logIn = async () => {
 
   const response = await accountStore.logIn(payload)
 
-  token.value = response.data.key
-  localStorage.setItem("token", response.data.key)
+  // token.value = response.data.key
+  // localStorage.setItem("token", response.data.key)
 }
 
 const googleLogin = () => {
