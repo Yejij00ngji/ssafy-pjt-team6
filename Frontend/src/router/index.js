@@ -66,11 +66,6 @@ const router = createRouter({
       name: 'Recommendations',
       component: () => import('@/views/recommendations/RecommendView.vue')
     },
-    {
-      path: '/recommendations/test',
-      name: 'TEST',
-      component: () => import('@/views/recommendations/RecommendTestView.vue')
-    },
     // 커뮤니티
     {
       path: '/community',

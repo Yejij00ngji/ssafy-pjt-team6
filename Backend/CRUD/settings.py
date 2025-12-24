@@ -103,6 +103,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CORS_ALLOWED_ALL_ORIGINS = True
+
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5173',
     'http://localhost:5173',
@@ -265,3 +267,29 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # 2. 웹 브라우저에서 접근할 때 사용할 URL 주소
 MEDIA_URL = '/media/'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'INFO',  # 이곳을 DEBUG로 바꾸면 더 많은 로그가 출력됩니다.
+            'class': 'logging.StreamHandler',
+            'stream': 'ext://sys.stdout',  # 콘솔에 출력
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',  # 이곳을 DEBUG로 바꾸면 더 많은 로그가 출력됩니다.
+            'propagate': True,
+        },
+        # 추가적으로 다른 앱에 대해서도 로그를 설정할 수 있습니다.
+        'your_app_name': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

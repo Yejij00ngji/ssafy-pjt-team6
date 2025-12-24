@@ -98,25 +98,37 @@ def subscriptions(request):
 # -----------------------------------------------------------------------------------------
 # 추천 로직
 # -----------------------------------------------------------------------------------------
+import logging
+
+logger = logging.getLogger(__name__)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_recommendations(request):
+    logger.info("추천 요청이 들어왔습니다.")
+
     user = request.user
 
     try:
         profile = user.financialprofile
     except:
+        logger.error("금융 프로필을 찾을 수 없습니다.")  # 오류 로그
         return Response({"error": "금융 프로필 없음"}, status=404)
 
     if not profile.cluster_label:
+        logger.warning("마이데이터 연동이 필요합니다.")  # 경고 로그
         return Response({"error": "마이데이터 연동 필요"}, status=400)
 
-    recommendations = recommend_products(user)
+    # 추천 로직 실행
+    recommendations = recommend_products(user, top_n=3)
+    
+    if not recommendations:
+        logger.warning("추천 결과가 없습니다.")  # 경고 로그
+        return Response({"error": "추천 결과가 없습니다."}, status=404)
 
     # 🔥 여기서 DB 저장
     save_recommendations(user, profile, recommendations)
-
+    
     result = []
     for rec in recommendations:
         option = rec["product_option"]
@@ -129,7 +141,10 @@ def get_recommendations(request):
             "save_trm": option.save_trm,
             "score": round(rec["score"], 3),
             "confidence": round(rec["confidence"], 3),
+            "reason": rec["reason"]  # 여기서 이유 추가
         })
+        
+    logger.info(f"추천결과: {result}")
 
     return Response({
         "user": user.username,
