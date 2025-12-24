@@ -1,6 +1,9 @@
 import numpy as np
 import random
 import pandas as pd
+import joblib
+import os
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from sklearn.cluster import KMeans
@@ -110,3 +113,12 @@ class Command(BaseCommand):
             FinancialProfile.objects.filter(id=row['id']).update(cluster_label=int(row['cluster']))  # 클러스터 라벨 저장 - 통계를 위해 int로 저장
 
         self.stdout.write(self.style.SUCCESS("마이데이터 생성 및 AI 클러스터링 완료!"))
+
+        # 모델 저장 경로 설정
+        model_dir = os.path.join(settings.BASE_DIR, 'ml_models')
+        if not os.path.exists(model_dir):
+            os.makedirs(model_dir)
+
+        # 스케일러와 모델 저장
+        joblib.dump(scaler, os.path.join(model_dir, 'scaler.pkl'))
+        joblib.dump(kmeans, os.path.join(model_dir, 'kmeans_model.pkl'))

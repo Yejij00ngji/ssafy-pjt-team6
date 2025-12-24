@@ -8,8 +8,29 @@ from django.conf import settings
 MODEL_PATH = os.path.join(settings.BASE_DIR, 'ml_models', 'kmeans_model.pkl')
 SCALER_PATH = os.path.join(settings.BASE_DIR, 'ml_models', 'scaler.pkl')
 
+
+def validate_and_sanitize_profile(profile):
+    """데이터 유효성 검사 및 기본값 보정"""
+    # 1. 소득이 0이거나 음수인 경우 (최소 생계비 수준으로 보정하거나 에러 처리)
+    if profile.annual_income_amt <= 0:
+        profile.annual_income_amt = 12000000  # 연 1200만원 기본값 예시
+    
+    # 2. 총 자산이 0인 경우 (분모 0 방지)
+    total_assets = profile.balance_amt + profile.invest_eval_amt
+    if total_assets <= 0:
+        # 자산이 없다고 응답한 경우, 최소한의 계산을 위해 1원 설정
+        total_assets = 1
+        
+    # 3. 비율이 1(100%)을 초과하는 경우 보정
+    # 지출이 소득의 2배를 넘을 순 있지만, 스케일링을 위해 2.0으로 캡핑(Capping)
+    if profile.expense_to_income_ratio > 2.0:
+        profile.expense_to_income_ratio = 2.0
+        
+    return profile
+
 # 미동의자 클러스터 할당
 def assign_cluster_logic(profile):
+    profile=validate_and_sanitize_profile(profile)   # 검사 실행
     try:
         model = joblib.load(MODEL_PATH)
         
@@ -17,10 +38,12 @@ def assign_cluster_logic(profile):
         # annual_income_amt, inv_ratio, withdrawable_ratio, growth, expense_ratio 순서 가정
         # 만약 모델이 비율(ratio)을 원한다면 계산해서 넣어줘야 합니다.
         
+        # 수정 후 (학습 로직과 동일하게)
+        total_assets = profile.balance_amt + profile.invest_eval_amt + 1
         input_data = pd.DataFrame([{
             'annual_income_amt': profile.annual_income_amt,
-            'inv_ratio': profile.invest_eval_amt / (profile.annual_income_amt * 2) if profile.annual_income_amt > 0 else 0,
-            'withdrawable_ratio': profile.withdrawable_amt / profile.balance_amt if profile.balance_amt > 0 else 0,
+            'inv_ratio': profile.invest_eval_amt / total_assets,
+            'withdrawable_ratio': profile.withdrawable_amt / total_assets,
             'expense_growth_rate': profile.expense_growth_rate,
             'expense_to_income_ratio': profile.expense_to_income_ratio
         }])
