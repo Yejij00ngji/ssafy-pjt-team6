@@ -2,17 +2,20 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProductStore } from './products'
+import { useRecommendationStore } from './recommendations'
 import axios from 'axios'
 
 export const useAccountStore = defineStore('account', () => {
   const API_URL = 'http://127.0.0.1:8000'
 
   const productStore = useProductStore()
+  const recommendationStore = useRecommendationStore()
 
   const router = useRouter()
   
   const token = ref(null)
   const user = ref(null)
+  const financial_profile = ref({})
 
   const isLogin = computed(() => {
     return token.value ? true : false
@@ -27,8 +30,6 @@ export const useAccountStore = defineStore('account', () => {
       return false
     }
   })
-
-  const cluster_info = ref(null)
 
   const signUp = async ({email,password1,password2,is_mydata_agreed}) => {
     const response = await axios.post(`${API_URL}/accounts/signup/`,{email,password1,password2,is_mydata_agreed})
@@ -74,6 +75,9 @@ export const useAccountStore = defineStore('account', () => {
     token.value = null
     user.value = null
     productStore.subscriptions = null
+    financial_profile.value = {}
+
+    recommendationStore.setRecommendations([])
 
     router.push({ name: 'LoginView' })
   }
@@ -100,5 +104,19 @@ export const useAccountStore = defineStore('account', () => {
     }
   }
 
-  return { API_URL, token, user, isLogin, isMyData, cluster_info, signUp, logIn, logOut, updateProfile }
+  const getFinancialProfile = async () => {
+    const response = await axios.get(`${API_URL}/accounts/financial-profile/`, {
+      headers: {
+        Authorization: `Token ${token.value}`
+      }
+    })
+
+    console.log(response.data)
+
+    if (response.data){
+      financial_profile.value = response.data
+    }
+  }
+
+  return { API_URL, token, user, isLogin, isMyData, financial_profile, signUp, logIn, logOut, updateProfile, getFinancialProfile }
 }, { persist: true })

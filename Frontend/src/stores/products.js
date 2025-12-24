@@ -69,9 +69,24 @@ export const useProductStore = defineStore('product', () => {
       })
   }
 
-  const delSubscription = async () => {
-    pass
+  const delSubscription = async (id) => {
+    try {
+      await axios.delete(
+        `${accountStore.API_URL}/subscriptions/${id}/`,
+        {
+          headers: {
+            'Authorization': `Token ${accountStore.token}`
+          },
+        }
+      )
+      subscriptions.value = subscriptions.value.filter(s => s.id !== id)
+      
+      return true
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
   }
 
-  return { subscriptions, getProducts, getProductDetails, subscribeProduct, getSubscriptions }
+  return { subscriptions, getProducts, getProductDetails, subscribeProduct, getSubscriptions, delSubscription }
 }, { persist: true })

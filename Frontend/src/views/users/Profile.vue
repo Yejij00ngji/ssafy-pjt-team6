@@ -2,7 +2,7 @@
   <div class="mypage-container">
     <section class="profile-section">
       <div class="card profile-card">
-        <div v-if="!isEditMode">
+        <div v-if="!isEditMode" class="profile-card-inner">
           <div class="profile-header">
             <div class="profile-avatar">
               <div class="avatar-bg">
@@ -11,19 +11,22 @@
             </div>
             <div class="profile-info">
               <div class="name-edit-group">
-                <h2 class="user-name">{{ accountStore.user?.nickname || '사용자' }}님</h2>
-                <button @click="openEditMode" class="edit-btn-small">내 정보 수정</button>
+                <h2 class="user-name">
+                  {{ accountStore.user?.nickname || '사용자' }}님
+                  <span @click="openEditMode" class="edit-text-link">내 정보 수정</span>
+                </h2>
               </div>
               <p class="user-email">{{ accountStore.user?.email }}</p>
               <div class="tag-group">
-                <span class="tag">#자산관리_꿈나무</span>
-                <span class="tag">#안전제일주의</span>
+                <span v-if="accountStore.financial_profile?.tag" class="tag">#{{ accountStore.financial_profile.tag }}</span>
+                <span v-else class="tag">#자산관리_꿈나무</span>
                 <span v-if="accountStore.user?.is_mydata_agreed" class="tag" style="background: #E7F9F3; color: #00B06B;">#마이데이터_연동중</span>
               </div>
             </div>
           </div>
           <div class="profile-footer">
-            <button @click="goToReDiagnostic" class="btn-secondary-full">투자 성향 재진단</button>
+            <button v-if="recommendationStore.recommendations?.length == 0 && !accountStore.user?.is_mydata_agreed" @click="goToReDiagnostic" class="btn-secondary-full">투자 성향 진단</button>
+            <button v-else @click="goToReDiagnostic" class="btn-secondary-full">투자 성향 재진단</button>
           </div>
         </div>
 
@@ -58,19 +61,26 @@
       </div>
 
       <div class="card persona-card">
-        <div class="card-header">
-          <h3>금융 페르소나</h3>
-          <span class="date-tertiary">2025.12.24 기준</span>
-        </div>
         <div class="persona-content">
-          <div class="radar-placeholder">
-            <div class="persona-status">
-              <span class="status-dot" :class="{ active: accountStore.user?.is_mydata_agreed }"></span>
-              {{ accountStore.user?.is_mydata_agreed ? '마이데이터 연동 완료' : '마이데이터 미연동' }}
-            </div>
+          <div class="persona-status" style="margin-bottom: 20px; padding: 12px; background: #F9FAFB; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #4E5968;">
+            <span class="status-dot" :class="{ active: accountStore.user?.is_mydata_agreed }"></span>
+            {{ accountStore.user?.is_mydata_agreed ? '마이데이터 분석 정보 포함됨' : '마이데이터 미연동 상태' }}
           </div>
-          <div class="persona-btns" style="display: flex; gap: 8px; margin-top: 20px;">
-            <button @click="openEditMode" class="btn-ghost-small">연동 설정 변경</button>
+
+          <div class="radar-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 160px; text-align: center;">
+            <template v-if="accountStore.financial_profile && accountStore.financial_profile.title">
+              <div class="persona-icon" style="font-size: 52px; margin-bottom: 16px;">{{ accountStore.financial_profile.icon }}</div>
+              <h4 style="font-size: 19px; font-weight: 700; color: #191F28; margin-bottom: 10px;">{{ accountStore.financial_profile.title }}</h4>
+              <p style="font-size: 14px; color: #4E5968; line-height: 1.6; word-break: keep-all; padding: 0 10px;">
+                {{ accountStore.financial_profile.description }}
+              </p>
+            </template>
+            <template v-else>
+              <div class="empty-persona" style="color: #8B95A1;">
+                <div style="font-size: 40px; margin-bottom: 12px; opacity: 0.5;">🤔</div>
+                <p style="font-size: 14px; line-height: 1.5;">분석된 페르소나가 없습니다.<br/>투자 성향 재진단을 진행해주세요.</p>
+              </div>
+            </template>
           </div>
         </div>
       </div>
@@ -108,7 +118,6 @@
         <div class="card-header">
           <h3>내가 가입한 상품 <span class="count-badge">{{ productStore.subscriptions?.length || 0 }}</span></h3>
         </div>
-        
         <div v-if="productStore.subscriptions?.length > 0" class="list-table">
           <div class="list-thead">
             <span class="th">상품정보</span>
@@ -116,7 +125,6 @@
             <span class="th text-center">금리</span>
             <span class="th text-center">잔액</span>
           </div>
-
           <div class="list-tbody">
             <div 
               v-for="sub in productStore.subscriptions" 
@@ -125,9 +133,7 @@
               @click="goToDetail(sub.id)"
             >
               <div class="td info">
-                <div class="bank-avatar">
-                  <span class="avatar-text">{{ sub.product_name[0] }}</span>
-                </div>
+                <div class="bank-avatar"><span class="avatar-text">{{ sub.product_name[0] }}</span></div>
                 <strong class="product-name">{{ sub.product_name }}</strong>
               </div>
               <div class="td text-center text-secondary">{{ sub.bank_name }}</div>
@@ -136,7 +142,6 @@
             </div>
           </div>
         </div>
-        
         <div v-else class="empty-state">
           <p>아직 가입한 금융 상품이 없어요.</p>
           <router-link to="/products" class="btn-link">상품 보러가기</router-link>
@@ -148,13 +153,11 @@
       <div class="card chart-card">
         <div class="card-header">
           <div class="header-text-group">
-            <h3>상품별 금리 비교 차트</h3>
-            <p class="text-tertiary">가입한 상품들의 금리 차이를 한눈에 확인하세요.</p>
+            <h3>내 금리 TOP 3 비교 차트</h3>
+            <p class="text-tertiary">보유 중인 상품 중 금리가 가장 높은 3개 상품입니다.</p>
           </div>
         </div>
-        <div class="chart-container">
-          <canvas id="rateChart"></canvas>
-        </div>
+        <div class="chart-container"><canvas id="rateChart"></canvas></div>
       </div>
     </section>
   </div>
@@ -185,7 +188,7 @@ const editData = ref({
   nickname: '', 
   password1: '', 
   password2: '',
-  is_mydata_agreed: false // 초기값 설정
+  is_mydata_agreed: false 
 })
 
 const passwordError = computed(() => {
@@ -196,7 +199,7 @@ const passwordError = computed(() => {
 
 const openEditMode = () => {
   editData.value.nickname = accountStore.user?.nickname || ''
-  editData.value.is_mydata_agreed = accountStore.user?.is_mydata_agreed || false // 유저 정보 로드
+  editData.value.is_mydata_agreed = accountStore.user?.is_mydata_agreed || false 
   editData.value.password1 = ''
   editData.value.password2 = ''
   isEditMode.value = true
@@ -206,20 +209,12 @@ const closeEditMode = () => { isEditMode.value = false }
 
 const updateFullProfile = async () => {
   if (passwordError.value) return alert(passwordError.value)
-  
-  // 페이로드 구성: 닉네임과 마이데이터 동의 여부 포함
   const payload = { 
     nickname: editData.value.nickname,
     is_mydata_agreed: editData.value.is_mydata_agreed
   }
-  
-  // 비밀번호 입력 시에만 포함
-  if (editData.value.password1) {
-    payload.password = editData.value.password1
-  }
-  
+  if (editData.value.password1) payload.password = editData.value.password1
   if (await accountStore.updateProfile(payload)) {
-    // alert('수정되었습니다.')
     closeEditMode()
   }
 }
@@ -235,31 +230,36 @@ const goOptionApply = (id) => {
 const renderChart = () => {
   const ctx = document.getElementById('rateChart')
   if (!ctx || !productStore.subscriptions?.length) return
-  if (rateChart) rateChart.destroy()
   
+  const topThreeSubscriptions = [...productStore.subscriptions]
+    .sort((a, b) => b.intr_rate2 - a.intr_rate2)
+    .slice(0, 3)
+
+  if (rateChart) rateChart.destroy()
   rateChart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: productStore.subscriptions.map(s => s.product_name),
+      labels: topThreeSubscriptions.map(s => s.product_name),
       datasets: [
-        { label: '기본 금리 (%)', data: productStore.subscriptions.map(s => s.intr_rate), backgroundColor: 'rgba(49, 130, 246, 0.4)', borderRadius: 8 },
-        { label: '우대 금리 (%)', data: productStore.subscriptions.map(s => s.intr_rate2), backgroundColor: '#3182F6', borderRadius: 8 }
+        { label: '기본 금리 (%)', data: topThreeSubscriptions.map(s => s.intr_rate), backgroundColor: 'rgba(49, 130, 246, 0.4)', borderRadius: 8 },
+        { label: '우대 금리 (%)', data: topThreeSubscriptions.map(s => s.intr_rate2), backgroundColor: '#3182F6', borderRadius: 8 }
       ]
     },
-    options: { 
-      responsive: true, 
-      maintainAspectRatio: false,
+    options: { responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 6 } } },
-      scales: { 
-        y: { beginAtZero: true, grid: { color: '#F2F4F6' } },
-        x: { grid: { display: false } }
-      }
+      scales: { y: { beginAtZero: true, grid: { color: '#F2F4F6' } }, x: { grid: { display: false } } }
     }
   })
 }
 
 onMounted(async () => {
-  await productStore.getSubscriptions()
+  await Promise.all([
+    productStore.getSubscriptions(),
+    accountStore.getFinancialProfile()
+  ])
+  if (recommendationStore.recommendations?.length == 0 && accountStore.user?.is_mydata_agreed){
+    await recommendationStore.getRecommendations()
+  }
   renderChart()
 })
 
@@ -267,108 +267,61 @@ watch(() => productStore.subscriptions, renderChart, { deep: true })
 </script>
 
 <style scoped>
-/* Toss Design System Variables & Base */
-.mypage-container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 48px 24px;
-  background-color: #F9FAFB;
+.mypage-container { max-width: 1100px; margin: 0 auto; padding: 48px 24px; background-color: #F9FAFB; display: flex; flex-direction: column; gap: 32px; font-family: 'Pretendard', sans-serif; color: #191F28; }
+.card { background: #FFFFFF; border-radius: 28px; padding: 32px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.02); }
+
+.profile-card { 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center;
+  min-height: 300px;
+}
+.profile-card-inner {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  font-family: 'Pretendard', sans-serif;
-  color: #191F28;
+  height: 100%;
+  justify-content: space-between;
 }
+.profile-header { display: flex; gap: 24px; align-items: center; margin-bottom: 32px; }
 
-.card {
-  background: #FFFFFF;
-  border-radius: 28px;
-  padding: 32px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.02);
-}
+.profile-section { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
+.avatar-bg { width: 80px; height: 80px; background: #F2F4F6; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #3182F6; font-size: 32px; font-weight: bold; }
 
-/* 1. Profile Section */
-.profile-section {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 20px;
-}
+/* 유저 네임 및 수정 텍스트 스타일 수정 */
+.user-name { font-size: 26px; font-weight: 700; display: flex; align-items: baseline; gap: 8px; }
+.edit-text-link { font-size: 13px; font-weight: 500; color: #8B95A1; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.edit-text-link:hover { color: #4E5968; }
 
-.profile-header { display: flex; gap: 24px; align-items: center; margin-bottom: 24px; }
-.avatar-bg { 
-  width: 80px; height: 80px; 
-  background: #F2F4F6; 
-  border-radius: 50%; 
-  display: flex; justify-content: center; align-items: center; 
-  color: #3182F6; font-size: 32px; font-weight: bold; 
-}
-
-.user-name { font-size: 26px; font-weight: 700; }
 .user-email { color: #8B95A1; font-size: 15px; margin-top: 4px; }
-.edit-btn-small { background: #F2F4F6; border: none; padding: 6px 12px; border-radius: 8px; font-size: 13px; color: #4E5968; cursor: pointer; }
-
-.tag-group { display: flex; gap: 8px; margin-top: 12px; }
+.tag-group { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 .tag { background: #E8F3FF; color: #3182F6; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; }
-
-.btn-secondary-full { 
-  width: 100%; padding: 18px; border-radius: 16px; border: none; 
-  background: #3182F6; color: white; font-weight: 700; font-size: 16px;
-  cursor: pointer; transition: 0.2s; 
-}
+.btn-secondary-full { width: 100%; padding: 18px; border-radius: 16px; border: none; background: #3182F6; color: white; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
 .btn-secondary-full:hover { background: #1B64DA; transform: translateY(-2px); }
-
-/* 2. Form Styling (통일) */
-.custom-input {
-  padding: 14px 18px; border-radius: 14px; border: 1px solid #E5E8EB;
-  background-color: #F9FAFB; font-size: 15px; outline: none; transition: 0.2s;
-  width: 100%; box-sizing: border-box;
-}
+.custom-input { padding: 14px 18px; border-radius: 14px; border: 1px solid #E5E8EB; background-color: #F9FAFB; font-size: 15px; outline: none; transition: 0.2s; width: 100%; box-sizing: border-box; }
 .custom-input:focus { border-color: #3182F6; background-color: #fff; }
-
 .input-item { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
 .input-item label { font-size: 14px; font-weight: 600; color: #4E5968; }
 .error-text { color: #F04452; font-size: 12px; margin-top: 4px; }
-
-/* 3. Recommended Grid */
 .recommend-section .subtitle { color: #4E5968; margin-top: 4px; }
 .recommend-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 24px; }
-.recommend-card {
-  background: #fff; border-radius: 24px; padding: 32px 24px;
-  border: 1px solid #E5E8EB; text-align: center; position: relative;
-  transition: 0.3s;
-}
+.recommend-card { background: #fff; border-radius: 24px; padding: 32px 24px; border: 1px solid #E5E8EB; text-align: center; position: relative; transition: 0.3s; }
 .recommend-card:hover { transform: translateY(-8px); border-color: #3182F6; box-shadow: 0 12px 32px rgba(0,0,0,0.05); }
 .badge-best { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #3182F6; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; }
 .rate-value { font-size: 22px; font-weight: 800; color: #3182F6; }
-
-/* 4. Subscribed List Table (Products 페이지와 통일된 Grid) */
 .list-table { margin-top: 16px; }
-.list-thead, .product-row {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.2fr;
-  align-items: center; padding: 20px 0; gap: 12px;
-}
+.list-thead, .product-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1.2fr; align-items: center; padding: 20px 0; gap: 12px; }
 .list-thead { border-bottom: 1px solid #F2F4F6; }
 .th { font-size: 14px; color: #8B95A1; font-weight: 500; }
-
 .product-row { border-radius: 16px; cursor: pointer; transition: 0.2s; }
 .product-row:hover { background-color: #F9FAFB; padding-left: 12px; padding-right: 12px; }
-
-.bank-avatar {
-  width: 40px; height: 40px; background: #F2F4F6; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center; margin-right: 14px;
-  color: #3182F6; font-weight: 700;
-}
+.bank-avatar { width: 40px; height: 40px; background: #F2F4F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 14px; color: #3182F6; font-weight: 700; }
 .td { text-align: center; }
 .td.info { display: flex; align-items: center; justify-content: flex-start; text-align: left; }
 .text-point { color: #3182F6; font-weight: 700; }
 .count-badge { background: #E8F3FF; color: #3182F6; padding: 2px 10px; border-radius: 12px; font-size: 14px; }
-
-/* 5. Chart & Empty State */
 .chart-container { height: 320px; margin-top: 24px; }
 .empty-state { text-align: center; padding: 64px 0; color: #8B95A1; }
 .btn-link { color: #3182F6; text-decoration: none; font-weight: 600; margin-top: 12px; display: inline-block; }
-
 .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #E5E8EB; display: inline-block; margin-right: 8px; }
 .status-dot.active { background: #3182F6; box-shadow: 0 0 8px rgba(49,130,246,0.4); }
 

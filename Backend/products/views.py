@@ -104,16 +104,9 @@ def subscriptions(request, subscription_id=None):
         
         # 방식 A: Subscription 테이블의 고유 ID(pk)로 삭제 (권장)
         if subscription_id:
-            subscription = get_object_or_404(Subscription, id=subscription_id, user=request.user)
+            subscription = get_object_or_404(Subscription, id=subscription_id)
             subscription.delete()
             return Response({"message": "해당 상품 가입이 성공적으로 해지되었습니다."}, status=status.HTTP_204_NO_CONTENT)
-        
-        # 방식 B: ProductOption ID를 body로 받아 삭제
-        option_id = request.data.get('product_option_id')
-        if option_id:
-            subscription = get_object_or_404(Subscription, product_option_id=option_id, user=request.user)
-            subscription.delete()
-            return Response({"message": "해당 옵션의 가입 내역이 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
             
         return Response({"error": "삭제할 ID가 제공되지 않았습니다."}, status=status.HTTP_400_BAD_REQUEST)
 

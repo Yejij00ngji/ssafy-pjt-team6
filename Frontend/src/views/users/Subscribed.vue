@@ -103,10 +103,10 @@ const calculateDDay = (expiryDate) => {
 const handleUnsubscribe = async () => {
   if (confirm('정말로 이 상품을 해지하시겠습니까? 해지 후에는 복구가 불가능합니다.')) {
     try {
-      const success = await productStore.unsubscribeProduct(subscribedOption.value.id)
+      const success = await productStore.delSubscription(subscribedOption.value.id)
       if (success) {
         alert('상품 해지가 완료되었습니다.')
-        router.push({ name: 'MyPage' }) // 마이페이지로 리다이렉트
+        router.push({ name: 'Profile' }) // 마이페이지로 리다이렉트
       }
     } catch (error) {
       console.error('해지 중 오류 발생:', error)
