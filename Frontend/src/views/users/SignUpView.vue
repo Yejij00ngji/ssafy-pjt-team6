@@ -1,15 +1,25 @@
 <template>
-  <div class="toss-container-narrow">
-    <div class="signup-header">
-      <h1 class="toss-title">회원가입</h1>
-      <p class="toss-desc">Money:Bee에서 스마트한 자산 관리를 시작하세요</p>
-    </div>
+  <div class="auth-page">
+    <div class="auth-container">
+      <header class="auth-header">
+        <h1 class="auth-title">회원가입</h1>
+        <p class="auth-description">
+          비교를 통한 똑똑한 머니 불리기 <br />
+          <strong>머니:비</strong> 에 오신 것을 환영해요!
+        </p>
+      </header>
 
-    <form @submit.prevent="handleSignUp" class="signup-form">
-      <div class="form-section">
-        <div class="input-group">
+      <form @submit.prevent="handleSignUp" class="auth-form">
+        <div class="input-wrapper">
           <label for="email">이메일</label>
-          <input type="email" id="email" v-model.trim="email" placeholder="user@example.com" class="toss-input" required>
+          <input 
+            id="email"
+            v-model="email" 
+            type="email" 
+            placeholder="user@example.com"
+            class="toss-input"
+            required
+          />
         </div>
 
         <div class="input-group">
@@ -52,17 +62,17 @@
             {{ isPasswordMatch ? '비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.' }}
           </p>
         </div>
-      </div>
 
-      <button 
-        type="submit" 
-        class="toss-btn-main w-full mt-8" 
-        :disabled="!isFormValid"
-        :class="{ 'btn-disabled': !isFormValid }"
-      >
-        가입하기
-      </button>
-    </form>
+        <button 
+          type="submit" 
+          class="submit-btn" 
+          :disabled="!isFormValid"
+          :class="{ 'btn-disabled': !isFormValid }"
+        >
+          가입하기
+        </button>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -127,27 +137,131 @@ const handleSignUp = async () => {
 </script>
 
 <style scoped>
-/* style에 scoped를 추가하여 다른 컴포넌트와 스타일 충돌 방지 */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 200px);
+  padding: 20px;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 400px;
+  background: white;
+}
+
+.auth-header {
+  margin-bottom: 40px;
+}
+
+.auth-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #191f28;
+  margin-bottom: 12px;
+}
+
+.auth-description {
+  font-size: 16px;
+  color: #4e5968;
+  line-height: 1.5;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 1. 입력창 그룹 간격 유지 */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* 라벨과 인풋 사이 간격 */
+}
+
+/* 2. 비밀번호 입력창 감싸는 컨테이너 (아이콘 배치의 기준) */
+.password-wrapper {
+  position: relative; /* 중요: 아이콘이 이 안에서 절대 위치를 잡게 함 */
+  width: 100%;
+}
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-wrapper label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333d4b;
+}
+
+/* 3. 인풋 스타일 통일 (이메일 필드와 동일하게) */
 .toss-input, .toss-input-fixed {
   width: 100%;
-  box-sizing: border-box;
-  padding: 16px 20px;
-  border-radius: 14px;
-  background-color: var(--toss-gray-bg);
-  border: 1.5px solid transparent;
+  padding: 16px;
+  padding-right: 48px; /* 아이콘과 텍스트가 겹치지 않게 여백 확보 */
+  border-radius: 12px;
+  border: 1px solid #e5e8eb;
+  background-color: #f9fafb;
   font-size: 16px;
-  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box; /* 패딩이 너비에 영향을 주지 않도록 */
 }
 
+/* 4. Focus 시 디자인 (머니비 메인 컬러 적용) */
 .toss-input:focus, .toss-input-fixed:focus {
-  border-color: var(--toss-blue);
-  background-color: #fff;
+  outline: none;
+  border-color: #00ad7c;
+  background-color: white;
+  box-shadow: 0 0 0 1px #00ad7c;
 }
 
-.input-success { border-color: #2ecc71 !important; background-color: #fff; }
-.input-error { border-color: #f04452 !important; background-color: #fff; }
+/* 5. 에러 상태 시 디자인 */
+.input-error {
+  border-color: #f04452 !important;
+  box-shadow: 0 0 0 1px #f04452 !important;
+}
 
-.password-wrapper { position: relative; width: 100%; }
+/* 6. 아이콘 위치 및 디자인 세밀 조정 */
+.eye-icon, .status-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8b95a1; /* 토스 그레이 컬러 */
+  cursor: pointer;
+  z-index: 10;
+  user-select: none; /* 아이콘 클릭 시 텍스트 드래그 방지 */
+}
+
+/* 7. 라벨 스타일 (폰트 가독성 상향) */
+.input-group label, .input-wrapper label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4e5968;
+  margin-left: 2px;
+}
+
+.submit-btn {
+  padding: 16px;
+  border-radius: 12px;
+  border: none;
+  background-color: #00ad7c;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.submit-btn:disabled {
+  background-color: #e5e8eb;
+  cursor: not-allowed;
+}
 
 .eye-icon {
   position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
