@@ -6,6 +6,7 @@ class ProductFilter(filters.FilterSet):
   # 검색 기준 은행 탐색
   bank = filters.CharFilter(field_name="kor_co_nm", lookup_expr='icontains')
 
+  # DEPOSIT, SAVING
   product_type = filters.CharFilter(method='filter_product_type')
 
   # term: 1, 3, 6, 12, 24, 36
