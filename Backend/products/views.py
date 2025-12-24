@@ -10,6 +10,7 @@ from users.models import FinancialProfile
 from .serializers import ProductOptionSerializer, FinancialProductSerializer, FinancialProductDetailSerializer, SubscriptionSerializer
 from .filters import ProductFilter
 from .services.recommendations import recommend_products
+from .services.save_nodata import update_profile_by_survey_safe
 
 from datetime import date
 from dateutil.relativedelta import relativedelta
@@ -98,32 +99,29 @@ def subscriptions(request):
 # -----------------------------------------------------------------------------------------
 # 추천 로직
 # -----------------------------------------------------------------------------------------
-import logging
-
-logger = logging.getLogger(__name__)
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_recommendations(request):
-    logger.info("추천 요청이 들어왔습니다.")
 
     user = request.user
 
+    # 1. 금융 프로필 확인
     try:
-        profile = user.financialprofile
-    except:
-        logger.error("금융 프로필을 찾을 수 없습니다.")  # 오류 로그
-        return Response({"error": "금융 프로필 없음"}, status=404)
+        # 1. 안전하게 프로필 확보
+        profile, created = FinancialProfile.objects.get_or_create(user=user)
+    except Exception:
+        return Response({"error": "금융 프로필을 찾을 수 없습니다."}, status=404)
 
-    if profile.cluster_label not in [0, 1, 2, 3, 4]:
-        logger.warning("마이데이터 연동이 필요합니다.")  # 경고 로그
-        return Response({"error": "마이데이터 연동 필요"}, status=400)
+    # 2. 마이데이터 미동의자 및 설문 미완료자 차단
+    # 클러스터 라벨이 없다는 것은 마이데이터 연동도 안 되었고 설문조사도 안 했다는 의미입니다.
+    if profile.cluster_label is None:
+        return Response({"error": "마이데이터 연동 또는 설문조사가 필요합니다.", "code": "NEED_DATA_LINK"}, status=400)
 
-    # 추천 로직 실행
+
+    # 4. 추천 로직 실행 (recommend_products 함수 내부에서 profile의 데이터를 기반으로 연산됨)
     recommendations = recommend_products(user, top_n=3)
     
     if not recommendations:
-        logger.warning("추천 결과가 없습니다.")  # 경고 로그
         return Response({"error": "추천 결과가 없습니다."}, status=404)
 
     # 🔥 여기서 DB 저장
@@ -144,14 +142,36 @@ def get_recommendations(request):
             "reason": rec["reason"]  # 여기서 이유 추가
         })
         
-    logger.info(f"추천결과: {result}")
-
     return Response({
         "user": user.username,
         "cluster": profile.cluster_label,
         "recommendations": result
     })
 
+# 미동의자 로직
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_survey(request):
+    user = request.user
+    survey_data = request.data
+
+    try:
+        # 1. 여기서 확실하게 생성 또는 가져오기를 수행
+        profile, created = FinancialProfile.objects.get_or_create(user=user)
+        
+        # 2. profile 객체를 직접 함수에 넘겨주세요 (user 대신 profile을 넘기는 게 안전)
+        profile = update_profile_by_survey_safe(profile, survey_data)
+        
+        return Response({
+            "message": "설문이 완료되었습니다.",
+            "cluster": profile.cluster_label
+        }, status=200)
+        
+    except Exception as e:
+        # 에러가 나면 정확히 어떤 에러인지 서버 터미널(VSCode 등)에 찍힙니다.
+        print(f"🔥 백엔드 에러 발생: {str(e)}") 
+        return Response({"error": str(e)}, status=400)
+    
 def get_queryset(self):
     term = self.request.query_params.get('term')
     queryset = FinancialProduct.objects.all()

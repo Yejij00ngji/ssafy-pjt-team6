@@ -1,5 +1,15 @@
 <template>
   <div class="toss-detail-container">
+    <!-- 페르소나 정의 -->
+    <section class="user-persona-card">
+      <div class="persona-icon">{{ currentCluster.icon }}</div>
+      <div class="persona-info">
+        <span class="persona-tag">{{ currentCluster.tag }}</span>
+        <h2 class="persona-title">{{ userName }}님은 <br/>{{ currentCluster.title }}</h2>
+        <p class="persona-desc">{{ currentCluster.description }}</p>
+      </div>
+    </section>
+
     <div v-for="(rec, index) in recommendations" :key="index" class="product-full-section">
       
       <header class="product-header">
@@ -69,11 +79,52 @@ import { computed } from 'vue'
 const props = defineProps({
   isMyData: Boolean,
   userName: { type: String, default: '사용자' },
+  cluster: { type: [Number, String], default: 0 }, // 🟢 부모로부터 클러스터 번호 수신
   // 부모로부터 받은 실제 추천 데이터 리스트
   recommendations: {
     type: Array,
     default: () => []
   }
+})
+
+// 클러스터 정의
+// clusterMapper.js 또는 ResultsStepItem.vue 내부
+const clusterMapper = {
+  0: {
+    title: "성실하게 모으는 저축왕",
+    tag: "안정저축형",
+    icon: "🌱",
+    description: "소득 대비 소비를 잘 관리하며 꾸준히 자산을 쌓아가고 계시네요!"
+  },
+  1: {
+    title: "현재의 행복이 중요한 욜로족",
+    tag: "소비중심형",
+    icon: "🌈",
+    description: "지출 비중이 다소 높지만, 지금부터 조금씩 미래를 위한 준비를 시작해볼까요?"
+  },
+  2: {
+    title: "현금을 든든하게 보유한 홀더",
+    tag: "현금보유형",
+    icon: "🏦",
+    description: "자산의 유동성이 매우 좋으시네요. 이제 더 높은 금리의 상품으로 눈을 돌릴 때입니다."
+  },
+  3: {
+    title: "여유로운 자산 관리 전문가",
+    tag: "자산관리형",
+    icon: "💼",
+    description: "높은 소득과 철저한 지출 관리로 가장 이상적인 금융 생활을 하고 계십니다."
+  },
+  4: {
+    title: "수익을 쫓는 공격적 투자자",
+    tag: "공격투자형",
+    icon: "🚀",
+    description: "자산의 대부분을 적극적으로 운용하시는군요. 고수익을 위한 최적의 상품을 추천합니다."
+  }
+};
+
+// 🟢 클러스터 데이터 매핑
+const currentCluster = computed(() => {
+  return clusterMapper[props.cluster] || clusterMapper[0];
 })
 
 // 가장 점수가 높은 첫 번째 상품을 메인으로 노출
@@ -122,6 +173,23 @@ const handleReAuth = () => {
 }
 
 .toss-divider { border: 0; height: 1px; background: #f2f4f6; margin: 48px 0; }
+
+/* 🟢 추가된 페르소나 카드 스타일 (토스 스타일) */
+.user-persona-card {
+  padding: 40px 24px;
+  background: linear-gradient(135deg, #f9fafb 0%, #f2f4f6 100%);
+  border-radius: 0 0 24px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.persona-icon { font-size: 48px; }
+.persona-tag { 
+  display: inline-block; padding: 4px 8px; background: #fff; 
+  color: #3182f6; border-radius: 6px; font-size: 12px; font-weight: 700; margin-bottom: 8px;
+}
+.persona-title { font-size: 22px; font-weight: 700; color: #191f28; line-height: 1.4; margin: 0; }
+.persona-desc { font-size: 15px; color: #4e5968; margin-top: 8px; line-height: 1.5; }
 
 /* AI 분석 리스트 */
 .section-title { font-size: 20px; font-weight: 700; color: #191f28; margin-bottom: 28px; }

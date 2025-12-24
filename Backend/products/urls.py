@@ -7,4 +7,5 @@ urlpatterns = [
     path('products/<int:pk>/', views.product_details),
     path('subscriptions/', views.subscriptions),
     path('recommendations/', views.get_recommendations),
+    path('recommendations/survey/', views.submit_survey),  # 미동의자 로직
 ]

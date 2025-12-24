@@ -8,6 +8,7 @@ import pandas as pd
 import joblib
 import os
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 
 from users.models import FinancialProfile
 
@@ -141,3 +142,78 @@ def predict_user_cluster(profile):
         # 모델 파일이 없으면 전체 클러스터링 한 번 실행
         run_financial_clustering()
         return predict_user_cluster(profile)
+    
+# 미동의자 클러스터 분류
+def assign_cluster_logic(profile):
+    # 1. 모델 파일 경로 설정 (경로는 프로젝트 구조에 맞게 수정)
+    model_path = os.path.join(settings.BASE_DIR, 'ml_models', 'kmeans_model.pkl')
+    scaler_path = os.path.join(settings.BASE_DIR, 'ml_models', 'scaler.pkl') # 스케일러도 있다면 로드
+
+    try:
+        model = joblib.load(model_path)
+        
+        # 2. 피처 데이터 구성 (학습 때와 동일한 순서여야 함!)
+        # annual_income_amt, inv_ratio, withdrawable_ratio, growth, expense_ratio 순서 가정
+        # 만약 모델이 비율(ratio)을 원한다면 계산해서 넣어줘야 합니다.
+        
+        input_data = pd.DataFrame([{
+            'annual_income_amt': profile.annual_income_amt,
+            'inv_ratio': profile.invest_eval_amt / (profile.annual_income_amt * 2) if profile.annual_income_amt > 0 else 0,
+            'withdrawable_ratio': profile.withdrawable_amt / profile.balance_amt if profile.balance_amt > 0 else 0,
+            'expense_growth_rate': profile.expense_growth_rate,
+            'expense_to_income_ratio': profile.expense_to_income_ratio
+        }])
+
+        # 3. 스케일링 및 예측
+        scaler = joblib.load(scaler_path)
+        input_scaled = scaler.transform(input_data)
+        cluster = model.predict(input_scaled)[0]
+        
+        # cluster = model.predict(input_data)[0] # 스케일러 없을 경우
+        return int(cluster)
+
+    except Exception as e:
+        print(f"모델 예측 실패: {e}")
+        return 0 # 실패 시 기본값
+
+# 미동의자 설문조사 > db 저장 함수  
+# views.py 또는 services.py
+# def update_profile_by_survey(user, survey_data):
+#     profile, _ = FinancialProfile.objects.get_or_create(user=user)
+
+#     try:
+#         # 데이터가 프론트에서 넘어올 때 숫자인지 확인
+#         profile.annual_income_amt = int(survey_data.get('annual_income_amt', 0))
+#         profile.invest_eval_amt = int(survey_data.get('invest_eval_amt', 0))
+#         profile.balance_amt = int(survey_data.get('balance_amt', 0))
+#         profile.withdrawable_amt = int(survey_data.get('withdrawable_amt', 0))
+        
+#         # 소수점 데이터(Float) 처리
+#         profile.expense_growth_rate = float(survey_data.get('expense_growth_rate', 1.0))
+#         profile.expense_to_income_ratio = float(survey_data.get('expense_to_income_ratio', 0.0))
+        
+#         # KMeans 모델 pkl 호출 로직 (앞서 설명한 코드)
+#         profile.cluster_label = assign_cluster_logic(profile) 
+        
+#         profile.save()
+#         return profile
+#     except (TypeError, ValueError) as e:
+#         # 데이터 타입이 안 맞을 경우 에러 발생
+#         raise Exception(f"데이터 형식 오류: {str(e)}")
+
+# views.py 또는 services.py
+def update_profile_by_survey_safe(profile, data):
+    # 이제 profile을 직접 받았으므로 user.financialprofile을 호출할 필요가 없습니다.
+    profile.annual_income_amt = int(data.get('annual_income_amt', 0))
+    profile.invest_eval_amt = int(data.get('invest_eval_amt', 0))
+    profile.balance_amt = int(data.get('balance_amt', 0))
+    profile.withdrawable_amt = int(data.get('withdrawable_amt', 0))
+    profile.expense_growth_rate = float(data.get('expense_growth_rate', 1.0))
+    profile.expense_to_income_ratio = float(data.get('expense_to_income_ratio', 0.0))
+    
+    # 클러스터 할당 (모델 로직이 불안하면 일단 주석 처리하고 테스트하세요)
+    # profile.cluster_label = assign_cluster_logic(profile) 
+    profile.cluster_label = 1 # 임시 테스트용
+    
+    profile.save()
+    return profile
