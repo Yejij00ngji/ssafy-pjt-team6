@@ -2,11 +2,11 @@
   <div class="toss-detail-container">
     <!-- 페르소나 정의 -->
     <section class="user-persona-card">
-      <div class="persona-icon">{{ currentCluster.icon }}</div>
+      <div class="persona-icon">{{ accountStore.financial_profile.icon }}</div>
       <div class="persona-info">
-        <span class="persona-tag">{{ currentCluster.tag }}</span>
-        <h2 class="persona-title">{{ userName }}님은 <br/>{{ currentCluster.title }}</h2>
-        <p class="persona-desc">{{ currentCluster.description }}</p>
+        <span class="persona-tag">{{ accountStore.financial_profile.tag }}</span>
+        <h2 class="persona-title">{{ userName }}님은 <br/>{{ accountStore.financial_profile.title }}</h2>
+        <p class="persona-desc">{{ accountStore.financial_profile.description }}</p>
       </div>
     </section>
 
@@ -34,7 +34,7 @@
       </div>
 
       <div class="button-group">
-        <button class="toss-btn-blue">신청하기</button>
+        <button class="toss-btn-blue" @click="goOptionApply(rec.product_option_id)">신청하기</button>
       </div>
 
       <hr class="toss-divider" />
@@ -74,7 +74,12 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { useRouter } from 'vue-router';
+import { onMounted } from 'vue'
+import { useAccountStore } from '@/stores/accounts';
+
+const router = useRouter()
+const accountStore = useAccountStore()
 
 const props = defineProps({
   isMyData: Boolean,
@@ -89,58 +94,68 @@ const props = defineProps({
 
 // 클러스터 정의
 // clusterMapper.js 또는 ResultsStepItem.vue 내부
-const clusterMapper = {
-  0: {
-    title: "성실하게 모으는 저축왕",
-    tag: "안정저축형",
-    icon: "🌱",
-    description: "소득 대비 소비를 잘 관리하며 꾸준히 자산을 쌓아가고 계시네요!"
-  },
-  1: {
-    title: "현재의 행복이 중요한 욜로족",
-    tag: "소비중심형",
-    icon: "🌈",
-    description: "지출 비중이 다소 높지만, 지금부터 조금씩 미래를 위한 준비를 시작해볼까요?"
-  },
-  2: {
-    title: "현금을 든든하게 보유한 홀더",
-    tag: "현금보유형",
-    icon: "🏦",
-    description: "자산의 유동성이 매우 좋으시네요. 이제 더 높은 금리의 상품으로 눈을 돌릴 때입니다."
-  },
-  3: {
-    title: "여유로운 자산 관리 전문가",
-    tag: "자산관리형",
-    icon: "💼",
-    description: "높은 소득과 철저한 지출 관리로 가장 이상적인 금융 생활을 하고 계십니다."
-  },
-  4: {
-    title: "수익을 쫓는 공격적 투자자",
-    tag: "공격투자형",
-    icon: "🚀",
-    description: "자산의 대부분을 적극적으로 운용하시는군요. 고수익을 위한 최적의 상품을 추천합니다."
-  }
-};
+// const clusterMapper = {
+//   0: {
+//     title: "성실하게 모으는 저축왕",
+//     tag: "안정저축형",
+//     icon: "🌱",
+//     description: "소득 대비 소비를 잘 관리하며 꾸준히 자산을 쌓아가고 계시네요!"
+//   },
+//   1: {
+//     title: "현재의 행복이 중요한 욜로족",
+//     tag: "소비중심형",
+//     icon: "🌈",
+//     description: "지출 비중이 다소 높지만, 지금부터 조금씩 미래를 위한 준비를 시작해볼까요?"
+//   },
+//   2: {
+//     title: "현금을 든든하게 보유한 홀더",
+//     tag: "현금보유형",
+//     icon: "🏦",
+//     description: "자산의 유동성이 매우 좋으시네요. 이제 더 높은 금리의 상품으로 눈을 돌릴 때입니다."
+//   },
+//   3: {
+//     title: "여유로운 자산 관리 전문가",
+//     tag: "자산관리형",
+//     icon: "💼",
+//     description: "높은 소득과 철저한 지출 관리로 가장 이상적인 금융 생활을 하고 계십니다."
+//   },
+//   4: {
+//     title: "수익을 쫓는 공격적 투자자",
+//     tag: "공격투자형",
+//     icon: "🚀",
+//     description: "자산의 대부분을 적극적으로 운용하시는군요. 고수익을 위한 최적의 상품을 추천합니다."
+//   }
+// };
 
 // 🟢 클러스터 데이터 매핑
-const currentCluster = computed(() => {
-  return clusterMapper[props.cluster] || clusterMapper[0];
-})
+// const currentCluster = computed(() => {
+//   return clusterMapper[props.cluster] || clusterMapper[0];
+// })
 
-// 가장 점수가 높은 첫 번째 상품을 메인으로 노출
-const mainProduct = computed(() => {
-  return props.recommendations[0] || {}
-})
+// // 가장 점수가 높은 첫 번째 상품을 메인으로 노출
+// const mainProduct = computed(() => {
+//   return props.recommendations[0] || {}
+// })
 
-const analysisSummary = computed(() => {
-  return props.isMyData 
-    ? '현재 보유하신 자산 현황과 지출 패턴을 고려하여 선정했습니다.'
-    : '답변하신 가입 목적과 선호 기간을 바탕으로 선정했습니다.'
-})
+// const analysisSummary = computed(() => {
+//   return props.isMyData 
+//     ? '현재 보유하신 자산 현황과 지출 패턴을 고려하여 선정했습니다.'
+//     : '답변하신 가입 목적과 선호 기간을 바탕으로 선정했습니다.'
+// })
 
-const handleReAuth = () => {
-  console.log('Redirecting to MyData Auth...')
+// const handleReAuth = () => {
+//   console.log('Redirecting to MyData Auth...')
+// }
+
+const goOptionApply = (id) => {
+  if (id) router.push({ name: 'Subscribe', params: { id: id } })
 }
+
+onMounted(async () => {
+  await Promise.all([
+    accountStore.getFinancialProfile()
+  ])
+})
 </script>
 
 <style scoped>
