@@ -10,15 +10,17 @@ from .models import ProductOption, FinancialProduct, Subscription
 from users.models import FinancialProfile
 from .serializers import ProductOptionSerializer, FinancialProductSerializer, FinancialProductDetailSerializer, SubscriptionSerializer
 from .filters import ProductFilter
-from .services.recommendations import recommend_products
+
+from products.services.engine import recommend_products, save_recommendations
 from .services.save_nodata import update_profile_by_survey_safe
+from ai.services.recommendation_explainer import explain_recommendation 
 
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
-from products.services.recommendation_history import save_recommendations
-
-# 전체 상품 조회
+"""
+예/적금 상품 조회
+"""
 @api_view(['GET'])
 def products(request):
     if request.method == 'GET':
@@ -61,14 +63,11 @@ def options(request):
     subscribed_options = ProductOption.objects.filter(id__in=subscribed_option_ids).select_related('product')
     serializer = ProductOptionSerializer(subscribed_options, many=True)
 
-    # product_options = ProductOption.objects.all()
-    # serializer = ProductOptionSerializer(product_options,many=True)
     return Response(serializer.data)
 
-# =================================================================================
-# 예적금 통합
-# =================================================================================
-  
+"""
+가입 정보 관리
+"""  
 @api_view(['GET', 'POST', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def subscriptions(request, subscription_id=None):
@@ -99,8 +98,6 @@ def subscriptions(request, subscription_id=None):
 
     # 3. DELETE: 상품 해지 (삭제)
     elif request.method == 'DELETE':
-        # URL 파라미터로 넘어온 subscription_id를 사용하거나 
-        # request body에서 product_option_id를 받아 처리할 수 있습니다.
         
         # 방식 A: Subscription 테이블의 고유 ID(pk)로 삭제 (권장)
         if subscription_id:
@@ -117,14 +114,16 @@ def subscriptions(request, subscription_id=None):
             
         return Response({"error": "삭제할 ID가 제공되지 않았습니다."}, status=status.HTTP_400_BAD_REQUEST)
 
-# -----------------------------------------------------------------------------------------
-# 추천 로직
-# -----------------------------------------------------------------------------------------
+"""
+상품 추천 로직
+"""
+# 마이데이터 동의자
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_recommendations(request):
-
     user = request.user
+    # 프론트에서 보낸 자연어 쿼리
+    user_query = request.query_params.get('query', None)
 
     # 1. 금융 프로필 확인
     try:
@@ -138,20 +137,22 @@ def get_recommendations(request):
     if profile.cluster_label is None:
         return Response({"error": "마이데이터 연동 또는 설문조사가 필요합니다.", "code": "NEED_DATA_LINK"}, status=400)
 
-
-    # 4. 추천 로직 실행 (recommend_products 함수 내부에서 profile의 데이터를 기반으로 연산됨)
-    recommendations = recommend_products(user, top_n=3)
+    # 3. 추천 로직 실행 (recommend_products 함수 내부에서 profile의 데이터를 기반으로 연산됨)
+    recommendations = recommend_products(user, top_n=3, user_query=user_query)
     
     if not recommendations:
         return Response({"error": "추천 결과가 없습니다."}, status=404)
 
-    # 🔥 여기서 DB 저장
+    # 4. 여기서 DB 저장
     save_recommendations(user, profile, recommendations)
     
     result = []
-    for rec in recommendations:
+    # 가장 높은 점수(1등) 상품에 대해서만 심층 AI 리포트 생성 (API 호출 비용 및 속도 절감)
+    for i, rec in enumerate(recommendations):
         option = rec["product_option"]
-        result.append({
+        
+        # 기본 정보 구성
+        item = {
             "product_option_id": option.id,
             "product_name": option.product.fin_prdt_nm,
             "bank_name": option.product.kor_co_nm,
@@ -159,14 +160,32 @@ def get_recommendations(request):
             "intr_rate2": option.intr_rate2,
             "save_trm": option.save_trm,
             "score": round(rec["score"], 3),
-            "confidence": round(rec["confidence"], 3),
-            "reason": rec["reason"]  # 여기서 이유 추가
-        })
+            "confidence": round(rec.get("confidence", 0), 3),
+            "similarity": round(rec.get("similarity", 0), 2),
+            "cluster_weight": round(rec.get("cluster_weight", 0), 2),
+        }
+
+        # 1등 상품인 경우에만 GMS(LLM) 리포트 생성
+        if i == 0:
+            ai_analysis = explain_recommendation(user, item, user_query)
+            item.update({
+                "reason": ai_analysis.get("reason"),
+                "report": ai_analysis.get("report"),
+                "nudge": ai_analysis.get("nudge"),
+            })
+        else:
+            # 2, 3등은 간단한 텍스트로 대체하거나 기존 로직 사용
+            item["reason"] = "데이터 기반 추천 상품입니다."
+            item["report"] = None
+            item["nudge"] = None
+            
+        result.append(item)
         
     return Response({
         "user": user.username,
         "cluster": profile.cluster_label,
-        "recommendations": result
+        "recommendations": result,
+        "query_used": user_query # 어떤 의도가 반영되었는지 확인용
     })
 
 # 미동의자 로직
