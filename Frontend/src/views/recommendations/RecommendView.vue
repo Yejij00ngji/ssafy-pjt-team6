@@ -14,15 +14,20 @@
   </div>
 </template>
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useAccountStore } from '@/stores/accounts'
+import { useRecommendationStore } from '@/stores/recommendations'
+import { useRoute } from 'vue-router'
 import axios from 'axios'
 import StartStepItem from '@/components/recommendations/StartStepItem.vue'
 import ResultsStepItem from '@/components/recommendations/ResultsStepItem.vue'
 import LoadingItem from '@/components/recommendations/LoadingItem.vue'
 import SurveyItem from '@/components/recommendations/SurveyItem.vue'
 
+const route = useRoute()
+
 const accountStore = useAccountStore()
+const recommendationStore = useRecommendationStore()
 
 const currentStep = ref('intro') // intro -> survey(선택) -> loading -> result
 const isMyDataAgreed = ref(false)
@@ -42,13 +47,11 @@ const currentStepComponent = computed(() => {
 
 // 실제 API 호출 함수
 const getRecommendations = async () => {
-  const token = accountStore.token
-  const API_URL = "http://localhost:8000" // 환경에 맞춰 수정
 
   try {
     isLoadingError.value = false
-    const response = await axios.get(`${API_URL}/recommendations/`, {
-      headers: { Authorization: `Token ${token}` },
+    const response = await axios.get(`${accountStore.API_URL}/recommendations/`, {
+      headers: { Authorization: `Token ${accountStore.token}` },
       timeout: 60000 // OpenAI 응답을 위해 넉넉히 설정
     })
 
@@ -58,6 +61,9 @@ const getRecommendations = async () => {
 
     // 결과 저장 및 다음 단계 이동
     recommendations.value = response.data.recommendations
+
+    recommendationStore.setRecommendations(recommendations.value)
+
     currentStep.value = 'result'
   } catch (error) {
     console.error("추천 데이터 로드 실패:", error)
@@ -89,6 +95,12 @@ const resetAll = () => {
   currentStep.value = 'intro'
   recommendations.value = []
 }
+
+onMounted(() => {
+  if (route.query.step === 'survey') {
+    currentStep.value = 'survey'
+  }
+})
 </script>
 
 <style scoped>
