@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.db import transaction
 from products.models import FinancialProduct, ProductOption
+# from ai.services.recommendation_explainer import get_embedding  # 🔥 임베딩 함수 임포트
 
 # API 기본 정보 설정
 API_KEY = settings.API_KEY
@@ -55,6 +56,7 @@ class Command(BaseCommand):
         
         product_codes = []
         for product_data in base_list:
+
             # 통합 모델에 맞게 필드 매핑
             data = {
                 'product_type': p_type, # 구분 필드 추가
@@ -90,6 +92,11 @@ class Command(BaseCommand):
             product_instance = products_dict.get(fin_prdt_cd)
             
             if product_instance:
+                # 🔥 여기서 해당 상품의 텍스트로 임베딩 생성
+                # (상품 하나에 옵션이 여러 개라면, product_instance에서 미리 계산한 걸 재사용하는 게 효율적입니다)
+                # embedding_text = f"{product_instance.fin_prdt_nm} {product_instance.etc_note}"
+                # p_embedding = get_embedding(embedding_text)
+
                 options_to_create.append(ProductOption(
                     product=product_instance,
                     fin_prdt_cd=fin_prdt_cd,
@@ -97,6 +104,7 @@ class Command(BaseCommand):
                     intr_rate_type_nm=option_data.get('intr_rate_type_nm'),
                     intr_rate=option_data.get('intr_rate') if option_data.get('intr_rate') is not None else -1,
                     intr_rate2=option_data.get('intr_rate2') if option_data.get('intr_rate2') is not None else -1,
+                    # embedding=p_embedding,
                 ))
             
         ProductOption.objects.bulk_create(options_to_create, ignore_conflicts=True)

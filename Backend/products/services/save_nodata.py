@@ -1,6 +1,7 @@
 import joblib
 import os
 import numpy as np
+import pandas as pd
 from django.conf import settings
 
 # 1. 모델 파일 경로 설정 (예: base_dir/ml_models/...)

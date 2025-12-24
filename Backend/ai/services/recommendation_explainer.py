@@ -8,6 +8,35 @@ from ai.prompts import RECOMMEND_EXPLAIN_PROMPT
 GMS_KEY = os.getenv('GMS_API_KEY')
 LLM_URL = os.getenv('LLM_ENDPOINT') # https://gms.ssafy.io/gmsapi/api.openai.com/v1/chat/completions
 LLM_MODEL = os.getenv('LLM_MODEL', 'gpt-4o')
+EMBEDDING_URL = os.getenv('EMBEDDING_ENDPOINT')
+
+def get_embedding(text):
+    """
+    사용자가 입력한 텍스트(자연어)를 벡터로 변환
+    """
+    headers = {
+        "Authorization": f"Bearer {GMS_KEY}", 
+        "Content-Type": "application/json"
+        }
+    
+    payload = {
+        "model": "text-embedding-3-small",
+        "input": text
+    }
+    
+    try:
+        # GMS 임베딩 엔드포인트 호출
+        response = requests.post(
+            EMBEDDING_URL, 
+            headers=headers, 
+            json=payload, 
+            timeout=10
+        )
+        response.raise_for_status()
+        return response.json()['data'][0]['embedding']
+    except Exception as e:
+        print(f"Embedding Error: {e}")
+        return None
 
 def explain_recommendation(user, rec, user_query=None):
     """
