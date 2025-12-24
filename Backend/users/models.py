@@ -88,15 +88,15 @@ class FinancialProfile(models.Model):
     expense_to_income_ratio = models.FloatField(default=0.0, help_text="소득 대비 지출 비율")
 
 
-    # 변수처럼 사용할 수 있게 도와주는 데코레이터
-    # 따로 migration할 필요 없음
-    @property
-    def age(self):  # 메서드 이름을 age로 설정
-        if not self.user.birth_date:
-            return 30
-        today = date.today()
-        birth = self.user.birth_date
-        return today.year - birth.year - ((today.month, today.day) < (birth.month, birth.day))
+    # # 변수처럼 사용할 수 있게 도와주는 데코레이터
+    # # 따로 migration할 필요 없음
+    # @property
+    # def age(self):  # 메서드 이름을 age로 설정
+    #     if not self.user.birth_date:
+    #         return 30
+    #     today = date.today()
+    #     birth = self.user.birth_date
+    #     return today.year - birth.year - ((today.month, today.day) < (birth.month, birth.day))
     
     def __str__(self):
         return f"{self.user.username}'s Financial Profile"

@@ -12,7 +12,7 @@ from products.serializers import ProductOptionSerializer
 
 
 class CustomRegisterSerializer(RegisterSerializer):
-  birth_date = serializers.DateField()
+  birth_date = serializers.DateField(required=False, allow_null=True)
   # salary = serializers.IntegerField()
   # possessions = serializers.IntegerField()
   is_mydata_agreed = serializers.BooleanField()
