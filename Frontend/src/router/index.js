@@ -49,6 +49,11 @@ const router = createRouter({
       name: 'Subscribe',
       component: () => import('@/views/users/Subscribe.vue')
     },
+    {
+      path: '/subscribed/:id',
+      name: 'Subscribed',
+      component: () => import('@/views/users/Subscribed.vue')
+    },
     //상품
     {
       path: '/products',

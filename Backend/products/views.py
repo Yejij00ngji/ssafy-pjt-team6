@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -68,20 +69,18 @@ def options(request):
 # 예적금 통합
 # =================================================================================
   
-@api_view(['GET', 'POST'])
+@api_view(['GET', 'POST', 'DELETE'])
 @permission_classes([IsAuthenticated])
-def subscriptions(request):
-  if request.method == 'POST':
-    serializer = SubscriptionSerializer(data = request.data)
-    
-    if serializer.is_valid(raise_exception=True):
+def subscriptions(request, subscription_id=None):
+    # 1. POST: 상품 가입
+    if request.method == 'POST':
+        serializer = SubscriptionSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            option = serializer.validated_data['product_option']
+            months = option.save_trm
+            expired_date = date.today() + relativedelta(months=months)
 
-      # 가입 날짜 기준 만기일 계산
-      option = serializer.validated_data['product_option']
-      months = option.save_trm
-      expired_date = date.today() + relativedelta(months=months)
-
-      serializer.save(
+            serializer.save(
                 user=request.user, 
                 expired_at=expired_date,
                 init_intr_rate=option.intr_rate or 0,
@@ -90,11 +89,33 @@ def subscriptions(request):
                 init_intr_rate_type_nm=option.intr_rate_type_nm,
                 is_active=True
             )
-      return Response(serializer.data, status=status.HTTP_201_CREATED)
-  elif request.method == 'GET':
-    user_subscriptions = Subscription.objects.filter(user=request.user)
-    serializer = SubscriptionSerializer(user_subscriptions, many=True)
-    return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    # 2. GET: 내 가입 목록 조회
+    elif request.method == 'GET':
+        user_subscriptions = Subscription.objects.filter(user=request.user)
+        serializer = SubscriptionSerializer(user_subscriptions, many=True)
+        return Response(serializer.data)
+
+    # 3. DELETE: 상품 해지 (삭제)
+    elif request.method == 'DELETE':
+        # URL 파라미터로 넘어온 subscription_id를 사용하거나 
+        # request body에서 product_option_id를 받아 처리할 수 있습니다.
+        
+        # 방식 A: Subscription 테이블의 고유 ID(pk)로 삭제 (권장)
+        if subscription_id:
+            subscription = get_object_or_404(Subscription, id=subscription_id, user=request.user)
+            subscription.delete()
+            return Response({"message": "해당 상품 가입이 성공적으로 해지되었습니다."}, status=status.HTTP_204_NO_CONTENT)
+        
+        # 방식 B: ProductOption ID를 body로 받아 삭제
+        option_id = request.data.get('product_option_id')
+        if option_id:
+            subscription = get_object_or_404(Subscription, product_option_id=option_id, user=request.user)
+            subscription.delete()
+            return Response({"message": "해당 옵션의 가입 내역이 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
+            
+        return Response({"error": "삭제할 ID가 제공되지 않았습니다."}, status=status.HTTP_400_BAD_REQUEST)
 
 # -----------------------------------------------------------------------------------------
 # 추천 로직
