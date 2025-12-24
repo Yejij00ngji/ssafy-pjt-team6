@@ -8,7 +8,7 @@ from django.db.models import Avg, Count, Prefetch
 
 from .models import ProductOption, FinancialProduct, Subscription
 from users.models import FinancialProfile
-from .serializers import ProductOptionSerializer, FinancialProductSerializer, FinancialProductDetailSerializer, SubscriptionSerializer
+from .serializers import ProductOptionSerializer, FinancialProductSerializer, FinancialProductDetailSerializer, SubscriptionSerializer, ProductOptionDetailSerializer
 from .filters import ProductFilter
 
 from products.services.engine import recommend_products, save_recommendations
@@ -17,6 +17,7 @@ from ai.services.recommendation_explainer import explain_recommendation
 
 from datetime import date
 from dateutil.relativedelta import relativedelta
+import traceback
 
 """
 예/적금 상품 조회
@@ -199,17 +200,42 @@ def submit_survey(request):
         # 1. 여기서 확실하게 생성 또는 가져오기를 수행
         profile, created = FinancialProfile.objects.get_or_create(user=user)
         
-        # 2. profile 객체를 직접 함수에 넘겨주세요 (user 대신 profile을 넘기는 게 안전)
+        # 2. 설문 데이터로 프로필 업데이트 및 클러스터 할당
+        # 이 함수 내부에서 '유효성 검사'와 'assign_cluster_logic'이 차례로 실행됩니다.
         profile = update_profile_by_survey_safe(profile, survey_data)
+
+        # 1. 추천 결과 가져오기 (List of dicts)
+        raw_recommendations = recommend_products(user, top_n=3)
+        
+        # 2. 결과 가공 (Serializer 활용)
+        serialized_recommendations = []
+        for rec in raw_recommendations:
+            # ProductOptionDetailSerializer 사용 (필드: id, intr_rate, save_trm 등 포함)
+            option_data = ProductOptionDetailSerializer(rec['product_option']).data
+            
+            # [핵심] 프론트엔드에서 바로 보여줄 상품/은행 정보 추가
+            product = rec['product_option'].product
+            option_data['fin_prdt_nm'] = product.fin_prdt_nm
+            option_data['kor_co_nm'] = product.kor_co_nm
+            
+            # [핵심] AI 분석 데이터 추가
+            option_data['ai_analysis'] = rec.get('ai_analysis')
+            option_data['confidence'] = rec.get('confidence')
+            option_data['score'] = rec.get('score')
+            
+            serialized_recommendations.append(option_data)
         
         return Response({
             "message": "설문이 완료되었습니다.",
-            "cluster": profile.cluster_label
+            "cluster_label": profile.cluster_label,
+            "cluster_name": profile.cluster_name,  # "YOLO족" 같은 이름이 나감
+            "recommendations": serialized_recommendations,  # 프론트엔드가 기다리는 핵심 데이터
         }, status=200)
         
     except Exception as e:
         # 에러가 나면 정확히 어떤 에러인지 서버 터미널(VSCode 등)에 찍힙니다.
         print(f"🔥 백엔드 에러 발생: {str(e)}") 
+        print(traceback.format_exc()) # 어디서 에러 났는지 상세히 출력
         return Response({"error": str(e)}, status=400)
     
 def get_queryset(self):

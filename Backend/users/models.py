@@ -63,6 +63,7 @@ class FinancialProfile(models.Model):
         
     # [AI 분석 항목] k-means로 분류된 페르소나 라벨
     cluster_label = models.IntegerField(null=True, blank=True)
+    cluster_name = models.CharField(max_length=50, null=True, blank=True)
     
     # [추가] 저축 목적 (추천 로직의 필터로 활용)
     PURPOSE_CHOICES = [
@@ -86,6 +87,8 @@ class FinancialProfile(models.Model):
     # [가공 항목] 소득 대비 지출 비율 (자산 형성 가능성 파악)
     # 0.9 이상이면 소득의 대부분을 소비하는 욜로 성향으로 판단
     expense_to_income_ratio = models.FloatField(default=0.0, help_text="소득 대비 지출 비율")
+
+
 
 
     # # 변수처럼 사용할 수 있게 도와주는 데코레이터

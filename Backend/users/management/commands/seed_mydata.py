@@ -109,10 +109,39 @@ class Command(BaseCommand):
         kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
         df['cluster'] = kmeans.fit_predict(scaled)
 
-        for _, row in df.iterrows():
-            FinancialProfile.objects.filter(id=row['id']).update(cluster_label=int(row['cluster']))  # 클러스터 라벨 저장 - 통계를 위해 int로 저장
+        # 1. 클러스터별 평균 특징 계산
+        summary = df.groupby('cluster').mean()
 
-        self.stdout.write(self.style.SUCCESS("마이데이터 생성 및 AI 클러스터링 완료!"))
+        # 2. 특징에 따른 페르소나 매핑 (가장 두드러진 특징 기준)
+        # 소득이 가장 높은 그룹 -> 자산 관리 전문가
+        expert_id = summary['inc'].idxmax()
+        # 지출 비율이 가장 높은 그룹 -> YOLO족
+        yolo_id = summary['expense_ratio'].idxmax()
+        # 투자 비중이 가장 높은 그룹 -> 공격적 투자자
+        aggressive_id = summary['inv_ratio'].idxmax()
+        # 현금 유동성이 가장 높은 그룹 -> 홀더
+        holder_id = summary['withdrawable_ratio'].idxmax()
+
+        # 매핑 사전 구성 (나머지 하나는 자동으로 '성실한 저축왕' 할당)
+        all_ids = set(df['cluster'].unique())
+        assigned_ids = {expert_id, yolo_id, aggressive_id, holder_id}
+        steady_id = list(all_ids - assigned_ids)[0] if (all_ids - assigned_ids) else None
+
+        persona_map = {
+            expert_id: "자산 관리 전문가",
+            yolo_id: "YOLO족",
+            aggressive_id: "공격적 투자자",
+            holder_id: "현금 홀더",
+            steady_id: "성실한 저축왕"
+        }
+
+        # 3. DB 업데이트 (라벨 번호와 명칭을 동시에 저장)
+        for _, row in df.iterrows():
+            p_name = persona_map.get(row['cluster'], "일반 사용자")
+            FinancialProfile.objects.filter(id=row['id']).update(
+                cluster_label=int(row['cluster']),
+                cluster_name=p_name
+            )
 
         # 모델 저장 경로 설정
         model_dir = os.path.join(settings.BASE_DIR, 'ml_models')
@@ -122,3 +151,9 @@ class Command(BaseCommand):
         # 스케일러와 모델 저장
         joblib.dump(scaler, os.path.join(model_dir, 'scaler.pkl'))
         joblib.dump(kmeans, os.path.join(model_dir, 'kmeans_model.pkl'))
+
+        # [추가 제안] 나중에 설문조사에서 persona_map을 똑같이 쓰기 위해 이것도 저장해두면 좋습니다!
+        joblib.dump(persona_map, os.path.join(model_dir, 'persona_map.pkl'))
+
+        self.stdout.write(self.style.SUCCESS(f"✨ AI 페르소나 매칭 완료: {persona_map}"))
+        self.stdout.write(self.style.SUCCESS("마이데이터 생성, 클러스터링 및 모델 저장 완료!"))
