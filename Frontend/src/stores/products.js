@@ -10,7 +10,7 @@ export const useProductStore = defineStore('product', () => {
 
   const subscriptions = ref([])
 
-  const getProducts = async ({ bank, term }) => {
+  const getProducts = async ({ bank, term, product_type }) => {
     const response = await axios.get(
       `${accountStore.API_URL}/products/`,{
       // headers: {
@@ -18,11 +18,12 @@ export const useProductStore = defineStore('product', () => {
       // },
       params: {
         bank: bank || undefined,
-        term: term || undefined
+        term: term || undefined,
+        product_type: product_type || undefined,
       }
       })
     
-    console.log(response.data)
+    // console.log(response.data)
 
     return response.data
   }
