@@ -231,6 +231,7 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {'access_type': 'online'},
         'OAUTH_PKCE_ENABLED': True, # 최근 Google 로그인 이슈 해결에 도움됨
+        'JWT_DECODE_LEEWAY': 30, # 시간 오차 허용 (iat 검증 시 30초 여유를 줌)
     },
     'kakao': {
         'APP': {

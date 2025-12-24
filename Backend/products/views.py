@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Prefetch
 
 from .models import ProductOption, FinancialProduct, Subscription
 from users.models import FinancialProfile
@@ -19,17 +19,28 @@ from products.services.recommendation_history import save_recommendations
 # 전체 상품 조회
 @api_view(['GET'])
 def products(request):
-  if request.method == 'GET':
-    
-    queryset = FinancialProduct.objects.all().distinct()
+    if request.method == 'GET':
+        term = request.query_params.get('term')
+        
+        queryset = FinancialProduct.objects.all().distinct()
 
-    filterset = ProductFilter(request.GET, queryset=queryset)
+        if term:
+            filtered_options = ProductOption.objects.filter(save_trm=term)
+            queryset = queryset.prefetch_related(
+                Prefetch('options', queryset=filtered_options)
+            )
+        else:
+            queryset = queryset.prefetch_related('options')
 
-    if filterset.is_valid():
-      queryset = filterset.qs
+        filterset = ProductFilter(request.GET, queryset=queryset)
 
-    serializer = FinancialProductSerializer(queryset, many=True)
-    return Response(serializer.data)
+        if filterset.is_valid():
+            queryset = filterset.qs
+        else:
+            return Response(filterset.errors, status=400)
+
+        serializer = FinancialProductSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 # 상품 상세 정보 조회
 @api_view(['GET','POST'])
@@ -69,8 +80,15 @@ def subscriptions(request):
       months = option.save_trm
       expired_date = date.today() + relativedelta(months=months)
 
-      serializer.save(user=request.user, expired_at=expired_date)
-
+      serializer.save(
+                user=request.user, 
+                expired_at=expired_date,
+                init_intr_rate=option.intr_rate or 0,
+                init_intr_rate2=option.intr_rate2 or 0,
+                init_save_trm=option.save_trm,
+                init_intr_rate_type_nm=option.intr_rate_type_nm,
+                is_active=True
+            )
       return Response(serializer.data, status=status.HTTP_201_CREATED)
   elif request.method == 'GET':
     user_subscriptions = Subscription.objects.filter(user=request.user)
@@ -119,4 +137,14 @@ def get_recommendations(request):
         "recommendations": result
     })
 
-
+def get_queryset(self):
+    term = self.request.query_params.get('term')
+    queryset = FinancialProduct.objects.all()
+    
+    if term:
+        # term이 있을 경우, options를 가져올 때 해당 term만 필터링해서 가져옴
+        return queryset.prefetch_related(
+            Prefetch('options', queryset=ProductOption.objects.filter(save_trm=term))
+        ).filter(options__save_trm=term).distinct()
+    
+    return queryset.prefetch_related('options')
