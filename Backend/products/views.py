@@ -151,7 +151,7 @@ def build_recommendation_response(user, profile, raw_recommendations, user_query
             "confidence": int((top.get("confidence", 0) or 0) * 100)
         }
         try:
-            ai = explain_recommendation(user, explain_input, user_query)  # 기존 시그니처 사용
+            ai = explain_recommendation(user, explain_input, user_query, is_mydata=is_mydata)
             top["ai_analysis"] = {
                 "reason": ai.get("reason"),
                 "report": ai.get("report"),
@@ -220,57 +220,10 @@ def get_recommendations(request):
     if not recommendations:
         return Response({"error": "추천 결과가 없습니다."}, status=404)
 
-    # 4. 여기서 DB 저장
-    save_recommendations(user, profile, recommendations)
-    
-    result = []
-    # 가장 높은 점수(1등) 상품에 대해서만 심층 AI 리포트 생성 (API 호출 비용 및 속도 절감)
-    for i, rec in enumerate(recommendations):
-        option = rec["product_option"]
-        
-        # 기본 정보 구성
-        item = {
-            "product_option_id": option.id,
-            "product_name": option.product.fin_prdt_nm,
-            "bank_name": option.product.kor_co_nm,
-            "intr_rate": option.intr_rate,
-            "intr_rate2": option.intr_rate2,
-            "save_trm": option.save_trm,
-            "score": round(rec["score"], 3),
-            "confidence": round(rec.get("confidence", 0), 3),
-            "similarity": round(rec.get("similarity", 0), 2),
-            "cluster_weight": round(rec.get("cluster_weight", 0), 2),
-        }
-
-        # 1등 상품인 경우에만 GMS(LLM) 리포트 생성
-        if i == 0:
-            ai_analysis = explain_recommendation(user, item, user_query)
-            item.update({
-                "reason": ai_analysis.get("reason"),
-                "report": ai_analysis.get("report"),
-                "nudge": ai_analysis.get("nudge"),
-            })
-        else:
-            # 2, 3등은 간단한 텍스트로 대체하거나 기존 로직 사용
-            item["reason"] = "데이터 기반 추천 상품입니다."
-            item["report"] = None
-            item["nudge"] = None
-            
-        result.append(item)
-
-    # 🔥 [추가] 페르소나 정보 구성
-    # profile.cluster_name이나 pkl 로직을 통해 매칭된 정보를 가져옵니다.
-    persona_data = {
-        "name": getattr(profile, 'cluster_name', "자산 분석가"), # 예: "YOLO족", "개미형"
-        "label": profile.cluster_label,
-        "icon": "💰", # 클러스터별로 아이콘 매핑 로직을 넣을 수 있습니다.
-        "description": f"고객님은 {profile.cluster_name} 성향이 강하시네요! 이를 바탕으로 분석했습니다."
-    }
-        
-    # 기존 save_recommendations(...) 호출은 유지
+    # 4. DB 저장 (추천 기록)
     save_recommendations(user, profile, recommendations)
 
-    # 공통 빌더로 응답 생성
+    # 공통 빌더로 응답 생성 (LLM 호출은 여기서 is_mydata=True로 처리됩니다)
     response_payload = build_recommendation_response(user, profile, recommendations, user_query, is_mydata=True)
     return Response(response_payload)
 
