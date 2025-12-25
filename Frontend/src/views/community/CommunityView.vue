@@ -191,7 +191,7 @@ onMounted(fetchArticles)
   position: fixed;
   bottom: 40px;
   right: calc(50% - 540px);
-  background-color: #00ad7c; /* 인프런 그린 컬러 */
+  background-color: #3182f6; /* 토스 블루 */
   color: white;
   padding: 16px 24px;
   border-radius: 32px;

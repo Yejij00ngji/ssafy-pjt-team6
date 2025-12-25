@@ -111,6 +111,7 @@ body {
   gap: 24px;
 }
 
+
 /* Navigation Responsive Utilities */
 @media (max-width: 1023px) {
   .lg-hide { display: none !important; }

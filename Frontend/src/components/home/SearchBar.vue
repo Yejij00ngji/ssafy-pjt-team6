@@ -55,7 +55,7 @@ defineEmits(['update:modelValue', 'search'])
 }
 
 .search-container:focus-within {
-  border-color: #00ad7c; /* 인프런 그린 컬러 포인트 */
+  border-color: #3182f6; /* 인프런 그린 컬러 포인트 */
   box-shadow: 0 6px 20px rgba(0, 173, 124, 0.12);
 }
 
@@ -105,7 +105,7 @@ defineEmits(['update:modelValue', 'search'])
 .search-submit-btn {
   width: 48px;
   height: 48px;
-  background-color: #00ad7c; /* 강조색: 초록색 */
+  background-color: #3182f6; /* 강조색: 파란색 */
   border: none;
   border-radius: 50%;
   color: white;
@@ -117,7 +117,7 @@ defineEmits(['update:modelValue', 'search'])
 }
 
 .search-submit-btn:hover {
-  background-color: #00966b;
+  background-color: #3182f6;
   transform: scale(1.05);
 }
 

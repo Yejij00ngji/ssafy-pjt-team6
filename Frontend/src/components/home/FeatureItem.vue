@@ -1,117 +1,157 @@
-<template>
-  <section class="feature-section">
-    <div class="max-w-[1100px] mx-auto px-5">
-      <h2 class="section-title">Money:B는 이렇게 추천해요</h2>
-      
-      <div class="process-grid">
-        <div class="process-card">
-          <div class="icon-circle bg-blue-light">
-            <span class="material-symbols-outlined text-blue">person_search</span>
-          </div>
-          <h3>1. 페르소나 분석</h3>
-          <p>
-            간단한 설문을 통해 당신의 소비 습관과 투자 성향을 분석하고, 
-            맞춤 금융 페르소나를 도출합니다.
-          </p>
-        </div>
-
-        <div class="process-card">
-          <div class="icon-circle bg-purple-light">
-            <span class="material-symbols-outlined text-purple">database</span>
-          </div>
-          <h3>2. 실시간 상품 비교</h3>
-          <p>
-            시중에 나와 있는 은행별 예적금 상품의 금리와 조건을 
-            실시간으로 수집하고 대조합니다.
-          </p>
-        </div>
-
-        <div class="process-card">
-          <div class="icon-circle bg-green-light">
-            <span class="material-symbols-outlined text-green">verified</span>
-          </div>
-          <h3>3. 최적의 Top 3 제안</h3>
-          <p>
-            복잡한 조건과 서류 없이, 당신의 페르소나에 가장 큰 이득을 줄 
-            수 있는 상품 3가지를 엄선하여 제안해 드립니다.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-</template>
-
 <script setup>
-// 스크립트 로직은 현재 필요 없음
+// 필요한 로직이 있다면 여기에 추가하세요.
 </script>
 
+<template>
+  <main>
+    <!-- Feature Section -->
+    <section class="bg-white py-24 sm:py-32">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center">
+          <h2 class="text-lg font-bold leading-8 text-yellow-500">머니:비 핵심 기능</h2>
+          <p class="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+            금융 생활의 새로운 기준
+          </p>
+          <p class="mt-6 text-lg leading-8 text-gray-600">
+            안전하고 스마트한 자산 관리를 경험하세요. 당신의 데이터를 기반으로 최적의 솔루션을 제공합니다.
+          </p>
+        </div>
+
+        <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+          <div class="grid grid-cols-1 gap-x-8 gap-y-16 lg:grid-cols-3">
+            <!-- Feature 1 -->
+            <div class="group relative flex flex-col items-center text-center p-8 rounded-3xl bg-slate-50 hover:bg-white hover:shadow-2xl transition-all duration-500 border border-transparent hover:border-yellow-100">
+              <div class="mb-8 relative">
+                <div class="absolute inset-0 bg-yellow-400 blur-2xl opacity-10 group-hover:opacity-30 transition-opacity"></div>
+                <div class="hexagon-shape bg-white shadow-lg relative z-10 group-hover:-translate-y-2 transition-transform duration-300">
+                  <span class="material-symbols-outlined text-4xl text-yellow-500">pie_chart</span>
+                </div>
+              </div>
+              <h3 class="text-xl font-bold leading-7 text-gray-900 group-hover:text-yellow-600 transition-colors">개인 맞춤형 포트폴리오</h3>
+              <p class="mt-4 text-base leading-7 text-gray-500 text-balance">
+                AI 알고리즘이 소비 패턴과 투자 성향을 분석하여, 나에게 딱 맞는 1:1 맞춤 금융 포트폴리오를 제안합니다.
+              </p>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="group relative flex flex-col items-center text-center p-8 rounded-3xl bg-slate-50 hover:bg-white hover:shadow-2xl transition-all duration-500 border border-transparent hover:border-yellow-100">
+              <div class="mb-8 relative">
+                <div class="absolute inset-0 bg-yellow-400 blur-2xl opacity-10 group-hover:opacity-30 transition-opacity"></div>
+                <div class="hexagon-shape bg-white shadow-lg relative z-10 group-hover:-translate-y-2 transition-transform duration-300">
+                  <span class="material-symbols-outlined text-4xl text-yellow-500">monitoring</span>
+                </div>
+              </div>
+              <h3 class="text-xl font-bold leading-7 text-gray-900 group-hover:text-yellow-600 transition-colors">실시간 자산 분석</h3>
+              <p class="mt-4 text-base leading-7 text-gray-500 text-balance">
+                은행, 증권, 보험 등 흩어진 모든 자산을 한 화면에서 확인하세요. 실시간 변동 내역을 놓치지 않고 알려드립니다.
+              </p>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="group relative flex flex-col items-center text-center p-8 rounded-3xl bg-slate-50 hover:bg-white hover:shadow-2xl transition-all duration-500 border border-transparent hover:border-yellow-100">
+              <div class="mb-8 relative">
+                <div class="absolute inset-0 bg-yellow-400 blur-2xl opacity-10 group-hover:opacity-30 transition-opacity"></div>
+                <div class="hexagon-shape bg-white shadow-lg relative z-10 group-hover:-translate-y-2 transition-transform duration-300">
+                  <span class="material-symbols-outlined text-4xl text-yellow-500">shield_lock</span>
+                </div>
+              </div>
+              <h3 class="text-xl font-bold leading-7 text-gray-900 group-hover:text-yellow-600 transition-colors">안전한 데이터 보안</h3>
+              <p class="mt-4 text-base leading-7 text-gray-500 text-balance">
+                금융권 수준의 철저한 보안 시스템으로 당신의 소중한 정보를 24시간 안전하게 보호합니다. 안심하고 사용하세요.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it Works Section -->
+    <section class="relative bg-slate-50 py-24 sm:py-32 overflow-hidden">
+      <div class="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-yellow-400/10 blur-3xl pointer-events-none"></div>
+      
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-16 md:text-center">
+          <h2 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">이용 방법</h2>
+          <p class="mt-4 text-lg text-gray-600 font-medium">단 3단계면 충분합니다. 지금 바로 시작해보세요.</p>
+        </div>
+
+        <div class="relative">
+          <!-- Connecting Line for Desktop -->
+          <div aria-hidden="true" class="absolute left-0 top-12 hidden h-1 w-full -translate-y-1/2 bg-yellow-100 lg:block"></div>
+          
+          <div class="grid grid-cols-1 gap-12 lg:grid-cols-3 lg:gap-8">
+            <!-- Step 1 -->
+            <div class="relative flex flex-col items-center">
+              <div class="relative z-10 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-white shadow-xl ring-4 ring-yellow-50">
+                <span class="material-symbols-outlined text-4xl text-yellow-500">account_balance_wallet</span>
+                <div class="absolute -right-2 -top-2 h-9 w-9 rounded-2xl bg-yellow-400 flex items-center justify-center text-sm font-black text-slate-900 shadow-lg shadow-yellow-200">1</div>
+              </div>
+              <div class="mt-8 text-center">
+                <h3 class="text-xl font-bold text-gray-900">계좌 연동</h3>
+                <p class="mt-3 text-sm text-gray-500 leading-relaxed font-medium">간편 인증을 통해 보유하고 계신<br/>은행, 증권 계좌를 한 번에 연동하세요.</p>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="relative flex flex-col items-center">
+              <div class="relative z-10 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-white shadow-xl ring-4 ring-yellow-50">
+                <span class="material-symbols-outlined text-4xl text-yellow-500">psychology</span>
+                <div class="absolute -right-2 -top-2 h-9 w-9 rounded-2xl bg-yellow-400 flex items-center justify-center text-sm font-black text-slate-900 shadow-lg shadow-yellow-200">2</div>
+              </div>
+              <div class="mt-8 text-center">
+                <h3 class="text-xl font-bold text-gray-900">성향 분석</h3>
+                <p class="mt-3 text-sm text-gray-500 leading-relaxed font-medium">간단한 설문을 통해 당신의<br/>투자 성향과 소비 패턴을 분석합니다.</p>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="relative flex flex-col items-center">
+              <div class="relative z-10 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-white shadow-xl ring-4 ring-yellow-50">
+                <span class="material-symbols-outlined text-4xl text-yellow-500">lightbulb</span>
+                <div class="absolute -right-2 -top-2 h-9 w-9 rounded-2xl bg-yellow-400 flex items-center justify-center text-sm font-black text-slate-900 shadow-lg shadow-yellow-200">3</div>
+              </div>
+              <div class="mt-8 text-center">
+                <h3 class="text-xl font-bold text-gray-900">솔루션 받기</h3>
+                <p class="mt-3 text-sm text-gray-500 leading-relaxed font-medium">분석 결과를 바탕으로 AI가 제안하는<br/>최적의 자산 관리 솔루션을 확인하세요.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="bg-indigo-400 py-20 sm:py-28 relative overflow-hidden">
+      <!-- Decorative background -->
+      <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#000000 1px, transparent 1px); background-size: 32px 32px;"></div>
+      <div class="absolute right-0 top-0 h-96 w-96 translate-x-1/3 -translate-y-1/3 rounded-full bg-white/30 blur-3xl"></div>
+      
+      <div class="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">
+          지금 바로 내 자산의 균형을 찾아보세요
+        </h2>
+        <p class="mx-auto mt-6 max-w-2xl text-lg text-slate-800 font-bold">
+          머니:비와 함께라면 복잡한 금융이 놀랍도록 쉬워집니다.
+        </p>
+      </div>
+    </section>
+  </main>
+</template>
+
 <style scoped>
-/* 서비스 설명 섹션 */
-.feature-section {
-  padding: 100px 0;
-  background-color: #fcfcfc; /* 배경색 살짝 변경 */
-}
-
-.section-title {
-  font-size: 32px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 60px;
-  color: #191f28;
-}
-
-.process-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
-}
-
-.process-card {
-  padding: 40px;
-  background: #ffffff; /* 카드 배경은 흰색으로 */
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.03); /* 은은한 그림자 */
-  transition: all 0.3s;
-  text-align: center; /* 카드 내용 중앙 정렬 */
-}
-
-.process-card:hover {
-  transform: translateY(-5px); /* 호버 시 살짝 떠오르는 효과 */
-  box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-}
-
-.icon-circle {
-  width: 60px; /* 아이콘 크기 약간 키움 */
-  height: 60px;
-  border-radius: 20px;
+.hexagon-shape {
+  width: 80px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 24px auto; /* 중앙 정렬 */
-  font-size: 28px; /* 아이콘 자체 크기 */
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  margin: 0 auto;
 }
 
-.bg-blue-light { background-color: #e8f3ff; color: #3182f6; } /* 아이콘 컬러도 설정 */
-.bg-purple-light { background-color: #f2f0ff; color: #8657f2; }
-.bg-green-light { background-color: #e7f9ed; color: #21b66b; }
-
-.process-card h3 {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  color: #333d4b;
-}
-
-.process-card p {
-  font-size: 15px;
-  color: #6b7684;
-  line-height: 1.6;
-}
-
-/* 반응형 처리 */
-@media (max-width: 768px) {
-  .process-grid { grid-template-columns: 1fr; }
-  .section-title { font-size: 28px; margin-bottom: 40px; }
-  .process-card { padding: 30px; }
+@media (max-width: 1024px) {
+  [aria-hidden="true"] {
+    display: none;
+  }
 }
 </style>
