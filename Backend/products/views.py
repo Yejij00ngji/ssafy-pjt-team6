@@ -111,6 +111,89 @@ def subscriptions(request, subscription_id=None):
 """
 상품 추천 로직
 """
+
+# 미동의자/동의자 추천 결과 통일
+# 공통: 추천 결과를 통일된 응답으로 빌드
+def build_recommendation_response(user, profile, raw_recommendations, user_query=None, is_mydata=True):
+    """
+    raw_recommendations: recommend_products가 반환한 리스트(각 항목에 'product_option' 및 score/confidence 등 포함)
+    is_mydata: 마이데이터 동의 여부 (향후 explain_recommendation에 전달할 때 사용 가능)
+    반환: dict (Response에 바로 넣을 수 있는 형태)
+    """
+    serialized = []
+    # 먼저 기본 정보 평탄화
+    for rec in raw_recommendations:
+        opt = rec.get('product_option')
+        option_data = ProductOptionDetailSerializer(opt).data
+        product = opt.product
+        option_data.update({
+            "fin_prdt_nm": product.fin_prdt_nm,
+            "kor_co_nm": product.kor_co_nm,
+            "score": round(rec.get("score", 0), 3),
+            "confidence": round(rec.get("confidence", 0), 3),
+            "similarity": round(rec.get("similarity", 0), 2),
+            "cluster_weight": round(rec.get("cluster_weight", 0), 2),
+            "ai_analysis": None
+        })
+        serialized.append(option_data)
+
+    # 상위 1개(인덱스 0)에 대해서만 explain_recommendation 호출 (비용/지연 고려)
+    if serialized:
+        top = serialized[0]
+        # explain_recommendation expects certain keys (we pass a compact dict)
+        explain_input = {
+            "fin_prdt_nm": top.get("fin_prdt_nm"),
+            "intr_rate": top.get("intr_rate"),
+            "intr_rate2": top.get("intr_rate2"),
+            "save_trm": top.get("save_trm"),
+            "similarity": top.get("similarity"),
+            "cluster_weight": top.get("cluster_weight"),
+            "confidence": int((top.get("confidence", 0) or 0) * 100)
+        }
+        try:
+            ai = explain_recommendation(user, explain_input, user_query)  # 기존 시그니처 사용
+            top["ai_analysis"] = {
+                "reason": ai.get("reason"),
+                "report": ai.get("report"),
+                "nudge": ai.get("nudge"),
+            }
+        except Exception as e:
+            top["ai_analysis"] = {
+                "reason": "데이터 기반 추천입니다.",
+                "report": None,
+                "nudge": None
+            }
+
+    # 프로필 스냅샷
+    profile_snapshot = {
+        "annual_income_amt": profile.annual_income_amt,
+        "invest_eval_amt": profile.invest_eval_amt,
+        "balance_amt": profile.balance_amt,
+        "withdrawable_amt": profile.withdrawable_amt,
+        "expense_growth_rate": profile.expense_growth_rate,
+        "expense_to_income_ratio": profile.expense_to_income_ratio,
+        "cluster_label": profile.cluster_label,
+        "cluster_name": (profile.cluster_name or "").strip(),
+    }
+
+    persona_data = {
+        "name": profile_snapshot["cluster_name"] or "자산 분석가",
+        "label": profile_snapshot["cluster_label"],
+        "icon": "💰" if is_mydata else "📝",
+        "description": f"사용자 성향: {profile_snapshot['cluster_name']}"
+    }
+
+    payload = {
+        "user": user.email,
+        "is_mydata_linked": bool(getattr(profile, 'is_mydata_linked', False)),
+        "persona": persona_data,
+        "cluster": profile_snapshot["cluster_label"],
+        "profile": profile_snapshot,
+        "recommendations": serialized,
+        "query_used": user_query
+    }
+    return payload
+
 # 마이데이터 동의자
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -184,14 +267,12 @@ def get_recommendations(request):
         "description": f"고객님은 {profile.cluster_name} 성향이 강하시네요! 이를 바탕으로 분석했습니다."
     }
         
-    return Response({
-        "user": user.username,
-        "is_mydata_linked": getattr(profile, 'is_mydata_linked', False),
-        "persona": persona_data,  # 🔥 프론트엔드에서 persona.name으로 접근 가능
-        "cluster": profile.cluster_label,
-        "recommendations": result,
-        "query_used": user_query # 어떤 의도가 반영되었는지 확인용
-    })
+    # 기존 save_recommendations(...) 호출은 유지
+    save_recommendations(user, profile, recommendations)
+
+    # 공통 빌더로 응답 생성
+    response_payload = build_recommendation_response(user, profile, recommendations, user_query, is_mydata=True)
+    return Response(response_payload)
 
 # 미동의자 로직
 @api_view(['POST'])
@@ -199,48 +280,23 @@ def get_recommendations(request):
 def submit_survey(request):
     user = request.user
     survey_data = request.data
+    user_query = survey_data.get('query') or request.query_params.get('query')
 
-    try:
-        # 1. 여기서 확실하게 생성 또는 가져오기를 수행
-        profile, created = FinancialProfile.objects.get_or_create(user=user)
-        
-        # 2. 설문 데이터로 프로필 업데이트 및 클러스터 할당
-        # 이 함수 내부에서 '유효성 검사'와 'assign_cluster_logic'이 차례로 실행됩니다.
-        profile = update_profile_by_survey_safe(profile, survey_data)
 
-        # 1. 추천 결과 가져오기 (List of dicts)
-        raw_recommendations = recommend_products(user, top_n=3)
-        
-        # 2. 결과 가공 (Serializer 활용)
-        serialized_recommendations = []
-        for rec in raw_recommendations:
-            # ProductOptionDetailSerializer 사용 (필드: id, intr_rate, save_trm 등 포함)
-            option_data = ProductOptionDetailSerializer(rec['product_option']).data
-            
-            # [핵심] 프론트엔드에서 바로 보여줄 상품/은행 정보 추가
-            product = rec['product_option'].product
-            option_data['fin_prdt_nm'] = product.fin_prdt_nm
-            option_data['kor_co_nm'] = product.kor_co_nm
-            
-            # [핵심] AI 분석 데이터 추가
-            option_data['ai_analysis'] = rec.get('ai_analysis')
-            option_data['confidence'] = rec.get('confidence')
-            option_data['score'] = rec.get('score')
-            
-            serialized_recommendations.append(option_data)
-        
-        return Response({
-            "message": "설문이 완료되었습니다.",
-            "cluster_label": profile.cluster_label,
-            "cluster_name": profile.cluster_name,  # "YOLO족" 같은 이름이 나감
-            "recommendations": serialized_recommendations,  # 프론트엔드가 기다리는 핵심 데이터
-        }, status=200)
-        
-    except Exception as e:
-        # 에러가 나면 정확히 어떤 에러인지 서버 터미널(VSCode 등)에 찍힙니다.
-        print(f"🔥 백엔드 에러 발생: {str(e)}") 
-        print(traceback.format_exc()) # 어디서 에러 났는지 상세히 출력
-        return Response({"error": str(e)}, status=400)
+    # 1. 여기서 확실하게 생성 또는 가져오기를 수행
+    profile, created = FinancialProfile.objects.get_or_create(user=user)
+    
+    # 2. 설문 데이터로 프로필 업데이트 및 클러스터 할당
+    # 이 함수 내부에서 '유효성 검사'와 'assign_cluster_logic'이 차례로 실행됩니다.
+    profile = update_profile_by_survey_safe(profile, survey_data)
+
+    # 1. 추천 결과 가져오기 (List of dicts)
+    raw_recommendations = recommend_products(user, top_n=3, user_query=user_query)
+    
+            # profile 업데이트 및 추천 raw 생성은 기존대로
+    # raw_recommendations = recommend_products(...)
+    response_payload = build_recommendation_response(user, profile, raw_recommendations, user_query=user_query, is_mydata=False)
+    return Response(response_payload, status=200)
     
 def get_queryset(self):
     term = self.request.query_params.get('term')
@@ -280,6 +336,7 @@ def update_mydata(request):
     
     # 2. 정보 업데이트 (부분 수정)
     profile.is_mydata_linked = True
+    save
     profile.save()
     
     # 3. 성공 응답 반환

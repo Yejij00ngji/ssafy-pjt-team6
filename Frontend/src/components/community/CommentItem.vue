@@ -33,12 +33,6 @@
         </div>
       </div>
     </div>
-
-    <div v-if="!isEditing" class="comment-footer">
-      <button class="interaction-btn">
-        <span class="icon">💬</span> 답글 달기
-      </button>
-    </div>
   </div>
 </template>
 

@@ -111,7 +111,7 @@
             <span class="rate-label">최대</span>
             <span class="rate-value">{{ item.intr_rate2 }}%</span>
           </div>
-          <p class="recommend-reason">{{ item.reason.substring(0, 45) }}...</p>
+          <p class="recommend-reason">{{ (item.reason || item.ai_analysis?.reason || '').substring(0, 45) }}...</p>
           <div class="hover-guide">가입하러 가기 ❯</div>
         </div>
       </div>

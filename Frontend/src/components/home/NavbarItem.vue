@@ -171,6 +171,30 @@ const handleLogoutMobile = () => {
 .btn-login { color: var(--toss-text-sub); text-decoration: none; padding: 8px; font-size: 15px; }
 .btn-logout { background: none; border: none; color: #f04452; cursor: pointer; font-size: 15px; }
 
+/* Prevent dropdown item text from wrapping; show ellipsis */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--toss-text-sub);
+  transition: all 0.2s;
+  white-space: nowrap;        /* 한 줄 고정 */
+  overflow: hidden;          /* 넘치는 텍스트 숨김 */
+  text-overflow: ellipsis;   /* 말줄임 처리 */
+}
+
+/* Allow the text span to shrink inside flex so ellipsis works */
+.dropdown-item .item-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* 반응형 제어 (CSS만으로 확실하게) */
 @media (max-width: 1023px) {
   .lg-only { display: none !important; }

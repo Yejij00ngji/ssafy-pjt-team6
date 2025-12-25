@@ -102,19 +102,26 @@ const getRecommendations = async (userQueryText = "") => {
     } else {
       // 미동의자(설문): POST /recommendations/survey/
       const url = `${accountStore.API_URL}/recommendations/survey/`
-      // 백엔드 submit_survey expects survey data in request.data
       const payload = temporarySurveyData.value || {}
       const response = await axios.post(url, payload, {
         headers: { Authorization: `Token ${accountStore.token}`, 'Content-Type': 'application/json' },
         timeout: 60000
       })
 
-      // submit_survey 반환 형태: { recommendations: [...] }
+      // 응답 처리: recommendations + persona + profile 스냅샷 반영
       recommendations.value = response.data.recommendations || []
-      // submit_survey may also return cluster info
       userPersona.value = {
-        name: response.data.cluster_name || null,
-        label: response.data.cluster_label || null
+        name: (response.data.cluster_name || '').trim() || null,
+        label: response.data.cluster_label ?? null
+      }
+
+      // 서버가 보낸 profile 스냅샷이 있으면 Pinia 스토어에 즉시 반영
+      if (response.data.profile) {
+        accountStore.financial_profile = response.data.profile
+        // 선택적: user 객체에 마이데이터 상태/라벨도 동기화
+        if (accountStore.user) {
+          accountStore.user.is_mydata_linked = accountStore.user.is_mydata_linked || false
+        }
       }
     }
 

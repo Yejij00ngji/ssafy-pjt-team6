@@ -257,182 +257,250 @@ const onBankClick = (place, marker = null) => {
 };
 
 const getRoute = async (dest) => {
-  if (routeLine.value) routeLine.value.setMap(null);
-  
-  // 1. 출발지를 멀티캠퍼스 역삼 좌표로 고정
-  const multicampus = {
-    lat: 37.5012767,
-    lng: 127.0396002,
-    name: "멀티캠퍼스 역삼"
-  };
+  if (routeLine.value) { routeLine.value.setMap(null); routeLine.value = null; }
 
-  try {
-    const response = await axios.get('http://127.0.0.1:8000/externals/map/route/', {
-      params: { 
-        // 고정된 멀티캠퍼스 좌표 사용
-        origin: `${multicampus.lng},${multicampus.lat}`, 
-        destination: `${dest.lng},${dest.lat}` 
+  // 멀티캠퍼스 역삼을 항상 출발지로 사용
+  const multicampus = { lat: 37.5012767, lng: 127.0396002, name: "멀티캠퍼스 역삼" };
+  const originLngLat = `${multicampus.lng},${multicampus.lat}`;
+
+  // 시도할 priority 목록: 도보 기준 FASTEST 우선, 실패 시 RECOMMEND 폴백
+  const priorities = ['FASTEST', 'RECOMMEND'];
+  let finalResponse = null;
+
+  for (const pr of priorities) {
+    try {
+      const response = await axios.get('http://127.0.0.1:8000/externals/map/route/', {
+        params: {
+          origin: originLngLat,
+          destination: `${dest.lng},${dest.lat}`,
+          priority: pr
+        }
+      });
+
+      console.log('route API response', response.data);
+
+      if (response.data && typeof response.data.code === 'number' && response.data.code < 0) {
+        const msg = String(response.data.msg || '').toLowerCase();
+        console.warn('route API error code:', response.data.code, response.data.msg);
+        if (msg.includes('invalid priority') || response.data.code === -2) continue;
+        finalResponse = response; break;
       }
-    });
-    
-    if (response.data.routes?.[0]) {
-      const summary = response.data.routes[0].summary;
-      routeInfo.value = { 
-        targetName: dest.name, 
-        originName: multicampus.name, // 출발지 이름 추가
-        distance: (summary.distance / 1000).toFixed(1), 
-        duration: Math.ceil(summary.duration / 60) 
-      };
-      drawRoute(response.data.routes[0]);
+
+      if (response.data && response.data.routes && response.data.routes.length > 0) {
+        finalResponse = response; break;
+      }
+    } catch (err) {
+      console.error('route API call failed for priority', pr, err?.response?.data || err.message || err);
+      continue;
     }
-  } catch (e) {
-    console.error("경로 탐색 실패:", e.response?.data || e.message);
+  }
+
+  if (!finalResponse) {
+    console.warn('No valid route response after trying priorities');
+    return;
+  }
+
+  const route = finalResponse.data?.routes?.[0];
+  if (route && route.summary) {
+    const summary = route.summary;
+    routeInfo.value = {
+      targetName: dest.name,
+      originName: multicampus.name,
+      distance: (summary.distance / 1000).toFixed(1),
+      duration: Math.ceil(summary.duration / 60)
+    };
+    drawRoute(route);
+  } else {
+    console.warn('No route found in response', finalResponse.data);
   }
 };
 
+// drawRoute: vertexes 순서(lon/lat vs lat/lon) 자동 감지해서 polyline 생성
 const drawRoute = (routeData) => {
+  if (!routeData || !routeData.sections) return;
   const linePath = [];
-  routeData.sections.forEach(s => s.roads.forEach(r => r.vertexes.forEach((v, i) => { if (i % 2 === 0) linePath.push(new window.kakao.maps.LatLng(r.vertexes[i+1], r.vertexes[i])) })));
-  routeLine.value = new window.kakao.maps.Polyline({ path: linePath, strokeWeight: 6, strokeColor: '#3182F6', strokeOpacity: 0.9 });
+
+  // sections -> roads -> vertexes (vertexes: flat array [lng, lat, lng, lat,...] 혹은 [lat, lng,...])
+  routeData.sections.forEach(section => {
+    (section.roads || []).forEach(road => {
+      const verts = road.vertexes || [];
+      for (let i = 0; i + 1 < verts.length; i += 2) {
+        const a = Number(verts[i]);
+        const b = Number(verts[i + 1]);
+        // 자동 판별: 위도(lat)는 -90..90 범위, 경도(lng)는 -180..180 범위
+        // 만약 a가 경도 범위(-180..180)이고 b가 위도 범위(-90..90)라면 verts = [lng, lat]
+        let lat, lng;
+        if (a >= -180 && a <= 180 && b >= -90 && b <= 90) {
+          // assume [lng, lat]
+          lng = a; lat = b;
+        } else if (a >= -90 && a <= 90 && b >= -180 && b <= 180) {
+          // assume [lat, lng]
+          lat = a; lng = b;
+        } else {
+          // fallback: try swapping
+          lat = verts[i + 1]; lng = verts[i];
+        }
+        linePath.push(new window.kakao.maps.LatLng(Number(lat), Number(lng)));
+      }
+    });
+  });
+
+  if (linePath.length === 0) {
+    console.warn('라인 패스가 비어있습니다. routeData 확인 필요.', routeData);
+    return;
+  }
+
+  // 기존 라인 지우기
+  if (routeLine.value) {
+    routeLine.value.setMap(null);
+    routeLine.value = null;
+  }
+
+  routeLine.value = new window.kakao.maps.Polyline({
+    path: linePath,
+    strokeWeight: 6,
+    strokeColor: '#3182F6',
+    strokeOpacity: 0.9
+  });
   routeLine.value.setMap(map.value);
+
+  // 지도 영역에 맞춰 중심/줌 조정
+  const bounds = new window.kakao.maps.LatLngBounds();
+  linePath.forEach(p => bounds.extend(p));
+  map.value.setBounds(bounds);
 };
 </script>
 
 <style scoped>
-/* 이미지 속 디자인 완벽 복구 스타일 */
-.map-page-wrapper { background: #fff; min-height: 100vh; padding: 40px 0; font-family: 'Pretendard', sans-serif; }
-.content-container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-.map-header { margin-bottom: 30px; }
-.map-header .title { font-size: 32px; font-weight: 800; color: #191f28; }
-.map-header .subtitle { font-size: 16px; color: #4e5968; margin-top: 8px; }
+.map-page-wrapper { background: #fff; min-height: 100vh; padding: 24px 0; font-family: 'Pretendard', sans-serif; }
+.content-container { max-width: 1000px; margin: 0 auto; padding: 0 16px; }
+.map-header { margin-bottom: 18px; }
+.map-header .title { font-size: 24px; font-weight: 800; color: #191f28; }
+.map-header .subtitle { font-size: 14px; color: #4e5968; margin-top: 6px; }
 
-.main-grid { display: grid; grid-template-columns: 340px 1fr; gap: 40px; }
+.main-grid { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
 
-/* 이미지 속 필터 카드 디자인 */
+/* 필터 카드 컴팩트화 */
 .filter-card {
-  background-color: #f9fafb; /* 이미지의 아주 연한 회색 배경 */
-  border-radius: 28px;      /* 이미지처럼 아주 둥근 모서리 */
-  padding: 32px 24px;
+  background-color: #f9fafb;
+  border-radius: 20px;
+  padding: 18px 16px;
 }
 
 .select-group label {
-  display: block; font-size: 14px; font-weight: 600; color: #4e5968; margin-bottom: 12px;
+  display: block; font-size: 13px; font-weight: 600; color: #4e5968; margin-bottom: 8px;
 }
 
 .toss-select {
-  width: 100%; padding: 16px;
+  width: 100%; padding: 10px;
   border: 1px solid #e5e8eb; background: #fff;
-  border-radius: 12px; font-size: 16px; color: #191f28;
+  border-radius: 10px; font-size: 14px; color: #191f28;
   appearance: none; outline: none; margin-bottom: 8px;
 }
 
-/* 이미지 속 버튼 디자인 */
+/* 버튼 크기 축소 */
 .btn-main {
   width: 100%; background-color: #3182f6; color: #fff;
-  border: none; padding: 18px; border-radius: 16px;
-  font-weight: 700; font-size: 16px; cursor: pointer; margin-bottom: 12px;
+  border: none; padding: 10px; border-radius: 10px;
+  font-weight: 700; font-size: 14px; cursor: pointer; margin-bottom: 8px;
 }
 
 .btn-sub {
   width: 100%; background-color: #fff; color: #3182f6;
-  border: 1px solid #e5e8eb; padding: 18px; border-radius: 16px;
-  font-weight: 700; font-size: 16px; cursor: pointer;
+  border: 1px solid #e5e8eb; padding: 10px; border-radius: 10px;
+  font-weight: 700; font-size: 14px; cursor: pointer;
 }
 
-/* 지도 및 경로 카드 스타일 */
-.kakao-map-canvas { width: 100%; height: 750px; border-radius: 32px; border: 1px solid #f2f4f6; }
-.route-floating-card { position: absolute; top: 24px; left: 24px; z-index: 10; width: 280px; }
+/* 지도 및 경로 카드 스타일 (높이 축소) */
+.kakao-map-canvas { width: 100%; height: 600px; border-radius: 20px; border: 1px solid #f2f4f6; }
+
+.route-floating-card { position: absolute; top: 12px; left: 12px; z-index: 10; width: 240px; }
 .route-content {
-  background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
-  padding: 20px; border-radius: 24px; display: flex; align-items: center;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px);
+  padding: 12px; border-radius: 12px; display: flex; align-items: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
 }
 .destination-tag { background: #e8f3ff; color: #3182f6; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-bottom: 4px; display: inline-block; }
-.time strong { color: #3182f6; font-size: 20px; }
-.icon-circle { width: 44px; height: 44px; background: #3182f6; color: #fff; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-right: 14px; }
+.icon-circle { width: 34px; height: 34px; background: #3182f6; color: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 12px; }
 
 /* 헬퍼 클래스 */
-.mt-2 { margin-top: 8px; } .mt-3 { margin-top: 12px; } .mt-4 { margin-top: 16px; } .mt-5 { margin-top: 20px; } .mb-2 { margin-bottom: 8px; }
+.mt-2 { margin-top: 8px; } .mt-3 { margin-top: 12px; } .mt-4 { margin-top: 16px; } .mt-5 { margin-top: 18px; } .mb-2 { margin-bottom: 8px; }
 
-/* 경로 애니메이션 */
-.fade-slide-enter-from, .fade-slide-leave-to { opacity: 0; transform: translateY(-20px); }
-.fade-slide-enter-active, .fade-slide-leave-active { transition: all 0.3s ease; }
-
-/* 검색 결과 섹션 전체 */
-.result-section { border-top: 1px solid #f2f4f6; padding-top: 24px; }
-.result-header { margin-bottom: 16px; padding: 0 4px; }
-.result-count { font-size: 15px; color: #4e5968; }
+/* 검색 결과 섹션 전체 (컴팩트) */
+.result-section { border-top: 1px solid #f2f4f6; padding-top: 16px; }
+.result-header { margin-bottom: 10px; padding: 0 4px; }
+.result-count { font-size: 14px; color: #4e5968; }
 .result-count strong { color: #3182f6; }
 
 .bank-scroll-list { 
-  max-height: 400px; overflow-y: auto; padding-right: 4px;
+  max-height: 320px; overflow-y: auto; padding-right: 4px;
 }
 
-/* 개별 은행 카드 */
+/* 개별 은행 카드 (작게) */
 .bank-card {
   display: flex; align-items: flex-start;
-  padding: 20px; margin-bottom: 12px;
+  padding: 12px; margin-bottom: 10px;
   background: #ffffff; border: 1px solid #f2f4f6;
-  border-radius: 20px; cursor: pointer;
-  transition: all 0.2s ease;
+  border-radius: 12px; cursor: pointer;
+  transition: all 0.15s ease;
   position: relative;
 }
 
-.bank-card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.04); border-color: #3182f6; }
+.bank-card:hover { transform: translateY(-1px); box-shadow: 0 6px 12px rgba(0,0,0,0.03); border-color: #3182f6; }
 .bank-card.is-selected { background: #f2f8ff; border-color: #3182f6; }
 
 .bank-status-dot { 
   width: 8px; height: 8px; background: #3182f6; border-radius: 50%; 
-  margin-top: 6px; margin-right: 12px; flex-shrink: 0;
+  margin-top: 6px; margin-right: 10px; flex-shrink: 0;
 }
 
 .bank-info { flex-grow: 1; }
-.bank-name { font-size: 16px; font-weight: 700; color: #191f28; margin: 0 0 6px 0; }
-.bank-addr { font-size: 13px; color: #6b7684; margin: 0 0 10px 0; line-height: 1.4; }
+.bank-name { font-size: 14px; font-weight: 700; color: #191f28; margin: 0 0 6px 0; }
+.bank-addr { font-size: 12px; color: #6b7684; margin: 0 0 6px 0; line-height: 1.3; }
 
 /* 스크롤바 커스텀 */
-.bank-scroll-list::-webkit-scrollbar { width: 4px; }
+.bank-scroll-list::-webkit-scrollbar { width: 6px; }
 .bank-scroll-list::-webkit-scrollbar-thumb { background: #e5e8eb; border-radius: 4px; }
 
-/* 소요 시간 카드 위치를 지도 하단 중앙으로 */
+/* 소요 시간 카드 위치를 지도 하단 중앙으로 (크기 축소) */
 .route-floating-wrapper {
   position: absolute;
-  bottom: 24px;   /* 지도 바닥에서 24px 띄움 */
-  left: 50%;      /* 왼쪽에서 50% 이동 */
-  transform: translateX(-50%); /* 정확히 중앙 정렬 */
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 10;
   width: auto;
-  min-width: 320px;
+  min-width: 260px;
 }
 
 .route-content {
   background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(10px);
-  padding: 16px 20px;
-  border-radius: 20px; /* 토스풍 둥근 모서리 */
+  backdrop-filter: blur(8px);
+  padding: 10px 14px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid #e5e8eb;
 }
 
 .icon-circle {
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   background: #3182f6;
   color: #fff;
-  border-radius: 12px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 14px;
+  margin-right: 12px;
   flex-shrink: 0;
 }
 
 .text-info { flex-grow: 1; }
 
 .route-summary {
-  font-size: 15px;
+  font-size: 14px;
   color: #191f28;
   margin: 0;
   font-weight: 500;
@@ -444,7 +512,7 @@ const drawRoute = (routeData) => {
 }
 
 .route-summary strong {
-  font-size: 18px;
+  font-size: 16px;
   color: #3182f6;
 }
 
@@ -458,14 +526,29 @@ const drawRoute = (routeData) => {
   background: none;
   border: none;
   color: #b0b8c1;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
-  margin-left: 10px;
+  margin-left: 8px;
   padding: 4px;
 }
 
-/* 애니메이션 효과: 아래에서 위로 슥 올라오게 */
-.fade-slide-enter-from { opacity: 0; transform: translate(-50%, 20px); }
-.fade-slide-leave-to { opacity: 0; transform: translate(-50%, 20px); }
-.fade-slide-enter-active, .fade-slide-leave-active { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.map-section { position: relative; }
+
+.route-floating-wrapper {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: auto;
+  min-width: 260px;
+  pointer-events: auto;
+}
+
+/* 애니메이션 효과 */
+.fade-slide-enter-from, .fade-slide-leave-to { opacity: 0; transform: translateY(-12px); }
+.fade-slide-enter-active, .fade-slide-leave-active { transition: all 0.25s ease; }
+.fade-slide-enter-from { opacity: 0; transform: translate(-50%, 12px); }
+.fade-slide-leave-to { opacity: 0; transform: translate(-50%, 12px); }
+.fade-slide-enter-active, .fade-slide-leave-active { transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
 </style>

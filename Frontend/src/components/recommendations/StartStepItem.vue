@@ -59,7 +59,7 @@ const handleMyDataClick = () => {
     
     if (confirmConnect) {
       // 프로필 수정 페이지(마이데이터 입력란이 있는 곳)로 이동
-      router.push({ name: 'ProfileUpdate' }) 
+      router.push({ name: 'Profile' }) 
     } else {
       // 연결 안 할 경우 바로 설문 단계로 유도
       emit('next', { agreed: false })

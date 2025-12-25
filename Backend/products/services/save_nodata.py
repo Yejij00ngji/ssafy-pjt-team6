@@ -68,7 +68,9 @@ def assign_cluster_logic(profile):
 
 # db에 저장
 def update_profile_by_survey_safe(profile, data):
-    # 이제 profile을 직접 받았으므로 user.financialprofile을 호출할 필요가 없습니다.
+    # 로그: 들어온 설문 데이터 확인
+    print("▶ submit_survey incoming data:", data)
+
     profile.annual_income_amt = int(data.get('annual_income_amt', 0))
     profile.invest_eval_amt = int(data.get('invest_eval_amt', 0))
     profile.balance_amt = int(data.get('balance_amt', 0))
@@ -76,10 +78,24 @@ def update_profile_by_survey_safe(profile, data):
     profile.expense_growth_rate = float(data.get('expense_growth_rate', 1.0))
     profile.expense_to_income_ratio = float(data.get('expense_to_income_ratio', 0.0))
     
-    # [수정] 클러스터 번호와 이름을 동시에 받아서 저장
+    # 클러스터 할당
     cluster_id, cluster_name = assign_cluster_logic(profile)
     profile.cluster_label = cluster_id
-    profile.cluster_name = cluster_name
-    
+    profile.cluster_name = (cluster_name or "").strip()
+
     profile.save()
+
+    # 저장 후 스냅샷 로그 출력 (디버깅용)
+    snapshot = {
+        "annual_income_amt": profile.annual_income_amt,
+        "invest_eval_amt": profile.invest_eval_amt,
+        "balance_amt": profile.balance_amt,
+        "withdrawable_amt": profile.withdrawable_amt,
+        "expense_growth_rate": profile.expense_growth_rate,
+        "expense_to_income_ratio": profile.expense_to_income_ratio,
+        "cluster_label": profile.cluster_label,
+        "cluster_name": profile.cluster_name
+    }
+    print("▶ submit_survey saved profile snapshot:", snapshot)
+
     return profile

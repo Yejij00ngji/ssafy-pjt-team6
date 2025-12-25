@@ -37,7 +37,7 @@ def article_detail(request, article_pk):
         # 상세 조회 시 조회수 증가 로직 (선택)
         article.views += 1
         article.save()
-        serializer = ArticleSerializer(article)
+        serializer = ArticleSerializer(article, context={'request': request})
         return Response(serializer.data)
 
     elif request.method == 'PUT':

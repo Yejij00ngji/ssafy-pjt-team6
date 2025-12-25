@@ -135,36 +135,97 @@ const formatRate = (r) => {
   return `${Number(r).toFixed(1)}%`
 }
 
+// --- 차트 데이터 빌드: ai_analysis.distribution -> user profile -> 폴백 ---
 const buildChartData = () => {
-  const data = {
+  const mainRec = props.recommendations?.[0];
+  let consumption = 0, savings = 0, investment = 0;
+
+  // 1) LLM / 엔진이 distribution을 제공하면 우선 사용 (object 또는 array 모두 처리)
+  const dist = mainRec?.ai_analysis?.distribution || mainRec?.distribution;
+  if (dist) {
+    if (Array.isArray(dist) && dist.length >= 3) {
+      [consumption, savings, investment] = dist.map(Number);
+    } else if (typeof dist === 'object') {
+      consumption = Number(dist.consumption ?? dist.consume ?? dist.expense ?? dist[0] ?? 0);
+      savings     = Number(dist.savings ?? dist.save ?? dist[1] ?? 0);
+      investment  = Number(dist.investment ?? dist.invest ?? dist[2] ?? 0);
+    }
+  } else {
+    // 2) 마이데이터 프로필로부터 유추
+    const prof = accountStore.user?.financialprofile || {};
+    const annualIncome = Number(prof.annual_income_amt || 0);
+    const monthlyPaid = Number(prof.monthly_paid_amt || 0);
+    const investEval = Number(prof.invest_eval_amt || 0);
+    const balance = Number(prof.balance_amt || 0);
+
+    // 보수적인 매핑: 연간저축비율, 투자 비중(투자평가액 비율), 소비 = 나머지
+    let savingsRatio = 0, investRatio = 0;
+    if (annualIncome > 0) {
+      savingsRatio = Math.min((monthlyPaid * 12) / (annualIncome + 1), 0.6);
+    } else if (balance > 0) {
+      savingsRatio = Math.min(monthlyPaid / (balance + 1), 0.5);
+    }
+    if (investEval + balance > 0) {
+      investRatio = Math.min(investEval / (investEval + balance + 1), 0.8);
+    }
+    const consumptionRatio = Math.max(0, 1 - savingsRatio - investRatio);
+
+    consumption = consumptionRatio * 100;
+    savings = savingsRatio * 100;
+    investment = investRatio * 100;
+  }
+
+  // 3) 정규화 (합이 100이 되도록) 및 폴백 값 처리
+  let total = (Number(consumption) || 0) + (Number(savings) || 0) + (Number(investment) || 0);
+  if (total <= 0.0001) {
+    consumption = 50; savings = 30; investment = 20;
+    total = 100;
+  } else {
+    consumption = (consumption / total) * 100;
+    savings = (savings / total) * 100;
+    investment = (investment / total) * 100;
+  }
+
+  return {
     labels: ['소비', '저축', '투자'],
     datasets: [{
-      data: [70, 20, 10],
-      backgroundColor: ['#3b82f6', '#94a3b8', '#f1f5f9'],
+      data: [Math.round(consumption), Math.round(savings), Math.round(investment)],
+      backgroundColor: ['#ef4444', '#3b82f6', '#10b981'],
       hoverOffset: 4,
       borderWidth: 0
     }]
   }
-  return data
 }
 
+// --- 차트 초기화/갱신: 기존 인스턴스가 있으면 data만 갱신 ---
 const initChart = () => {
   const el = assetChart.value
   if (!el) return
   const ctx = el.getContext('2d')
-  if (chartInstance) chartInstance.destroy()
+  const data = buildChartData()
+
+  if (chartInstance) {
+    chartInstance.data = data
+    chartInstance.update()
+    return
+  }
+
   chartInstance = new Chart(ctx, {
     type: 'doughnut',
-    data: buildChartData(),
+    data,
     options: {
       cutout: '70%',
       responsive: true,
       plugins: {
-        legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 10, weight: '600' }, padding: 16 } }
+        legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 10, weight: '600' }, padding: 12 } }
       }
     }
   })
 }
+
+// 리액티브 변경 감지: 추천 리스트 또는 사용자 프로필 변경 시 차트 갱신
+watch(() => props.recommendations, () => { initChart() }, { deep: true })
+watch(() => accountStore.user?.financialprofile, () => { initChart() }, { deep: true })
 
 onMounted(() => {
   initChart()

@@ -31,11 +31,17 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ('article', 'user')
 
 class ArticleSerializer(serializers.ModelSerializer):
-
     user = UserSerializer(read_only=True)
-    # article 모델의 related_name='comments'를 사용하여 댓글 목록을 가져옴
     comments = CommentSerializer(many=True, read_only=True)
     comment_count = serializers.IntegerField(source='comments.count', read_only=True)
+    like_count = serializers.IntegerField(source='like_users.count', read_only=True)
+    is_liked = serializers.SerializerMethodField()
+
+    def get_is_liked(self, obj):
+        user = self.context.get('request').user
+        if user.is_authenticated:
+            return obj.like_users.filter(pk=user.pk).exists()
+        return False
 
     class Meta:
         model = Article

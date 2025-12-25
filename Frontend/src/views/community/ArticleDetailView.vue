@@ -88,7 +88,22 @@ const fetchArticleDetail = async () => {
     const response = await axios.get(`http://127.0.0.1:8000/community/${route.params.id}/`)
     article.value = response.data
 
-    // 이 로그를 통해 버튼이 안 보이는 원인을 찾으세요!
+    // 좋아요/댓글 수를 일관되게 사용할 수 있도록 보정
+    if (response.data.like_count !== undefined) {
+      article.value.likes = response.data.like_count
+    } else if (response.data.like_users) {
+      article.value.likes = response.data.like_users.length
+    } else {
+      article.value.likes = 0
+    }
+
+    if (response.data.comment_count !== undefined) {
+      // optional: keep comment count if provided
+      article.value.comments_count = response.data.comment_count
+    } else if (response.data.comments) {
+      article.value.comments_count = response.data.comments.length
+    }
+
     console.log('현재 로그인 유저 PK:', accountStore.user?.pk)
     console.log('게시글 작성자 ID:', article.value.user?.id)
 
@@ -101,15 +116,14 @@ const fetchArticleDetail = async () => {
 // 게시글 좋아요
 const handleLike = async () => {
   try {
-    await axios.post(`http://127.0.0.1:8000/community/${article.value.id}/like/`, {}, {
+    const res = await axios.post(`http://127.0.0.1:8000/community/${article.value.id}/like/`, {}, {
       headers: { Authorization: `Token ${accountStore.token}` }
     })
-    // 백엔드에서 준 최신 데이터로 로컬 상태 업데이트
-    article.value.likes = response.data.like_count
-
-    // fetchArticleDetail() // 좋아요 수 업데이트를 위해 다시 불러오기
+    // 백엔드에서 반환한 최신 like_count로 로컬 상태 업데이트
+    article.value.likes = res.data.like_count ?? (res.data.like_count === 0 ? 0 : article.value.likes)
   } catch (err) {
     console.error('좋아요 실패:', err)
+    if (err.response?.status === 401) alert('좋아요는 로그인 후 이용 가능합니다.')
   }
 }
 
