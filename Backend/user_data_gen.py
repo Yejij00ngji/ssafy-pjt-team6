@@ -28,7 +28,6 @@ def generate_users(count=2000):
                 "birth_date": birth.isoformat(),
                 # "salary": random.randint(3000, 12000) * 10000, # 3천만 ~ 1억 2천
                 # "possessions": random.randint(1000, 50000) * 10000, # 1천만 ~ 5억
-                "is_mydata_agreed": random.choice([True, False])
             }
         }
         users.append(user_data)

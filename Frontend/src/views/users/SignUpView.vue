@@ -88,7 +88,7 @@ const showPwd = ref(false);
 const email = ref('');
 const password1 = ref('');
 const password2 = ref('');
-const is_mydata_agreed = ref(false);
+const is_mydata_linked = ref(false);
 
 // 1. 비밀번호 유효성: 8자 이상
 const isPasswordValid = computed(() => password1.value.length >= 8);
@@ -112,7 +112,7 @@ const handleSignUp = async () => {
     password1: password1.value,
     password2: password2.value,
     // birth_date: null,           // 시리얼라이저 필드 존재 시 null이라도 전송
-    is_mydata_agreed: is_mydata_agreed.value,
+    is_mydata_linked: is_mydata_linked.value,
   };
 
   try {

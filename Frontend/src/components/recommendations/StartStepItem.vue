@@ -1,31 +1,131 @@
 <template>
   <div class="step-content">
-    <h1 class="toss-title">나에게 딱 맞는 <br/>예적금을 찾아볼까요?</h1>
+    <h1 class="toss-title">
+      나에게 딱 맞는 <br />
+      예적금을 찾아볼까요?
+    </h1>
     <p class="toss-desc">방식을 선택하면 분석을 시작합니다.</p>
 
     <div class="card-group">
-      <div class="toss-card select-card" @click="$emit('next', { agreed: true })">
-        <span class="icon">⚡️</span>
+      <div 
+        class="toss-card select-card" 
+        v-bind:class="isMyData ? 'is-linked' : ''"
+        @click="handleMyDataClick"
+      >
+        <span class="icon">{{ isMyData ? '✅' : '⚡️' }}</span>
         <div class="card-text">
-          <strong class="toss-title" style="font-size: 18px;">마이데이터 연결</strong>
-          <p class="toss-desc" style="margin:0;">30초 만에 가장 정확한 추천</p>
+          <strong class="toss-title-sub">
+            {{ isMyData ? '마이데이터 분석 시작' : '마이데이터 연결' }}
+          </strong>
+          <p class="toss-desc-sub">
+            {{ isMyData ? '이미 연결된 자산 정보로 진단' : '30초 만에 가장 정확한 추천' }}
+          </p>
         </div>
       </div>
 
       <div class="toss-card select-card" @click="$emit('next', { agreed: false })">
         <span class="icon">📝</span>
         <div class="card-text">
-          <strong class="toss-title" style="font-size: 18px;">직접 입력하기</strong>
-          <p class="toss-desc" style="margin:0;">간단한 질문으로 성향 파악</p>
+          <strong class="toss-title-sub">직접 입력하기</strong>
+          <p class="toss-desc-sub">간단한 질문으로 성향 파악</p>
         </div>
       </div>
     </div>
   </div>
 </template>
 
+<script setup>
+import { ref, defineProps, defineEmits } from 'vue'
+
+const props = defineProps({
+  isMyData: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const emit = defineEmits(['next'])
+
+const handleMyDataClick = () => {
+  if (props.isMyData) {
+    // 이미 연동된 유저라면 다음 단계로 이동
+    emit('next', { agreed: true })
+  } else {
+    // 미동의(미연동) 유저라면 경고창을 띄우고 직접 입력으로 유도
+    window.alert("현재 마이데이터 연동이 되어 있지 않습니다.\n'직접 입력하기'를 통해 분석을 진행해 주세요.")
+    
+    // 알림창 확인 후 바로 직접 입력 단계로 넘겨버리려면 아래 주석을 해제하세요.
+    // emit('next', { agreed: false })
+  }
+}
+</script>
+
 <style scoped>
-.card-group { display: flex; flex-direction: column; gap: 16px; margin-top: 40px; }
-.select-card { display: flex; align-items: center; gap: 20px; border: 1px solid var(--toss-border); }
-.select-card:hover { border-color: var(--toss-blue); }
+.step-content {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.toss-title {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #191f28;
+  margin-bottom: 8px;
+}
+
+.toss-desc {
+  font-size: 16px;
+  color: #4e5968;
+}
+
+.card-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 40px;
+}
+
+.toss-card {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.select-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 1px solid #f2f4f6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.select-card:hover {
+  border-color: #3182f6;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(49, 130, 246, 0.08);
+}
+
+.select-card.is-linked {
+  border-color: #3182f6;
+  background-color: #f9fbff;
+}
+
 .icon { font-size: 32px; }
+
+.card-text { display: flex; flex-direction: column; }
+
+.toss-title-sub {
+  font-size: 18px;
+  font-weight: 600;
+  color: #191f28;
+}
+
+.toss-desc-sub {
+  font-size: 14px;
+  color: #8b95a1;
+  margin-top: 4px;
+}
+
 </style>

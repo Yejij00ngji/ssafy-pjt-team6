@@ -13,9 +13,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser
 from .serializers import UserDetailSerializer, CustomGoogleSerializer, FinancialProfileSerializer
-
+from .models import FinancialProfile
 
 # Create your views here.
 
@@ -75,23 +74,17 @@ class NaverLogin(SocialLoginView):
         self.serializer.is_valid(raise_exception=True)
         self.login()
         return self.get_response()
-    
-# # 마이데이터 생성
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# # @parser_classes([MultiPartParser, FormParser])
-# def financial_profile(request):
-#     # 1. 시리얼라이저 초기화 (데이터와 context 전달)
-#     serializer = FinancialProfileSerializer(data=request.data)
-    
-#     # 2. 유효성 검사 (숫자 형식이 맞는지, 필수 필드 등 확인)
-#     if serializer.is_valid():
-#         profile = serializer.save(user=request.user)  # Serializer의 create() 메서드가 호출됨
-        
-#         predict_user_cluster(profile)
 
-#         return Response({"cluster": profile.cluster_label, "message": "성공"}, status=200)
+# views.py
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_status(self, request):
+    # FinancialProfile이 없으면 생성, 있으면 가져옴
+    profile, created = FinancialProfile.objects.get_or_create(user=request.user)
     
-#     # 3. 검증 실패 시 에러 반환
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    return Response({
+        "is_mydata_linked": profile.is_mydata_linked,
+        "cluster_label": profile.cluster_label,
+        "cluster_name": profile.cluster_name,
+        "nickname": request.user.nickname
+    }, status=200)

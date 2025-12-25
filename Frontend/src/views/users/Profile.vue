@@ -18,7 +18,7 @@
               <div class="tag-group">
                 <span class="tag">#자산관리_꿈나무</span>
                 <span class="tag">#안전제일주의</span>
-                <span v-if="accountStore.user?.is_mydata_agreed" class="tag" style="background: #E7F9F3; color: #00B06B;">#마이데이터_연동중</span>
+                <span v-if="accountStore.user?.is_mydata_linked" class="tag" style="background: #E7F9F3; color: #00B06B;">#마이데이터_연동중</span>
               </div>
             </div>
           </div>
@@ -45,7 +45,7 @@
             </div>
             
             <div class="input-item" style="flex-direction: row; align-items: center; gap: 10px; margin-top: 10px;">
-              <input type="checkbox" id="mydata-agree" v-model="editData.is_mydata_agreed" style="width: 18px; height: 18px; cursor: pointer;" />
+              <input type="checkbox" id="mydata-agree" v-model="editData.is_mydata_linked" style="width: 18px; height: 18px; cursor: pointer;" />
               <label for="mydata-agree" style="margin-bottom: 0; cursor: pointer;">마이데이터 서비스 연동 동의</label>
             </div>
 
@@ -65,8 +65,8 @@
         <div class="persona-content">
           <div class="radar-placeholder">
             <div class="persona-status">
-              <span class="status-dot" :class="{ active: accountStore.user?.is_mydata_agreed }"></span>
-              {{ accountStore.user?.is_mydata_agreed ? '마이데이터 연동 완료' : '마이데이터 미연동' }}
+              <span class="status-dot" :class="{ active: accountStore.user?.is_mydata_linked }"></span>
+              {{ accountStore.user?.is_mydata_linked ? '마이데이터 연동 완료' : '마이데이터 미연동' }}
             </div>
           </div>
           <div class="persona-btns" style="display: flex; gap: 8px; margin-top: 20px;">
@@ -185,7 +185,7 @@ const editData = ref({
   nickname: '', 
   password1: '', 
   password2: '',
-  is_mydata_agreed: false // 초기값 설정
+  is_mydata_linked: false // 초기값 설정
 })
 
 const passwordError = computed(() => {
@@ -196,7 +196,7 @@ const passwordError = computed(() => {
 
 const openEditMode = () => {
   editData.value.nickname = accountStore.user?.nickname || ''
-  editData.value.is_mydata_agreed = accountStore.user?.is_mydata_agreed || false // 유저 정보 로드
+  editData.value.is_mydata_linked = accountStore.user?.is_mydata_linked || false // 유저 정보 로드
   editData.value.password1 = ''
   editData.value.password2 = ''
   isEditMode.value = true
@@ -210,7 +210,7 @@ const updateFullProfile = async () => {
   // 페이로드 구성: 닉네임과 마이데이터 동의 여부 포함
   const payload = { 
     nickname: editData.value.nickname,
-    is_mydata_agreed: editData.value.is_mydata_agreed
+    is_mydata_linked: editData.value.is_mydata_linked
   }
   
   // 비밀번호 입력 시에만 포함

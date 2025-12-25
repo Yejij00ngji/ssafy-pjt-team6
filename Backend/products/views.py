@@ -135,7 +135,7 @@ def get_recommendations(request):
 
     # 2. 마이데이터 미동의자 및 설문 미완료자 차단
     # 클러스터 라벨이 없다는 것은 마이데이터 연동도 안 되었고 설문조사도 안 했다는 의미입니다.
-    if profile.cluster_label is None:
+    if not profile.is_mydata_linked and profile.cluster_label is None:
         return Response({"error": "마이데이터 연동 또는 설문조사가 필요합니다.", "code": "NEED_DATA_LINK"}, status=400)
 
     # 3. 추천 로직 실행 (recommend_products 함수 내부에서 profile의 데이터를 기반으로 연산됨)
@@ -181,9 +181,20 @@ def get_recommendations(request):
             item["nudge"] = None
             
         result.append(item)
+
+    # 🔥 [추가] 페르소나 정보 구성
+    # profile.cluster_name이나 pkl 로직을 통해 매칭된 정보를 가져옵니다.
+    persona_data = {
+        "name": getattr(profile, 'cluster_name', "자산 분석가"), # 예: "YOLO족", "개미형"
+        "label": profile.cluster_label,
+        "icon": "💰", # 클러스터별로 아이콘 매핑 로직을 넣을 수 있습니다.
+        "description": f"고객님은 {profile.cluster_name} 성향이 강하시네요! 이를 바탕으로 분석했습니다."
+    }
         
     return Response({
         "user": user.username,
+        "is_mydata_linked": getattr(profile, 'is_mydata_linked', False),
+        "persona": persona_data,  # 🔥 프론트엔드에서 persona.name으로 접근 가능
         "cluster": profile.cluster_label,
         "recommendations": result,
         "query_used": user_query # 어떤 의도가 반영되었는지 확인용
@@ -249,3 +260,52 @@ def get_queryset(self):
         ).filter(options__save_trm=term).distinct()
     
     return queryset.prefetch_related('options')
+
+"""
+마이데이터 해제
+"""
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def disconnect_mydata(request):
+    profile = request.user.financialprofile
+    # 모델에 정의한 초기화 메서드 실행
+    profile.disconnect_mydata()
+    
+    return Response({
+        "message": "마이데이터 연동이 성공적으로 해지되었으며, 모든 데이터가 초기화되었습니다.",
+        "is_mydata_linked": False
+    }, status=200)
+
+# PATCH 메서드로 변경하여 리소스의 부분 수정을 명시함
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_mydata(request):
+    user = request.user
+    
+    # 1. 프로필 가져오기 또는 생성
+    profile, created = FinancialProfile.objects.get_or_create(user=user)
+    
+    # 2. 정보 업데이트 (부분 수정)
+    profile.is_mydata_linked = True
+    save
+    profile.save()
+    
+    # 3. 성공 응답 반환
+    return Response({
+        "message": "마이데이터 이용 동의가 완료되었습니다.",
+        "is_mydata_linked": profile.is_mydata_linked,
+    }, status=200)
+
+# views.py
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def get_user_status(request):
+#     # FinancialProfile이 없으면 생성, 있으면 가져옴
+#     profile, created = FinancialProfile.objects.get_or_create(user=request.user)
+    
+#     return Response({
+#         "is_mydata_linked": profile.is_mydata_linked,
+#         "cluster_label": profile.cluster_label,
+#         "cluster_name": profile.cluster_name,
+#         "nickname": request.user.nickname
+#     }, status=200)
