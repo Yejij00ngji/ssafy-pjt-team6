@@ -116,26 +116,41 @@ class Command(BaseCommand):
 
         # 2. 특징에 따른 페르소나 매핑 (가장 두드러진 특징 기준)
         # 소득이 가장 높은 그룹 -> 자산 관리 전문가
-        expert_id = summary['inc'].idxmax()
-        # 지출 비율이 가장 높은 그룹 -> YOLO족
-        yolo_id = summary['expense_ratio'].idxmax()
-        # 투자 비중이 가장 높은 그룹 -> 공격적 투자자
-        aggressive_id = summary['inv_ratio'].idxmax()
-        # 현금 유동성이 가장 높은 그룹 -> 홀더
-        holder_id = summary['withdrawable_ratio'].idxmax()
+        # 각 metric에 대한 내림차순 클러스터 리스트
+        rank_inc = summary['inc'].sort_values(ascending=False).index.tolist()
+        rank_expense = summary['expense_ratio'].sort_values(ascending=False).index.tolist()
+        rank_inv = summary['inv_ratio'].sort_values(ascending=False).index.tolist()
+        rank_withdraw = summary['withdrawable_ratio'].sort_values(ascending=False).index.tolist()
 
-        # 매핑 사전 구성 (나머지 하나는 자동으로 '성실한 저축왕' 할당)
+        assigned = set()
+        persona_map = {}
+
+        # helper: pick first cluster from rank_list that's not yet assigned
+        def pick_unique(rank_list):
+            for cid in rank_list:
+                if cid not in assigned:
+                    assigned.add(cid)
+                    return cid
+            return None
+
+        expert_id = pick_unique(rank_inc)            # 고소득 -> 자산 관리 전문가
+        yolo_id = pick_unique(rank_expense)          # 지출비율 높음 -> YOLO
+        aggressive_id = pick_unique(rank_inv)        # 투자비중 높음 -> 공격적 투자자
+        holder_id = pick_unique(rank_withdraw)       # 현금 유동성 높음 -> 홀더
+
+        # 남은 클러스터(있으면) 하나를 steady로
         all_ids = set(df['cluster'].unique())
-        assigned_ids = {expert_id, yolo_id, aggressive_id, holder_id}
-        steady_id = list(all_ids - assigned_ids)[0] if (all_ids - assigned_ids) else None
+        remaining = list(all_ids - assigned)
+        steady_id = remaining[0] if remaining else None
 
-        persona_map = {
-            expert_id: "자산 관리 전문가",
-            yolo_id: "YOLO족",
-            aggressive_id: "공격적 투자자",
-            holder_id: "현금 홀더",
-            steady_id: "성실한 저축왕"
-        }
+        if expert_id is not None: persona_map[expert_id] = "자산 관리 전문가"
+        if yolo_id is not None: persona_map[yolo_id] = "YOLO족"
+        if aggressive_id is not None: persona_map[aggressive_id] = "공격적 투자자"
+        if holder_id is not None: persona_map[holder_id] = "현금 홀더"
+        if steady_id is not None: persona_map[steady_id] = "성실한 저축왕"
+
+        # 디버그 출력: 어떤 클러스터에 어떤 페르소나가 매핑됐는지 보여줌
+        self.stdout.write(self.style.SUCCESS(f"페르소나 매핑: {persona_map}"))
 
         # 3. DB 업데이트 (라벨 번호와 명칭을 동시에 저장)
         for _, row in df.iterrows():
