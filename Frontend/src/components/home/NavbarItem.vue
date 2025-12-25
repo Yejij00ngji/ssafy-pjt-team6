@@ -3,7 +3,8 @@
     <div class="nav-container">
       
       <div class="nav-group-left">
-        <RouterLink :to="{name:'Home'}" class="logo no-wrap">Money:Bee</RouterLink>
+        <img src="@/assets/icons/honeycomb.png" class="w-[30px] h-[30px] object-cover" alt="Logo" />
+        <RouterLink :to="{name:'Home'}" class="logo no-wrap">Money:B</RouterLink>
       </div>
 
       <div class="nav-group-center lg-only">
