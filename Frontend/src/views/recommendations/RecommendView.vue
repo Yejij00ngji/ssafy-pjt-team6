@@ -6,7 +6,7 @@
           :is="currentStepComponent" 
           :recommendations="recommendations"
           :cluster="userCluster"
-          :is-my-data="isMyDataAgreed"
+          :is-my-data="isMyData"
           @next="handleNextStep"
           @retry="resetAll"
         />
@@ -32,23 +32,36 @@ const accountStore = useAccountStore()
 const recommendationStore = useRecommendationStore()
 
 const currentStep = ref('intro') // intro -> survey(선택) -> loading -> result
-const isMyDataAgreed = ref(false)
+const isMyData = ref(false)
 const recommendations = ref([]) // API 결과를 저장할 상태
+const userPersona = ref(null)
+
 const isLoadingError = ref(false)
-const userCluster = ref(null)  // 클러스터 번호 저장용 상태
 const API_URL = "http://localhost:8000" // 환경에 맞춰 수정
 
 
-// 단계별 컴포넌트 매핑
+// 현재 단계에 따른 컴포넌트 계산
 const currentStepComponent = computed(() => {
-  const steps = {
-    intro: StartStepItem,
-    survey: SurveyItem,
-    loading: LoadingItem,
-    result: ResultsStepItem
+  switch (currentStep.value) {
+    case 'intro': return StartStepItem
+    case 'survey': return SurveyItem
+    case 'loading': return LoadingItem
+    case 'result': return ResultsStepItem
+    default: return StartStepItem
   }
-  return steps[currentStep.value]
 })
+
+// 유저 상태(마이데이터 연동 여부) 조회
+const fetchUserStatus = async () => {
+  try {
+    const response = await axios.get(`${accountStore.API_URL}/user/status/`, {
+      headers: { Authorization: `Token ${accountStore.token}` }
+    })
+    isMyData.value = response.data.is_mydata_linked
+  } catch (error) {
+    console.error("User status load failed:", error)
+  }
+}
 
 // 실제 API 호출 함수
 const getRecommendations = async () => {
@@ -66,7 +79,9 @@ const getRecommendations = async () => {
 
     // 결과 저장 및 다음 단계 이동
     // ✅ 백엔드 응답에서 데이터 추출
-    recommendations.value = response.data.recommendations
+    recommendations.value = response.data.recommendations || []
+    userPersona.value = response.data.persona || null
+    isMyData.value = response.data.is_mydata_linked || false
 
     recommendationStore.setRecommendations(recommendations.value)
 
@@ -80,63 +95,49 @@ const getRecommendations = async () => {
   }
 }
 
-// 흐름 제어 로직 (수정됨)
+// 단계 이동 핸들러
 const handleNextStep = async (data) => {
-  // 1. 초기 진입 단계 (Intro -> Survey or Loading)
   if (currentStep.value === 'intro') {
-    isMyDataAgreed.value = data.agreed;
-
-    if (data.agreed === false) {
-      currentStep.value = 'survey';
-      return; // 설문 단계로 이동 후 중단
+    if (data && data.agreed === false) {
+      currentStep.value = 'survey'
+      return
     } else {
-      currentStep.value = 'loading';
-      // 여기서 바로 getRecommendations()를 호출하지 않고 
-      // 아래 공통 호출 로직(3번)에서 처리하도록 흐름을 유도합니다.
+      currentStep.value = 'loading'
     }
-  }
-
-  // 2. 설문 완료 단계 (Survey -> Loading)
-  else if (currentStep.value === 'survey') {
+  } else if (currentStep.value === 'survey') {
     try {
-      // 🛑 주의: 여기서 바로 loading으로 바꾸면 화면이 넘어가버립니다.
-      // API 성공 후에 loading 상태를 유지하거나, 진입 시점에 바꾸는 것이 좋습니다.
-      const payload = JSON.parse(JSON.stringify(data));
-      console.log("전송할 순수 데이터:", payload);
-
-      await axios.post(`${API_URL}/recommendations/survey/`, payload, { 
+      const payload = JSON.parse(JSON.stringify(data))
+      await axios.post(`${accountStore.API_URL}/recommendations/survey/`, payload, { 
         headers: { Authorization: `Token ${accountStore.token}` }
-      });
-
-      currentStep.value = 'loading'; // 성공 시에 로딩 단계로 변경
+      })
+      currentStep.value = 'loading'
     } catch (error) {
-      console.error("서버 응답 에러 데이터:", error.response?.data); // 🔥 이 부분을 꼭 확인하세요!
-      const errorMsg = error.response?.data?.error || "설문 처리 중 오류가 발생했습니다.";
-      console.error("설문 저장 실패:", error);
-      alert(errorMsg);
-      currentStep.value = 'survey';
-      return; // 에러 시 함수 종료
+      const errorMsg = error.response?.data?.error || "설문 처리 중 오류가 발생했습니다."
+      alert(errorMsg)
+      return
     }
   } 
 
-  // 3. 공통 로딩 및 추천 결과 호출
-  // 위 1, 2단계에서 currentStep이 'loading'이 되었다면 실행됩니다.
   if (currentStep.value === 'loading') {
-    await getRecommendations();
+    await getRecommendations()
   }
-};
+}
 
-// 재시도 로직
+// 초기화
 const resetAll = () => {
   currentStep.value = 'intro'
   recommendations.value = []
+  userPersona.value = null
+  fetchUserStatus()
 }
 
 onMounted(() => {
+  fetchUserStatus()
   if (route.query.step === 'survey') {
     currentStep.value = 'survey'
   }
 })
+
 </script>
 
 <style scoped>

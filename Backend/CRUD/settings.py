@@ -27,8 +27,14 @@ YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
 # 3. kakao path key
 KAKAO_PATH_KEY = os.getenv('KAKAO_PATH_KEY')
 
-# 4. openai api key
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+# 4. GMS GPU key
+GMS_API_KEY = os.getenv('GMS_API_KEY')
+GMS_BASE_URL = os.getenv('GMS_BASE_URL')
+EMBEDDING_ENDPOINT = os.getenv('EMBEDDING_ENDPOINT')
+EMBEDDING_MODEL = os.getenv('EMBEDDING_MODEL')
+LLM_ENDPOINT = os.getenv('LLM_ENDPOINT')
+LLM_MODEL = os.getenv('LLM_MODEL')
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/

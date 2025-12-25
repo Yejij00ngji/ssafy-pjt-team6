@@ -23,7 +23,7 @@ export const useAccountStore = defineStore('account', () => {
 
   const isMyData = computed(() => {
     if (user.value){
-      return user.value.is_mydata_agreed ? true : false
+      return user.value.is_mydata_linked ? true : false
     }
     
     else {
@@ -31,8 +31,11 @@ export const useAccountStore = defineStore('account', () => {
     }
   })
 
-  const signUp = async ({email,password1,password2,is_mydata_agreed}) => {
-    const response = await axios.post(`${API_URL}/accounts/signup/`,{email,password1,password2,is_mydata_agreed})
+
+  const cluster_info = ref(null)
+
+  const signUp = async ({email,password1,password2,is_mydata_linked}) => {
+    const response = await axios.post(`${API_URL}/accounts/signup/`,{email,password1,password2,is_mydata_linked})
 
     token.value = response.data.key
     user.value = response.data.user

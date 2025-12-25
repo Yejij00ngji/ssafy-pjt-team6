@@ -10,7 +10,7 @@ class User(AbstractUser):
   birth_date = models.DateField(null=True, blank=True)
   # salary = models.IntegerField(null=True)
   # possessions = models.IntegerField(null=True)
-  is_mydata_agreed = models.BooleanField(default=False)
+#   is_mydata_agreed = models.BooleanField(default=False)  # financial에 있는 걸로 사용
 
   REQUIRED_FIELDS = [] # email은 기본적으로 필수이므로 생략 가능
   USERNAME_FIELD = 'username' # 여전히 username을 쓰지만 이메일 값이 들어갈 것임
@@ -22,7 +22,7 @@ class User(AbstractUser):
 # 마이데이터 유저 정보
 # ----------------------------------------------------------------------
 class FinancialProfile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='financialprofile')
 
     # -------------------------------------------------------------------------
     # 1. 마이데이터 공통 인증 및 연동 정보 (MyData Common)
@@ -63,6 +63,7 @@ class FinancialProfile(models.Model):
         
     # [AI 분석 항목] k-means로 분류된 페르소나 라벨
     cluster_label = models.IntegerField(null=True, blank=True)
+    cluster_name = models.CharField(max_length=50, null=True, blank=True)
     
     # [추가] 저축 목적 (추천 로직의 필터로 활용)
     PURPOSE_CHOICES = [
@@ -87,16 +88,35 @@ class FinancialProfile(models.Model):
     # 0.9 이상이면 소득의 대부분을 소비하는 욜로 성향으로 판단
     expense_to_income_ratio = models.FloatField(default=0.0, help_text="소득 대비 지출 비율")
 
-
-    # # 변수처럼 사용할 수 있게 도와주는 데코레이터
-    # # 따로 migration할 필요 없음
-    # @property
-    # def age(self):  # 메서드 이름을 age로 설정
-    #     if not self.user.birth_date:
-    #         return 30
-    #     today = date.today()
-    #     birth = self.user.birth_date
-    #     return today.year - birth.year - ((today.month, today.day) < (birth.month, birth.day))
+    """
+    사용자가 마이데이터 해제하면 관련 정보 다 삭제
+    """
+    def disconnect_mydata(user):
+        try:
+            profile = user.financialprofile
+            
+            # 1. 연동 상태 해제
+            profile.is_mydata_linked = False
+            
+            # 2. 불러왔던 마이데이터 수치들 초기화 (기본값으로 세팅)
+            profile.balance_amt = 0
+            profile.withdrawable_amt = 0
+            profile.last_offered_rate = 0.0
+            profile.monthly_paid_amt = 0
+            profile.invest_eval_amt = 0
+            profile.invest_purchase_amt = 0
+            profile.annual_income_amt = 0
+            profile.expense_growth_rate = 1.0
+            profile.expense_to_income_ratio = 0.0
+            
+            # 3. AI 분석 결과도 초기화 (더 이상 유효하지 않으므로)
+            profile.cluster_label = None
+            profile.cluster_name = None
+            
+            profile.save()
+            return True
+        except AttributeError:
+            return False
     
     def __str__(self):
         return f"{self.user.username}'s Financial Profile"

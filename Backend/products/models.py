@@ -37,6 +37,8 @@ class ProductOption(models.Model):
     save_trm = models.IntegerField()                            # 저축 기간 (단위: 개월)
     intr_rate = models.FloatField(null=True)                    # 저축 금리
     intr_rate2 = models.FloatField(null=True)                   # 최고 우대 금리
+    # embedding = models.JSONField(null=True, blank=True)         # 임베딩 벡터를 저장할 필드 추가 (빠른 ai 기능을 위해 필요)
+
 
 # 상품 가입 목록 테이블
 class Subscription(models.Model):

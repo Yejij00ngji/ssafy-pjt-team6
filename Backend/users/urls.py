@@ -12,4 +12,5 @@ urlpatterns = [
   path('naver/', views.NaverLogin.as_view(), name='naver_login'),
   path('kakao/', views.KakaoLogin.as_view(), name='kakao_login'), 
   path('google/token/', views.GoogleLogin.as_view(), name='google_api_login'),
+  path('user/status/', views.get_user_status, name='user_status'), # 이 경로도 없어서 404가 나는 중입니다.
 ]
