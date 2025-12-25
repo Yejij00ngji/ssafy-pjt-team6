@@ -46,7 +46,7 @@ def explain_recommendation(user, rec, user_query=None):
     
     # 프롬프트
     prompt = RECOMMEND_EXPLAIN_PROMPT.format(
-            cluster=user.financialprofile.cluster_label,
+            cluster=getattr(user.financialprofile, 'cluster_name', user.financialprofile.cluster_label),
             # 입력값이 없으면 "기본 금융 페르소나 분석"으로 대체
             user_query=user_query if (user_query and user_query.strip()) else "현재 페르소나에 최적화된 자산 관리",
             product_name=rec.get("fin_prdt_nm"),

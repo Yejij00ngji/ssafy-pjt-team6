@@ -110,6 +110,7 @@ class Command(BaseCommand):
         kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
         df['cluster'] = kmeans.fit_predict(scaled)
 
+
         # 1. 클러스터별 평균 특징 계산
         summary = df.groupby('cluster').mean()
 

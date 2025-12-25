@@ -5,7 +5,7 @@
         <component 
           :is="currentStepComponent" 
           :recommendations="recommendations"
-          :cluster="userCluster"
+          :cluster="userPersona"
           :is-my-data="isMyData"
           @next="handleNextStep"
           @retry="resetAll"
@@ -19,15 +19,16 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useAccountStore } from '@/stores/accounts'
 import { useRecommendationStore } from '@/stores/recommendations'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import StartStepItem from '@/components/recommendations/StartStepItem.vue'
 import ResultsStepItem from '@/components/recommendations/ResultsStepItem.vue'
 import LoadingItem from '@/components/recommendations/LoadingItem.vue'
 import SurveyItem from '@/components/recommendations/SurveyItem.vue'
+import NLPStepItem from '@/components/recommendations/NLPStepItem.vue'
 
 const route = useRoute()
-
+const router = useRouter()
 const accountStore = useAccountStore()
 const recommendationStore = useRecommendationStore()
 
@@ -36,15 +37,18 @@ const isMyData = ref(false)
 const recommendations = ref([]) // API 결과를 저장할 상태
 const userPersona = ref(null)
 
+// 설문 데이터를 임시로 저장할 객체
+const temporarySurveyData = ref({})
+
 const isLoadingError = ref(false)
 const API_URL = "http://localhost:8000" // 환경에 맞춰 수정
-
 
 // 현재 단계에 따른 컴포넌트 계산
 const currentStepComponent = computed(() => {
   switch (currentStep.value) {
     case 'intro': return StartStepItem
     case 'survey': return SurveyItem
+    case 'nlp': return NLPStepItem
     case 'loading': return LoadingItem
     case 'result': return ResultsStepItem
     default: return StartStepItem
@@ -54,7 +58,7 @@ const currentStepComponent = computed(() => {
 // 유저 상태(마이데이터 연동 여부) 조회
 const fetchUserStatus = async () => {
   try {
-    const response = await axios.get(`${accountStore.API_URL}/user/status/`, {
+    const response = await axios.get(`${accountStore.API_URL}/accounts/user/status/`, {
       headers: { Authorization: `Token ${accountStore.token}` }
     })
     isMyData.value = response.data.is_mydata_linked
@@ -63,35 +67,67 @@ const fetchUserStatus = async () => {
   }
 }
 
+// 인증 오류 처리: 로그아웃 하고 로그인 화면으로 이동
+const handleAuthError = async () => {
+  try {
+    await accountStore.logOut()
+  } catch (e) {
+    // 안전하게 리다이렉트
+  } finally {
+    router.push({ name: 'Login' })
+  }
+}
+
 // 실제 API 호출 함수
-const getRecommendations = async () => {
+// 실제 API 호출 함수
+const getRecommendations = async (userQueryText = "") => {
+  if (!accountStore.token) {
+    alert("로그인이 필요한 서비스입니다.")
+    router.push({ name: 'Login' })
+    return
+  }
 
   try {
-    isLoadingError.value = false
-    const response = await axios.get(`${accountStore.API_URL}/recommendations/`, {
-      headers: { Authorization: `Token ${accountStore.token}` },
-      timeout: 60000 // OpenAI 응답을 위해 넉넉히 설정
-    })
+    // 마이데이터 연동 유저: GET /recommendations/?query=...
+    if (isMyData.value || accountStore.isMyData) {
+      const url = `${accountStore.API_URL}/recommendations/`
+      const response = await axios.get(url, {
+        headers: { Authorization: `Token ${accountStore.token}` },
+        params: { query: userQueryText },
+        timeout: 60000
+      })
 
-    // 🔥 여기서 로그를 찍어보세요!
-    console.log("✅ 백엔드 전체 응답 데이터:", response.data);
-    console.log("📦 추천 리스트 추출:", response.data.recommendations);
+      recommendations.value = response.data.recommendations || []
+      userPersona.value = response.data.persona || null
+    } else {
+      // 미동의자(설문): POST /recommendations/survey/
+      const url = `${accountStore.API_URL}/recommendations/survey/`
+      // 백엔드 submit_survey expects survey data in request.data
+      const payload = temporarySurveyData.value || {}
+      const response = await axios.post(url, payload, {
+        headers: { Authorization: `Token ${accountStore.token}`, 'Content-Type': 'application/json' },
+        timeout: 60000
+      })
 
-    // 결과 저장 및 다음 단계 이동
-    // ✅ 백엔드 응답에서 데이터 추출
-    recommendations.value = response.data.recommendations || []
-    userPersona.value = response.data.persona || null
-    isMyData.value = response.data.is_mydata_linked || false
+      // submit_survey 반환 형태: { recommendations: [...] }
+      recommendations.value = response.data.recommendations || []
+      // submit_survey may also return cluster info
+      userPersona.value = {
+        name: response.data.cluster_name || null,
+        label: response.data.cluster_label || null
+      }
+    }
 
     recommendationStore.setRecommendations(recommendations.value)
-
     currentStep.value = 'result'
   } catch (error) {
     console.error("추천 데이터 로드 실패:", error)
-    isLoadingError.value = true
-    // 에러 발생 시 처리 (예: 경고창을 띄우고 다시 intro로 보내기 등)
-    alert("추천 결과를 가져오는 데 실패했습니다. 다시 시도해 주세요.")
-    currentStep.value = 'intro'
+    if (error.response?.status === 401) {
+      await handleAuthError?.()
+    } else {
+      alert("추천 결과를 분석하는 중 오류가 발생했습니다.")
+      currentStep.value = 'intro'
+    }
   }
 }
 
@@ -100,26 +136,16 @@ const handleNextStep = async (data) => {
   if (currentStep.value === 'intro') {
     if (data && data.agreed === false) {
       currentStep.value = 'survey'
-      return
     } else {
-      currentStep.value = 'loading'
+      currentStep.value = 'nlp'
     }
   } else if (currentStep.value === 'survey') {
-    try {
-      const payload = JSON.parse(JSON.stringify(data))
-      await axios.post(`${accountStore.API_URL}/recommendations/survey/`, payload, { 
-        headers: { Authorization: `Token ${accountStore.token}` }
-      })
-      currentStep.value = 'loading'
-    } catch (error) {
-      const errorMsg = error.response?.data?.error || "설문 처리 중 오류가 발생했습니다."
-      alert(errorMsg)
-      return
-    }
-  } 
-
-  if (currentStep.value === 'loading') {
-    await getRecommendations()
+    temporarySurveyData.value = data
+    currentStep.value = 'nlp'
+  } else if (currentStep.value === 'nlp') {
+    const userQueryText = data?.text || ""
+    currentStep.value = 'loading'
+    await getRecommendations(userQueryText)
   }
 }
 
@@ -137,7 +163,6 @@ onMounted(() => {
     currentStep.value = 'survey'
   }
 })
-
 </script>
 
 <style scoped>
@@ -148,7 +173,7 @@ onMounted(() => {
 .toss-container-narrow {
   max-width: 480px; /* 모바일 우선 너비 */
   margin: 0 auto;
-  padding: 60px 24px;
+  padding: 40px 24px;
 }
 /* 슬라이드 애니메이션 */
 .slide-fade-enter-active, .slide-fade-leave-active { transition: all 0.3s ease-out; }
