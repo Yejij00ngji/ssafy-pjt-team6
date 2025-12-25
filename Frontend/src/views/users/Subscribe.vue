@@ -1,5 +1,7 @@
 <template>
-  <div class="auth-page"> <div class="auth-container"> <button class="back-link-btn" @click="router.back()">
+  <div class="auth-page">
+    <div class="auth-container">
+      <button class="back-link-btn" @click="router.back()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -30,9 +32,22 @@
 
         <div class="info-summary-box">
           <div class="summary-row">
-            <span class="label">선택 옵션 번호</span>
-            <span class="value">{{ payload.product_option }}</span>
+            <span class="label">금융기관</span>
+            <span class="value">{{ option_detail.bank_name || '정보 없음' }}</span>
           </div>
+          <div class="summary-row">
+            <span class="label">상품명</span>
+            <span class="value">{{ option_detail.product_name || '정보 없음' }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">저축 기간</span>
+            <span class="value">{{ option_detail.save_trm }}개월</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">금리 ({{ option_detail.intr_rate_type_nm }})</span>
+            <span class="value">{{ option_detail.intr_rate }}% (최고 {{ option_detail.intr_rate2 }}%)</span>
+          </div>
+          
           <div class="summary-row total">
             <span class="label">최종 가입 금액</span>
             <span class="value-highlight">{{ payload.amounts.toLocaleString() }} 원</span>
@@ -47,13 +62,8 @@
           >
             가입 완료
           </button>
-          
-          <!-- <button @click="$router.back()" class="cancel-text-btn">
-            취소하기
-          </button> -->
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -61,11 +71,26 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
 import { useProductStore } from '@/stores/products'
-import { ref } from 'vue'
+import { useAccountStore } from '@/stores/accounts'
+import axios from 'axios'
+import { ref, onMounted } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
+const accountStore = useAccountStore()
 const productStore = useProductStore()
+
+// 초기값을 null 또는 객체로 설정하여 템플릿 접근 시 에러 방지
+const option_detail = ref({})
+
+const getOption = async (id) => {
+  try {
+    const response = await axios.get(`${accountStore.API_URL}/option/${id}`)
+    option_detail.value = response.data
+  } catch (err) {
+    console.error("옵션 정보를 불러오는데 실패했습니다.", err)
+  }
+}
 
 const payload = ref({
   product_option: route.params.id,
@@ -78,7 +103,7 @@ const onSubscribe = async () => {
     return
   }
 
-  if (confirm('정말로 이 상품에 가입하시겠습니까?')) {
+  if (confirm(`[${option_detail.value.product_name}]\n정말로 이 상품에 가입하시겠습니까?`)) {
     try {
       await productStore.subscribeProduct({
         product_option: payload.value.product_option,
@@ -92,6 +117,10 @@ const onSubscribe = async () => {
     }
   }
 }
+
+onMounted(async () => {
+  await getOption(route.params.id)
+})
 </script>
 
 <style scoped>

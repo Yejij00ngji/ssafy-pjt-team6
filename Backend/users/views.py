@@ -199,3 +199,12 @@ def get_user_status(request):
         "cluster_name": profile.cluster_name,
         "nickname": request.user.nickname
     }, status=200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getFinancialProfile(request):
+    financial_profile = get_object_or_404(FinancialProfile, user=request.user)
+
+    serializer = FinancialProfileSerializer(financial_profile)
+
+    return Response(serializer.data)

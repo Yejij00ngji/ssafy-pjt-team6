@@ -9,9 +9,14 @@ export const useRecommendationStore = defineStore('recommendation', () => {
   const accountStore = useAccountStore()
 
   const recommendations = ref([])
+  const persona = ref([])
 
   const setRecommendations = (data) => {
     recommendations.value = data
+  }
+
+  const setPersona = (data) => {
+    persona.value = data
   }
 
   const getRecommendations = async () => {
@@ -27,6 +32,7 @@ export const useRecommendationStore = defineStore('recommendation', () => {
       })
 
       recommendations.value = response.data.recommendations
+      persona.value = response.data.persona
 
     } catch (error) {
 
@@ -37,5 +43,5 @@ export const useRecommendationStore = defineStore('recommendation', () => {
     }
   }
 
-  return { recommendations, setRecommendations, getRecommendations }
+  return { recommendations, persona, setRecommendations, setPersona, getRecommendations }
 }, { persist: true })

@@ -81,6 +81,7 @@ export const useAccountStore = defineStore('account', () => {
     financial_profile.value = {}
 
     recommendationStore.setRecommendations([])
+    recommendationStore.setPersona([])
 
     router.push({ name: 'LoginView' })
   }

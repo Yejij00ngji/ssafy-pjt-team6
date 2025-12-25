@@ -99,6 +99,7 @@ const getRecommendations = async (userQueryText = "") => {
 
       recommendations.value = response.data.recommendations || []
       userPersona.value = response.data.persona || null
+      accountStore.financial_profile = response.data.profile
     } else {
       // 미동의자(설문): POST /recommendations/survey/
       const url = `${accountStore.API_URL}/recommendations/survey/`
@@ -110,10 +111,12 @@ const getRecommendations = async (userQueryText = "") => {
 
       // 응답 처리: recommendations + persona + profile 스냅샷 반영
       recommendations.value = response.data.recommendations || []
-      userPersona.value = {
-        name: (response.data.cluster_name || '').trim() || null,
-        label: response.data.cluster_label ?? null
-      }
+      // userPersona.value = {
+      //   name: (response.data.cluster_name || '').trim() || null,
+      //   label: response.data.cluster_label ?? null
+      // }
+
+      userPersona.value = response.data.persona || null
 
       // 서버가 보낸 profile 스냅샷이 있으면 Pinia 스토어에 즉시 반영
       if (response.data.profile) {
@@ -126,6 +129,7 @@ const getRecommendations = async (userQueryText = "") => {
     }
 
     recommendationStore.setRecommendations(recommendations.value)
+    recommendationStore.setPersona(userPersona.value)
     currentStep.value = 'result'
   } catch (error) {
     console.error("추천 데이터 로드 실패:", error)

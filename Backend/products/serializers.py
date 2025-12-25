@@ -159,3 +159,21 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
   def create(self, validated_data):
         return Subscription.objects.create(**validated_data)
+  
+class ShowOptionSerializer(serializers.ModelSerializer):
+    product_name = serializers.ReadOnlyField(source='product.fin_prdt_nm')
+    bank_name = serializers.ReadOnlyField(source='product.kor_co_nm')
+
+    class Meta:
+        model = ProductOption
+        fields = [
+            'id', 
+            'product',           # FinancialProduct의 모든 정보가 담김
+            'fin_prdt_cd', 
+            'intr_rate_type_nm', 
+            'save_trm', 
+            'intr_rate', 
+            'intr_rate2',
+            'product_name',
+            'bank_name',
+        ]

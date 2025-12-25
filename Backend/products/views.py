@@ -8,7 +8,7 @@ from django.db.models import Avg, Count, Prefetch
 
 from .models import ProductOption, FinancialProduct, Subscription
 from users.models import FinancialProfile
-from .serializers import ProductOptionSerializer, FinancialProductSerializer, FinancialProductDetailSerializer, SubscriptionSerializer, ProductOptionDetailSerializer
+from .serializers import ProductOptionSerializer, FinancialProductSerializer, FinancialProductDetailSerializer, SubscriptionSerializer, ProductOptionDetailSerializer, ShowOptionSerializer
 from .filters import ProductFilter
 
 from products.services.engine import recommend_products, save_recommendations
@@ -289,7 +289,6 @@ def update_mydata(request):
     
     # 2. 정보 업데이트 (부분 수정)
     profile.is_mydata_linked = True
-    save
     profile.save()
     
     # 3. 성공 응답 반환
@@ -297,6 +296,14 @@ def update_mydata(request):
         "message": "마이데이터 이용 동의가 완료되었습니다.",
         "is_mydata_linked": profile.is_mydata_linked,
     }, status=200)
+
+@api_view(['GET'])
+def show_option(request, option_id):
+    option = ProductOption.objects.get(id=option_id)
+
+    serializer = ShowOptionSerializer(option)
+
+    return Response(serializer.data)
 
 # views.py
 # @api_view(['GET'])

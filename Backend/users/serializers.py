@@ -89,24 +89,27 @@ class CustomGoogleSerializer(SocialLoginSerializer):
 class FinancialProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = FinancialProfile
-        # 요청에서 받을 5가지 필드 정의
+        # DB에 있는 필드들을 그대로 매핑합니다.
         fields = [
-            'balance_amt',
-            'invest_eval_amt',
             'annual_income_amt',
-            'monthly_paid_amt',
-            'withdrawable_amt'
+            'invest_eval_amt',
+            'balance_amt',
+            'withdrawable_amt',
+            'expense_growth_rate',
+            'expense_to_income_ratio',
+            'cluster_label',
+            'cluster_name',
         ]
+        # 클러스터 정보는 수동 입력 방지를 위해 읽기 전용으로 설정 가능합니다.
+        read_only_fields = ['cluster_label', 'cluster_name']
 
     def create(self, validated_data):
-        # view에서 넘겨준 user 객체를 꺼냅니다.
-        user = validated_data.pop('user')
+        # context에서 user를 가져오거나, 전달받은 데이터에서 추출
+        user = self.context.get('request').user
         
-        # update_or_create를 사용하여 기존 데이터가 있으면 덮어쓰고, 없으면 생성합니다.
+        # update_or_create로 기존 프로필이 있으면 업데이트, 없으면 신규 생성
         profile, created = FinancialProfile.objects.update_or_create(
             user=user,
-            defaults={
-                **validated_data,
-            }
+            defaults=validated_data
         )
         return profile

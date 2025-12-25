@@ -18,9 +18,8 @@
               </div>
               <p class="user-email">{{ accountStore.user?.email }}</p>
               <div class="tag-group">
-                <span v-if="accountStore.financial_profile?.tag" class="tag">#{{ accountStore.financial_profile.tag }}</span>
-                <span class="tag">#자산관리_꿈나무</span>
-                <span class="tag">#안전제일주의</span>
+                <span v-if="accountStore.financial_profile?.cluster_name" class="tag">#{{ accountStore.financial_profile.cluster_name }}</span>
+                <span v-if="accountStore.financial_profile?.annual_income_amt" class="tag">#연소득_{{ (accountStore.financial_profile.annual_income_amt / 10000).toLocaleString() }}만</span>
                 <span v-if="accountStore.user?.is_mydata_linked" class="tag" style="background: #E7F9F3; color: #00B06B;">#마이데이터_연동중</span>
               </div>
             </div>
@@ -47,11 +46,6 @@
               <input v-model="editData.password2" type="password" class="custom-input" placeholder="다시 입력" />
               <p v-if="passwordError" class="error-text">{{ passwordError }}</p>
             </div>
-            
-            <div class="input-item" style="flex-direction: row; align-items: center; gap: 10px; margin-top: 10px;">
-              <input type="checkbox" id="mydata-agree" v-model="editData.is_mydata_linked" style="width: 18px; height: 18px; cursor: pointer;" />
-              <label for="mydata-agree" style="margin-bottom: 0; cursor: pointer;">마이데이터 서비스 연동 동의</label>
-            </div>
 
             <div class="edit-actions" style="margin-top: 20px; display: flex; gap: 8px;">
               <button @click="updateFullProfile" class="btn-primary-small" style="background: #3182F6; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer;">저장</button>
@@ -63,26 +57,42 @@
 
       <div class="card persona-card">
         <div class="persona-content">
-
-          <div class="radar-placeholder">
-            <div class="persona-status">
+          <div class="persona-status-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div class="persona-label" style="font-size: 13px; font-weight: 600; color: #3182F6; background: #E8F3FF; padding: 4px 12px; border-radius: 20px;">AI 분석 리포트</div>
+            <div class="persona-status" style="font-size: 13px; color: #8B95A1;">
               <span class="status-dot" :class="{ active: accountStore.user?.is_mydata_linked }"></span>
-              {{ accountStore.user?.is_mydata_linked ? '마이데이터 연동 완료' : '마이데이터 미연동' }}
+              {{ accountStore.user?.is_mydata_linked ? '마이데이터 연동' : '데이터 미연동' }}
             </div>
           </div>
 
-          <div class="radar-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 160px; text-align: center;">
-            <template v-if="accountStore.financial_profile && accountStore.financial_profile.title">
-              <div class="persona-icon" style="font-size: 52px; margin-bottom: 16px;">{{ accountStore.financial_profile.icon }}</div>
-              <h4 style="font-size: 19px; font-weight: 700; color: #191F28; margin-bottom: 10px;">{{ accountStore.financial_profile.title }}</h4>
-              <p style="font-size: 14px; color: #4E5968; line-height: 1.6; word-break: keep-all; padding: 0 10px;">
-                {{ accountStore.financial_profile.description }}
+          <div class="persona-main" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 180px; text-align: center;">
+            <template v-if="recommendationStore.persona">
+              <div class="persona-icon" style="font-size: 56px; margin-bottom: 12px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));">
+                {{ recommendationStore.persona.icon }}
+              </div>
+              <h4 style="font-size: 22px; font-weight: 800; color: #191F28; margin-bottom: 8px;">
+                {{ recommendationStore.persona.name }}
+              </h4>
+              <p style="font-size: 15px; color: #4E5968; line-height: 1.6; word-break: keep-all; padding: 0 10px; margin-bottom: 20px;">
+                {{ recommendationStore.persona.description }}
               </p>
+              
+              <div class="financial-summary" style="display: flex; gap: 12px; width: 100%; justify-content: center; border-top: 1px solid #F2F4F6; pt: 20px; margin-top: 10px; padding-top: 20px;">
+                <div class="summary-item">
+                  <p style="font-size: 12px; color: #8B95A1; margin-bottom: 4px;">총 투자자산</p>
+                  <p style="font-size: 14px; font-weight: 700;">{{ (accountStore.financial_profile?.invest_eval_amt / 100000000).toFixed(1) }}억+</p>
+                </div>
+                <div style="width: 1px; background: #F2F4F6;"></div>
+                <div class="summary-item">
+                  <p style="font-size: 12px; color: #8B95A1; margin-bottom: 4px;">소비율</p>
+                  <p style="font-size: 14px; font-weight: 700; color: #F04452;">{{ (accountStore.financial_profile?.expense_to_income_ratio * 100).toFixed(1) }}%</p>
+                </div>
+              </div>
             </template>
             <template v-else>
               <div class="empty-persona" style="color: #8B95A1;">
-                <div style="font-size: 40px; margin-bottom: 12px; opacity: 0.5;">🤔</div>
-                <p style="font-size: 14px; line-height: 1.5;">분석된 페르소나가 없습니다.<br/>투자 성향 재진단을 진행해주세요.</p>
+                <div style="font-size: 40px; margin-bottom: 12px; opacity: 0.5;">🔍</div>
+                <p style="font-size: 14px; line-height: 1.5;">사용자님의 투자 성향을 분석 중입니다.<br/>진단을 완료해주세요.</p>
               </div>
             </template>
           </div>
@@ -92,27 +102,42 @@
 
     <section v-if="recommendationStore.recommendations?.length > 0" class="recommend-section">
       <div class="section-title-group">
-        <h3>머니:비가 찾은 <span class="highlight-text">꿀단지 TOP 3</span></h3>
-        <p class="subtitle">사용자님의 금융 성향과 딱 맞는 추천 상품이에요.</p>
+        <h3>머니:비가 찾은 <span class="highlight-text" style="color: #3182F6;">꿀단지 TOP 3</span></h3>
+        <p class="subtitle">사용자님의 투자 데이터와 성향을 교차 분석한 결과입니다.</p>
       </div>
       <div class="recommend-grid">
         <div 
-          v-for="(item, index) in recommendationStore.recommendations" 
-          :key="item.product_option_id" 
+          v-for="(item, index) in recommendationStore.recommendations.slice(0, 3)" 
+          :key="item.id" 
           class="recommend-card clickable-card"
           :class="{ 'best-pick': index === 0 }"
-          @click="goOptionApply(item.product_option_id)"
+          @click="goOptionApply(item.id)"
         >
-          <span v-if="index === 0" class="badge-best">BEST PICK</span>
-          <span class="rank-num">{{ index + 1 }}</span>
-          <p class="bank-name">{{ item.bank_name }}</p>
-          <h4 class="product-name">{{ item.product_name }}</h4>
-          <div class="rate-info">
-            <span class="rate-label">최대</span>
-            <span class="rate-value">{{ item.intr_rate2 }}%</span>
+          <span v-if="index === 0" class="badge-best">AI BEST</span>
+          <div class="card-header-info" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+             <span class="rank-num" style="font-size: 24px; font-weight: 800; color: #E5E8EB;">0{{ index + 1 }}</span>
+             <span class="save-term" style="font-size: 12px; background: #F2F4F6; padding: 4px 8px; border-radius: 6px; color: #4E5968;">{{ item.save_trm }}개월·{{ item.intr_rate_type_nm }}</span>
           </div>
-          <p class="recommend-reason">{{ (item.reason || item.ai_analysis?.reason || '').substring(0, 45) }}...</p>
-          <div class="hover-guide">가입하러 가기 ❯</div>
+          
+          <p class="bank-name" style="font-size: 13px; color: #8B95A1; margin-bottom: 4px; text-align: left;">{{ item.kor_co_nm }}</p>
+          <h4 class="product-name" style="font-size: 17px; font-weight: 700; color: #191F28; text-align: left; margin-bottom: 16px; height: 48px; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">{{ item.fin_prdt_nm }}</h4>
+          
+          <div class="rate-display" style="background: #F9FAFB; border-radius: 12px; padding: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="text-align: left;">
+              <span style="font-size: 11px; color: #8B95A1; display: block;">최고 금리</span>
+              <span class="rate-value" style="font-size: 20px; font-weight: 800; color: #3182F6;">{{ item.intr_rate2 }}%</span>
+            </div>
+            <div style="text-align: right;">
+              <span style="font-size: 11px; color: #8B95A1; display: block;">기본</span>
+              <span style="font-size: 14px; font-weight: 600; color: #4E5968;">{{ item.intr_rate }}%</span>
+            </div>
+          </div>
+
+          <p class="recommend-reason" style="font-size: 13px; color: #4E5968; text-align: left; line-height: 1.5; height: 60px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
+            {{ item.ai_analysis?.reason || '사용자님의 성향과 자산 현황을 고려했을 때 가장 높은 수익률이 기대되는 상품입니다.' }}
+          </p>
+          
+          <div class="hover-guide" style="margin-top: 16px; font-size: 13px; font-weight: 600; color: #3182F6; text-align: right;">자세히 보기 ❯</div>
         </div>
       </div>
     </section>
@@ -192,8 +217,7 @@ const editData = ref({
   nickname: '', 
   password1: '', 
   password2: '',
-
-  is_mydata_linked: false // 초기값 설정
+  is_mydata_linked: false 
 })
 
 const passwordError = computed(() => {
@@ -204,7 +228,7 @@ const passwordError = computed(() => {
 
 const openEditMode = () => {
   editData.value.nickname = accountStore.user?.nickname || ''
-  editData.value.is_mydata_linked = accountStore.user?.is_mydata_linked || false // 유저 정보 로드
+  editData.value.is_mydata_linked = accountStore.user?.is_mydata_linked || false 
   editData.value.password1 = ''
   editData.value.password2 = ''
   isEditMode.value = true
@@ -216,7 +240,6 @@ const updateFullProfile = async () => {
   if (passwordError.value) return alert(passwordError.value)
   const payload = { 
     nickname: editData.value.nickname,
-    is_mydata_linked: editData.value.is_mydata_linked
   }
   if (editData.value.password1) payload.password = editData.value.password1
   if (await accountStore.updateProfile(payload)) {
@@ -262,7 +285,7 @@ onMounted(async () => {
     productStore.getSubscriptions(),
     accountStore.getFinancialProfile()
   ])
-  if (recommendationStore.recommendations?.length == 0 && accountStore.user?.is_mydata_agreed){
+  if (recommendationStore.recommendations?.length == 0 && accountStore.user?.is_mydata_linked){
     await recommendationStore.getRecommendations()
   }
   renderChart()
@@ -292,7 +315,6 @@ watch(() => productStore.subscriptions, renderChart, { deep: true })
 .profile-section { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
 .avatar-bg { width: 80px; height: 80px; background: #F2F4F6; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #3182F6; font-size: 32px; font-weight: bold; }
 
-/* 유저 네임 및 수정 텍스트 스타일 수정 */
 .user-name { font-size: 26px; font-weight: 700; display: flex; align-items: baseline; gap: 8px; }
 .edit-text-link { font-size: 13px; font-weight: 500; color: #8B95A1; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 .edit-text-link:hover { color: #4E5968; }
@@ -307,12 +329,14 @@ watch(() => productStore.subscriptions, renderChart, { deep: true })
 .input-item { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
 .input-item label { font-size: 14px; font-weight: 600; color: #4E5968; }
 .error-text { color: #F04452; font-size: 12px; margin-top: 4px; }
-.recommend-section .subtitle { color: #4E5968; margin-top: 4px; }
+
+.recommend-section .subtitle { color: #8B95A1; margin-top: 4px; font-size: 15px; }
 .recommend-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 24px; }
-.recommend-card { background: #fff; border-radius: 24px; padding: 32px 24px; border: 1px solid #E5E8EB; text-align: center; position: relative; transition: 0.3s; }
-.recommend-card:hover { transform: translateY(-8px); border-color: #3182F6; box-shadow: 0 12px 32px rgba(0,0,0,0.05); }
-.badge-best { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #3182F6; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; }
-.rate-value { font-size: 22px; font-weight: 800; color: #3182F6; }
+.recommend-card { background: #fff; border-radius: 24px; padding: 24px; border: 1px solid #F2F4F6; transition: 0.3s; position: relative; cursor: pointer; }
+.recommend-card:hover { transform: translateY(-8px); border-color: #3182F6; box-shadow: 0 12px 32px rgba(49, 130, 246, 0.08); }
+.recommend-card.best-pick { border-color: #3182F6; background: linear-gradient(180deg, #FFFFFF 0%, #F0F7FF 100%); }
+.badge-best { position: absolute; top: -12px; left: 24px; background: #3182F6; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; }
+
 .list-table { margin-top: 16px; }
 .list-thead, .product-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1.2fr; align-items: center; padding: 20px 0; gap: 12px; }
 .list-thead { border-bottom: 1px solid #F2F4F6; }
