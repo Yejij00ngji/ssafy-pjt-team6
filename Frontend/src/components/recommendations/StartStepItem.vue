@@ -9,7 +9,7 @@
     <div class="card-group">
       <div 
         class="toss-card select-card" 
-        v-bind:class="isMyData ? 'is-linked' : ''"
+        :class="isMyData ? 'is-linked' : ''"
         @click="handleMyDataClick"
       >
         <span class="icon">{{ isMyData ? '✅' : '⚡️' }}</span>
@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits } from 'vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   isMyData: {
@@ -45,17 +45,25 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['next'])
+const router = useRouter()
 
 const handleMyDataClick = () => {
   if (props.isMyData) {
-    // 이미 연동된 유저라면 다음 단계로 이동
+    // 1. 이미 연동된 경우: LoadingItem -> ResultsStepItem으로 진행
     emit('next', { agreed: true })
   } else {
-    // 미동의(미연동) 유저라면 경고창을 띄우고 직접 입력으로 유도
-    window.alert("현재 마이데이터 연동이 되어 있지 않습니다.\n'직접 입력하기'를 통해 분석을 진행해 주세요.")
+    // 2. 미연동인 경우: 사용자에게 선택지 제공
+    const confirmConnect = window.confirm(
+      "현재 마이데이터가 연결되어 있지 않습니다.\n프로필 설정 페이지에서 자산을 연결하시겠습니까?"
+    )
     
-    // 알림창 확인 후 바로 직접 입력 단계로 넘겨버리려면 아래 주석을 해제하세요.
-    // emit('next', { agreed: false })
+    if (confirmConnect) {
+      // 프로필 수정 페이지(마이데이터 입력란이 있는 곳)로 이동
+      router.push({ name: 'ProfileUpdate' }) 
+    } else {
+      // 연결 안 할 경우 바로 설문 단계로 유도
+      emit('next', { agreed: false })
+    }
   }
 }
 </script>

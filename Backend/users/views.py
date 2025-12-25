@@ -82,6 +82,58 @@ def getClusterInfo(request):
     result = clusterMapper[profile.cluster_label]
     return Response(result)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])    
+def getClusterInfo(request):
+    # 1. DB에 저장된 사용자의 cluster_name(pkl 결과값)을 가져옵니다.
+    profile = FinancialProfile.objects.filter(user=request.user).first()
+
+    if not profile or profile.cluster_label is None:
+        return Response({})
+
+    # 2. UI용 메타데이터 (설명, 아이콘 등)
+    # pkl에서 나오는 cluster_name이 '안정저축형'이라고 가정
+    meta_mapper = {
+        "성실한 저축왕": {
+            'title': "성실하게 모으는 저축왕",
+            'icon': "🌱",
+            'description': "소득 대비 소비를 잘 관리하며 꾸준히 자산을 쌓아가고 계시네요!"
+        },
+        "YOLO족": {
+            'title': "현재의 행복이 중요한 욜로족",
+            'icon': "🌈",
+            'description': "지출 비중이 다소 높지만, 미래를 위한 준비를 시작해볼까요?"
+        },
+        "현금 홀더": {
+            'title': "현금을 든든하게 보유한 홀더",
+            'icon': "🏦",
+            'description': "자산의 유동성이 매우 좋으시네요. 이제 더 높은 금리의 상품으로 눈을 돌릴 때입니다."
+        },
+        "자산 관리 전문가": {
+            'title': "여유로운 자산 관리 전문가",
+            'icon': "💼",
+            'description': "높은 소득과 철저한 지출 관리로 가장 이상적인 금융 생활을 하고 계십니다."
+        },
+        "공격적 투자자": {
+            'title': "수익을 쫓는 공격적 투자자",
+            'icon': "🚀",
+            'description': "자산의 대부분을 적극적으로 운용하시는군요. 고수익을 위한 최적의 상품을 추천합니다."
+        },
+    }
+
+    # 3. DB에 저장된 이름에 맞는 메타데이터를 찾아 반환
+    # 만약 매퍼에 없으면 기본값(DB값)이라도 반환
+    info = meta_mapper.get(profile.cluster_name, {
+        'title': profile.cluster_name,
+        'icon': "💰",
+        'description': "사용자 맞춤형 분석 결과입니다."
+    })
+    
+    # tag는 DB에 저장된 이름을 그대로 사용 (pkl 데이터 반영)
+    info['tag'] = profile.cluster_name
+    
+    return Response(info)
+
 # 1. 에러 우회용 클라이언트 클래스 정의
 class ReliableOAuth2Client(OAuth2Client):
     def __init__(self, *args, **kwargs):
