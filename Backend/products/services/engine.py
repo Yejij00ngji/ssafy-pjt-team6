@@ -19,7 +19,6 @@ def recommend_products(user, top_n=3, user_query=None):
         for p in cluster_products
     }
 
-    # scored = []
 
     scored = []
     # 1단계: 모든 상품에 대해 마이데이터 유사도(Base Score)만 계산 (API 호출 X)

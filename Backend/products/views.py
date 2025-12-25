@@ -280,7 +280,6 @@ def update_mydata(request):
     
     # 2. 정보 업데이트 (부분 수정)
     profile.is_mydata_linked = True
-    save
     profile.save()
     
     # 3. 성공 응답 반환
