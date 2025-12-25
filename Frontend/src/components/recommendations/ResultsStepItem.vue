@@ -109,6 +109,14 @@ import { useAccountStore } from '@/stores/accounts';
 const router = useRouter()
 const accountStore = useAccountStore()
 
+// 1. 클러스터 정보를 담을 반응형 변수 (초기 에러 방지용 빈 객체)
+const currentCluster = ref({
+  tag: '분석 중...',
+  title: '',
+  icon: '',
+  description: ''
+})
+
 const props = defineProps({
   isMyData: Boolean,
   userName: { type: String, default: '사용자' },
@@ -178,12 +186,32 @@ const props = defineProps({
 const goOptionApply = (id) => {
   if (id) router.push({ name: 'Subscribe', params: { id: id } })
 }
+// 2. 백엔드의 getClusterInfo를 호출하는 함수
+const fetchClusterData = async () => {
+  try {
+    const res = await axios.get(`${accountStore.API_URL}/이미_설정된_경로/getClusterInfo/`, {
+      headers: { Authorization: `Token ${accountStore.token}` }
+    })
+    if (res.data && res.data.tag) {
+      currentCluster.value = res.data // 백엔드에서 준 {tag, title, icon...} 가 저장됨
+    }
+  } catch (err) {
+    console.error('클러스터 정보 로드 실패:', err)
+  }
+}
 
 onMounted(async () => {
-  await Promise.all([
-    accountStore.getFinancialProfile()
-  ])
+  // 클러스터 정보 가져오기
+  await fetchClusterData()
+  // 기존 프로필 정보 로드
+  await accountStore.getFinancialProfile()
 })
+
+// onMounted(async () => {
+//   await Promise.all([
+//     accountStore.getFinancialProfile()
+//   ])
+// })
 
 // 추천 신뢰도에 따라 CSS 클래스를 반환하는 함수
 const getConfidenceClass = (confidence) => {

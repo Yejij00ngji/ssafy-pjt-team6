@@ -7,11 +7,12 @@ from .models import User, FinancialProfile
 
 class CustomRegisterSerializer(RegisterSerializer):
     birth_date = serializers.DateField(required=False, allow_null=True)
-        # 필드명을 모델과 맞추어 is_mydata_linked로 변경 (혹은 기존 필드 유지 후 매핑)
-    is_mydata_linked = serializers.BooleanField(default=False)
+    # 필드명을 모델과 맞추어 is_mydata_linked로 변경 (혹은 기존 필드 유지 후 매핑)
+    is_mydata_linked = serializers.BooleanField(default=False, required=False)
 
     def get_cleaned_data(self):
-        data = super().get_cleaned_data()
+        data = super().get_cleaned_data()  # 부모 데이터 먼저
+        # 데이터가 없을 경우 none이나 기본값 할당
         data['birth_date'] = self.validated_data.get('birth_date')
         data['is_mydata_linked'] = self.validated_data.get('is_mydata_linked')
         return data
@@ -19,7 +20,10 @@ class CustomRegisterSerializer(RegisterSerializer):
     def save(self, request):
         # 1. 기본 유저 정보 저장
         user = super().save(request)
-        user.birth_date = self.validated_data.get('birth_date')
+        # 소셜 가입 시 birth_date가 없을 수 있으므로 안전하게 처리
+        birth_date = self.validated_data.get('birth_date')
+        if birth_date:
+            user.birth_date = birth_date
         
         if user.email:
             user.username = user.email

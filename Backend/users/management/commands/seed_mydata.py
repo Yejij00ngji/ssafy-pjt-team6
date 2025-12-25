@@ -3,10 +3,7 @@ import random
 import pandas as pd
 import joblib
 import os
-<<<<<<< HEAD
-=======
 from django.conf import settings
->>>>>>> feat/ai
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -113,19 +110,8 @@ class Command(BaseCommand):
         kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
         df['cluster'] = kmeans.fit_predict(scaled)
 
-<<<<<<< HEAD
-        # scaler_path = os.path.join(settings.ML_MODELS_DIR, 'financial_scaler_1.pkl')
-        # kmeans_path = os.path.join(settings.ML_MODELS_DIR, 'financial_kmeans_1.pkl')
-            
-        # joblib.dump(scaler, scaler_path)
-        # joblib.dump(kmeans, kmeans_path)
-
-        for _, row in df.iterrows():
-            FinancialProfile.objects.filter(id=row['id']).update(cluster_label=int(row['cluster']))  # 클러스터 라벨 저장 - 통계를 위해 int로 저장
-=======
         # 1. 클러스터별 평균 특징 계산
         summary = df.groupby('cluster').mean()
->>>>>>> feat/ai
 
         # 2. 특징에 따른 페르소나 매핑 (가장 두드러진 특징 기준)
         # 소득이 가장 높은 그룹 -> 자산 관리 전문가

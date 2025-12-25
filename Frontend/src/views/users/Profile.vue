@@ -18,15 +18,10 @@
               </div>
               <p class="user-email">{{ accountStore.user?.email }}</p>
               <div class="tag-group">
-<<<<<<< HEAD
                 <span v-if="accountStore.financial_profile?.tag" class="tag">#{{ accountStore.financial_profile.tag }}</span>
-                <span v-else class="tag">#자산관리_꿈나무</span>
-                <span v-if="accountStore.user?.is_mydata_agreed" class="tag" style="background: #E7F9F3; color: #00B06B;">#마이데이터_연동중</span>
-=======
                 <span class="tag">#자산관리_꿈나무</span>
                 <span class="tag">#안전제일주의</span>
                 <span v-if="accountStore.user?.is_mydata_linked" class="tag" style="background: #E7F9F3; color: #00B06B;">#마이데이터_연동중</span>
->>>>>>> feat/ai
               </div>
             </div>
           </div>
@@ -68,17 +63,12 @@
 
       <div class="card persona-card">
         <div class="persona-content">
-<<<<<<< HEAD
-          <div class="persona-status" style="margin-bottom: 20px; padding: 12px; background: #F9FAFB; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #4E5968;">
-            <span class="status-dot" :class="{ active: accountStore.user?.is_mydata_agreed }"></span>
-            {{ accountStore.user?.is_mydata_agreed ? '마이데이터 분석 정보 포함됨' : '마이데이터 미연동 상태' }}
-=======
+
           <div class="radar-placeholder">
             <div class="persona-status">
               <span class="status-dot" :class="{ active: accountStore.user?.is_mydata_linked }"></span>
               {{ accountStore.user?.is_mydata_linked ? '마이데이터 연동 완료' : '마이데이터 미연동' }}
             </div>
->>>>>>> feat/ai
           </div>
 
           <div class="radar-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 160px; text-align: center;">
@@ -202,11 +192,8 @@ const editData = ref({
   nickname: '', 
   password1: '', 
   password2: '',
-<<<<<<< HEAD
-  is_mydata_agreed: false 
-=======
+
   is_mydata_linked: false // 초기값 설정
->>>>>>> feat/ai
 })
 
 const passwordError = computed(() => {
@@ -217,11 +204,7 @@ const passwordError = computed(() => {
 
 const openEditMode = () => {
   editData.value.nickname = accountStore.user?.nickname || ''
-<<<<<<< HEAD
-  editData.value.is_mydata_agreed = accountStore.user?.is_mydata_agreed || false 
-=======
   editData.value.is_mydata_linked = accountStore.user?.is_mydata_linked || false // 유저 정보 로드
->>>>>>> feat/ai
   editData.value.password1 = ''
   editData.value.password2 = ''
   isEditMode.value = true
